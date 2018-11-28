@@ -1,5 +1,5 @@
 /**
- * Irrelon Lightstate - A very lightweight react-based state management library.
+ * Irrelon Nextstate - A high performance very lightweight react-based state management library.
  * MIT license.
  */
 import Emitter from 'irrelon-emitter';
