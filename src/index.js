@@ -55,8 +55,6 @@ const mapToStateData = (obj, overrides = {}) => {
 const useProps = (stateControllerMap, ComponentToWrap) => {
 	return class LightStateHOC extends React.Component {
 		static getInitialProps (ctx) {
-			console.log("Wrapped component getInitialProps");
-			
 			if (ComponentToWrap.getInitialProps) {
 				return ComponentToWrap.getInitialProps(ctx)
 					.then((dataProps) => {
@@ -74,7 +72,7 @@ const useProps = (stateControllerMap, ComponentToWrap) => {
 		
 		constructor (props) {
 			super(props);
-			console.log('Wrapped component constructor', props);
+			
 			const stateData = mapToStateData(stateControllerMap, props);
 			this._changeHandlers = {};
 			
