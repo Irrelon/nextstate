@@ -69,16 +69,14 @@ const mapToStateData = (obj, overrides = {}) => {
  * @returns {Class<React.Component>} The new HOC.
  */
 const useProps = (stateControllerMap, ComponentToWrap) => {
-	return class LightStateHOC extends React.Component {
+	return class IrrelonNextStateHOC extends React.Component {
 		static getInitialProps (ctx) {
 			if (ComponentToWrap.getInitialProps) {
 				return ComponentToWrap.getInitialProps(ctx)
 					.then((dataProps) => {
-						const stateData = mapToStateData(stateControllerMap);
-						
 						return {
 							...dataProps,
-							...stateData
+							...mapToStateData(stateControllerMap)
 						};
 					});
 			} else {
@@ -88,12 +86,10 @@ const useProps = (stateControllerMap, ComponentToWrap) => {
 		
 		constructor (props) {
 			super(props);
-			
-			const stateData = mapToStateData(stateControllerMap, props);
 			this._changeHandlers = {};
 			
 			this.state = {
-				...stateData
+				...mapToStateData(stateControllerMap, props)
 			};
 		}
 		
@@ -121,10 +117,10 @@ const useProps = (stateControllerMap, ComponentToWrap) => {
 		render () {
 			return (
 				<ComponentToWrap
-			{...this.props}
-			{...this.state}
-			/>
-		);
+					{...this.props}
+					{...this.state}
+				/>
+			);
 		}
 	};
 };
