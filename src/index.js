@@ -16,6 +16,22 @@ class StateController {
 	
 	update (data) {
 		if (!Object.is(this._data, data)) {
+			if (typeof this._data === 'object' && typeof data === 'object') {
+				// Mixin existing data
+				this._data = {
+					...this._data,
+					data
+				};
+			} else {
+				this._data = data;
+			}
+			
+			this.emit('change');
+		}
+	}
+	
+	overwrite (data) {
+		if (!Object.is(this._data, data)) {
 			this._data = data;
 			this.emit('change');
 		}
