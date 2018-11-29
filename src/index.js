@@ -20,7 +20,7 @@ class StateController {
 				// Mixin existing data
 				this._data = {
 					...this._data,
-					data
+					...data
 				};
 			} else {
 				this._data = data;
