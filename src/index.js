@@ -127,5 +127,6 @@ const useProps = (stateControllerMap, ComponentToWrap) => {
 
 export {
 	StateController,
-	useProps
+	useProps,
+	mapToStateData
 };
