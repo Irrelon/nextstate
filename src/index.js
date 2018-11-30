@@ -3,7 +3,10 @@
  * MIT license.
  */
 import Emitter from 'irrelon-emitter';
+import Path from 'irrelon-path';
 import React from "react";
+
+const pathSolver = new Path();
 
 /**
  * The StateController class manages states including their data
@@ -43,6 +46,10 @@ class StateController {
 	
 	find (query, options) {
 		return this._data;
+	}
+	
+	get (path) {
+		return pathSolver.get(this._data, path);
 	}
 }
 
