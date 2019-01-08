@@ -14,7 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "irrelon-emitter": "^2.0.11",
-    "irrelon-path": "^1.0.1",
+    "irrelon-path": "^1.0.2",
     "react": "^16.6.3"
   },
   "devDependencies": {
