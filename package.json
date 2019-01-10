@@ -1,6 +1,6 @@
 {
   "name": "irrelon-nextstate",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "High performance state management for Next.js without the crazy mess that redux creates.",
   "main": "lib/index.js",
   "files": [
@@ -13,7 +13,7 @@
   "author": "Rob Evans - Irrelon Software Limited",
   "license": "MIT",
   "dependencies": {
-    "irrelon-emitter": "^2.0.11",
+    "irrelon-emitter": "^2.0.12",
     "irrelon-path": "^1.0.2",
     "react": "^16.6.3"
   },
