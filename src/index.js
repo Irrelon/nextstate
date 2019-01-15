@@ -126,7 +126,7 @@ const useProps = (stateControllerMap, ComponentToWrap) => {
 			};
 		}
 		
-		componentDidMount () {
+		componentWillMount () {
 			Object.keys(stateControllerMap).forEach((key) => {
 				this._changeHandlers[key] = this.generateHandleChangeByKey(this, key, stateControllerMap[key]);
 				
