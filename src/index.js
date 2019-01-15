@@ -17,17 +17,43 @@ class StateController {
 		this._data = data;
 	}
 	
+	debugLog (msg) {
+		if (this._debug) {
+			console.log(`NextState Debug :: ${msg}`);
+		}
+	}
+	
+	debug (val) {
+		if (val !== undefined) {
+			this._debug = val;
+			return this;
+		}
+		
+		return this._debug;
+	}
+	
 	update (data) {
+		this.debugLog(`Asking to update state with ${JSON.stringify(data)}`);
+		
 		if (!Object.is(this._data, data)) {
+			this.debugLog(`Updating state with ${JSON.stringify(data)}`);
+			
 			if (typeof this._data === 'object' && typeof data === 'object') {
 				// Mixin existing data
+				this.debugLog(`Mixing in ${JSON.stringify(data)}`);
+				
 				this._data = {
 					...this._data,
 					...data
 				};
 			} else {
+				this.debugLog(`Assigning ${JSON.stringify(data)}`);
+				
 				this._data = data;
 			}
+			
+			this.debugLog(`Update completed, new data ${JSON.stringify(this._data)}`);
+			this.debugLog(`Emitting state change...`);
 			
 			this.emit('change');
 		}
@@ -59,7 +85,7 @@ Emitter(StateController);
 
 const mapToStateData = (obj, overrides = {}) => {
 	return Object.keys(obj).reduce((acc, key) => {
-		acc[key] = overrides[key] || obj[key].find();
+		acc[key] = overrides[key] || obj[key].value();
 		
 		return acc;
 	}, {});
@@ -103,20 +129,27 @@ const useProps = (stateControllerMap, ComponentToWrap) => {
 		componentDidMount () {
 			Object.keys(stateControllerMap).forEach((key) => {
 				this._changeHandlers[key] = this.generateHandleChangeByKey(this, key, stateControllerMap[key]);
+				
+				stateControllerMap[key].debugLog(`Hooking state change event for prop "${key}"`);
 				stateControllerMap[key].on('change', this._changeHandlers[key]);
 			});
 		}
 		
 		componentWillUnmount () {
 			Object.keys(stateControllerMap).forEach((key) => {
+				stateControllerMap[key].debugLog(`Unhooking state change event for prop "${key}"`);
 				stateControllerMap[key].off('change', this._changeHandlers[key]);
 			});
 		}
 		
 		generateHandleChangeByKey (componentInstance, key, stateController) {
+			stateController.debugLog(`Generating state change event handler for prop "${key}"`);
+			
 			return function () {
+				stateController.debugLog(`Updating prop "${key}" to ${JSON.stringify(stateController.value())}`);
+				
 				componentInstance.setState({
-					[key]: stateController.find()
+					[key]: stateController.value()
 				});
 			};
 		}
