@@ -127,6 +127,7 @@ const useProps = (stateControllerMap, ComponentToWrap) => {
 		}
 		
 		componentWillMount () {
+			ComponentToWrap.componentWillMount && ComponentToWrap.componentWillMount();
 			Object.keys(stateControllerMap).forEach((key) => {
 				this._changeHandlers[key] = this.generateHandleChangeByKey(this, key, stateControllerMap[key]);
 				
@@ -136,6 +137,7 @@ const useProps = (stateControllerMap, ComponentToWrap) => {
 		}
 		
 		componentWillUnmount () {
+			ComponentToWrap.componentWillUnmount && ComponentToWrap.componentWillUnmount();
 			Object.keys(stateControllerMap).forEach((key) => {
 				stateControllerMap[key].debugLog(`Unhooking state change event for prop "${key}"`);
 				stateControllerMap[key].off('change', this._changeHandlers[key]);
