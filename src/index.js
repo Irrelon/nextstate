@@ -13,13 +13,28 @@ const pathSolver = new Path();
  * and mutations.
  */
 class StateController {
-	constructor (data) {
+	constructor (data, options) {
 		this._data = data;
+		if (!options) {
+			return;
+		}
+		
+		this.name(options.name);
+		this.debug(options.debug);
+	}
+	
+	name (val) {
+		if (val !== undefined) {
+			this._name = val;
+			return this;
+		}
+		
+		return this._name;
 	}
 	
 	debugLog (msg) {
 		if (this._debug) {
-			console.log(`NextState Debug :: ${msg}`);
+			console.log(`NextState Debug :: ${this.name() || 'Unnamed'} :: ${msg}`);
 		}
 	}
 	
