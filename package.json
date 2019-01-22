@@ -13,7 +13,7 @@
   "author": "Rob Evans - Irrelon Software Limited",
   "license": "MIT",
   "dependencies": {
-    "irrelon-emitter": "^2.0.12",
+    "irrelon-emitter": "^2.0.16",
     "irrelon-path": "^1.0.2",
     "react": "^16.6.3"
   },
