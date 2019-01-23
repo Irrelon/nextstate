@@ -1,4 +1,5 @@
 import Emitter from 'irrelon-emitter';
+import {pathSolver} from "./utils";
 
 /**
  * The StateController class manages states including their data
@@ -6,7 +7,8 @@ import Emitter from 'irrelon-emitter';
  */
 class StateController {
 	constructor (data, options) {
-		this._data = data;
+		this._data = JSON.parse(JSON.stringify(data));
+		
 		if (!options) {
 			return;
 		}
@@ -68,7 +70,7 @@ class StateController {
 	
 	overwrite (data) {
 		if (!Object.is(this._data, data)) {
-			this._data = data;
+			this._data = JSON.parse(JSON.stringify(data));
 			this.emit('change');
 		}
 	}
