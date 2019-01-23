@@ -1,6 +1,6 @@
 {
   "name": "irrelon-nextstate",
-  "version": "1.1.9",
+  "version": "1.1.11",
   "description": "High performance state management for Next.js without the crazy mess that redux creates.",
   "main": "lib/index.js",
   "files": [
@@ -9,7 +9,8 @@
   "scripts": {
     "build": "npm test && rimraf lib && babel ./src/*.js --out-dir lib && rm ./lib/*.test.js",
     "test": "NODE_ENV=test jest **/*.test.js",
-    "publish": "npm build && npm publish"
+    "commit": "git commit -am \"New build\"",
+    "deploy": "npm run build && npm publish"
   },
   "author": "Rob Evans - Irrelon Software Limited",
   "license": "MIT",
