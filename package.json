@@ -7,24 +7,32 @@
     "lib/"
   ],
   "scripts": {
-    "build": "rimraf lib && babel src --out-dir lib",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rimraf lib && babel ./src/*.js --out-dir lib && rm ./lib/*.test.js",
+    "test": "NODE_ENV=test jest **/*.test.js"
   },
   "author": "Rob Evans - Irrelon Software Limited",
   "license": "MIT",
   "dependencies": {
     "irrelon-emitter": "^2.0.16",
     "irrelon-path": "^1.0.2",
-    "react": "^16.6.3"
+    "react": "^16.6.3",
+    "sinon": "^7.2.3"
   },
   "devDependencies": {
     "@babel/cli": "7.0.0-beta.42",
-    "@babel/core": "7.0.0-beta.42",
+    "@babel/core": "^7.0.0-beta.42",
     "@babel/plugin-proposal-class-properties": "7.0.0-beta.42",
     "@babel/plugin-proposal-object-rest-spread": "7.0.0-beta.42",
+    "@babel/polyfill": "7.0.0-beta.42",
     "@babel/preset-env": "7.0.0-beta.42",
     "@babel/preset-react": "7.0.0-beta.42",
+    "@babel/register": "7.0.0-beta.42",
+    "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^8.2.3",
+    "babel-jest": "^23.6.0",
+    "enzyme": "^3.8.0",
+    "enzyme-adapter-react-16": "^1.7.1",
+    "enzyme-to-json": "^3.3.5",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-config-prettier": "^2.9.0",
@@ -32,11 +40,25 @@
     "eslint-plugin-jsx": "0.0.2",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.8.2",
+    "jest": "^23.6.0",
+    "jsdom": "13.1.0",
+    "jsdom-global": "3.0.2",
+    "mocha": "^5.2.0",
     "react-dom": "^16.3.2",
-    "rimraf": "^2.6.2"
+    "regenerator-runtime": "^0.13.1",
+    "rimraf": "^2.6.2",
+	  "react-test-renderer": "latest"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/irrelon/irrelon-nextstate.git"
+  },
+  "jest": {
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
+    "setupFiles": [
+      "./jest.setup.js"
+    ]
   }
 }
