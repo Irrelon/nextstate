@@ -30,7 +30,8 @@
 			"anonymous": "always",
 			"named": "always",
 			"asyncArrow": "always"
-		}]
+		}],
+		"complexity": ["error", 5]
 	},
 	"parserOptions": {
 		"sourceType": "module",
