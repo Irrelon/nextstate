@@ -31,7 +31,14 @@ You can use your new state in various ways:
 import myAwesomeState from "./store/state/myAwesomeState";
 
 // Call to update the state. This data is spread internally
-// so it's like doing "state = {...currentState, ...newState}"
+// so it's like doing:
+//
+// state = {
+// 	...currentState,
+// 	...JSON.parse(
+// 		JSON.stringify(newState)
+// 	)
+// }
 myAwesomeState.update({
 	loading: true,
 	show: {

@@ -1,10 +1,10 @@
-const NextState = require('irrelon-nextstate');
+const {StateController} = require('irrelon-nextstate');
 const React = require('react');
 
-let counter = new NextState(0);
+let counter = new StateController(0);
 
 setInterval(() => {
-	counter++;
+	counter.update(counter.value() + 1);
 });
 
 class MyClass extends React.PureComponent {

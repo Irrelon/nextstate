@@ -7,7 +7,7 @@ const {get: pathGet} = require('irrelon-path');
  */
 class StateController {
 	constructor (data, options) {
-		this._data = JSON.parse(JSON.stringify(data));
+		this._data = this.decouple(data);
 		
 		if (!options) {
 			return;
@@ -15,6 +15,10 @@ class StateController {
 		
 		this.name(options.name);
 		this.debug(options.debug);
+	}
+	
+	decouple (data) {
+		return JSON.parse(JSON.stringify(data));
 	}
 	
 	name (val) {
@@ -44,35 +48,41 @@ class StateController {
 	update (data) {
 		this.debugLog(`(update) Asking to update state with ${JSON.stringify(data)}`);
 		
-		if (!Object.is(this._data, data)) {
-			this.debugLog(`(update) Updating state with ${JSON.stringify(data)}`);
-			
-			if (typeof this._data === 'object' && typeof data === 'object') {
-				// Mixin existing data
-				this.debugLog(`(update) Spreading ${JSON.stringify(data)}`);
-				
-				this._data = {
-					...this._data,
-					...data
-				};
-			} else {
-				this.debugLog(`(update) Assigning ${JSON.stringify(data)}`);
-				
-				this._data = data;
-			}
-			
-			this.debugLog(`(update) Update completed, new data ${JSON.stringify(this._data)}`);
-			this.debugLog(`(update) Emitting state change...`);
-			
-			this.emit('change');
+		if (Object.is(this._data, data)) {
+			return;
 		}
+		
+		this.debugLog(`(update) Updating state with ${JSON.stringify(data)}`);
+		
+		if (typeof this._data === 'object' && typeof data === 'object') {
+			// Mixin existing data
+			this.debugLog(`(update) Spreading ${JSON.stringify(data)}`);
+			
+			this._data = {
+				...this._data,
+				...this.decouple(data)
+			};
+		} else {
+			this.debugLog(`(update) Assigning ${JSON.stringify(data)}`);
+			
+			this._data = data;
+		}
+		
+		this.debugLog(`(update) Update completed, new data ${JSON.stringify(this._data)}`);
+		this.debugLog(`(update) Emitting state change...`);
+		
+		this.emit('change');
 	}
 	
 	overwrite (data) {
-		if (!Object.is(this._data, data)) {
-			this._data = JSON.parse(JSON.stringify(data));
-			this.emit('change');
+		if (Object.is(this._data, data)) {
+			return;
 		}
+		
+		this._data = {
+			...this.decouple(data)
+		};
+		this.emit('change');
 	}
 	
 	value () {

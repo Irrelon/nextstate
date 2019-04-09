@@ -9,10 +9,11 @@ import {mapToStateData, getDisplayName} from "./utils";
  * used to access the value (state controller) data.
  * @param {React.Component} ComponentToWrap The react component to wrap in this
  * HOC so that it will receive new props when state data changes.
- * @returns {{$$typeof, render}} The new HOC.
+ * @param {Object=} options An options object used to set flags like debug.
+ * @returns {React.PureComponent} The new HOC.
  */
-const useProps = (stateControllerMap, ComponentToWrap, options = {}) => {
-	class IrrelonNextStateHOC extends React.Component {
+const useProps = (stateControllerMap, ComponentToWrap, options = {debug: false}) => {
+	class IrrelonNextStateHOC extends React.PureComponent {
 		static getInitialProps (ctx) {
 			if (ComponentToWrap.getInitialProps) {
 				return ComponentToWrap.getInitialProps(ctx)
@@ -50,30 +51,31 @@ const useProps = (stateControllerMap, ComponentToWrap, options = {}) => {
 		
 		componentWillMount () {
 			// Only hook changes client-side
-			if (process && process.browser) {
-				this.debugLog('(componentWillMount) Generating state event listeners...');
-				
-				Object.keys(stateControllerMap).forEach((key) => {
-					this._changeHandlers[key] = this.generateHandleChangeByKey(this, key, stateControllerMap[key]);
-					
-					stateControllerMap[key].debugLog(`(componentWillMount) Hooking state change event for prop "${key}"`);
-					stateControllerMap[key].on('change', this._changeHandlers[key]);
-				});
-				
+			if (!process || !process.browser) {
+				this.debugLog('(componentWillMount) Event listeners not generated because we are running server-side');
 				return;
 			}
 			
-			this.debugLog('(componentWillMount) Event listeners not generated because we are running server-side');
+			this.debugLog('(componentWillMount) Generating state event listeners...');
+			
+			Object.keys(stateControllerMap).forEach((key) => {
+				this._changeHandlers[key] = this.generateHandleChangeByKey(this, key, stateControllerMap[key]);
+				
+				stateControllerMap[key].debugLog(`(componentWillMount) Hooking state change event for prop "${key}"`);
+				stateControllerMap[key].on('change', this._changeHandlers[key]);
+			});
 		}
 		
 		componentWillUnmount () {
 			// Only un-hook changes client-side
-			if (process && process.browser) {
-				Object.keys(stateControllerMap).forEach((key) => {
-					stateControllerMap[key].debugLog(`(componentWillUnmount) Unhooking state change event for prop "${key}"`);
-					stateControllerMap[key].off('change', this._changeHandlers[key]);
-				});
+			if (!process || !process.browser) {
+				return;
 			}
+			
+			Object.keys(stateControllerMap).forEach((key) => {
+				stateControllerMap[key].debugLog(`(componentWillUnmount) Unhooking state change event for prop "${key}"`);
+				stateControllerMap[key].off('change', this._changeHandlers[key]);
+			});
 		}
 		
 		generateHandleChangeByKey (componentInstance, key, stateController) {

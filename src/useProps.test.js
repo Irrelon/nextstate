@@ -18,17 +18,35 @@ const state = new StateController({
 class InnerComponent extends React.Component {
 	render () {
 		return (
-			<div>{this.props.componentData.testVal}</div>
+			<div>{JSON.stringify(this.props.componentData.testVal)}</div>
 		);
 	}
 }
 
 const WrappedComponent = useProps({componentData: state}, InnerComponent, {debug: false});
 
+let changeEventCount = 0;
+
+state.on("change", () => {
+	changeEventCount++;
+});
+
+beforeEach(() => {
+	changeEventCount = 0;
+});
+
 describe('useProps', () => {
-	it('WrappedComponent should render the correct state data before and after state updates', () => {
+	it('WrappedComponent should render the correct boolean state data before and after state updates', () => {
 		let testRenderer,
 			testInstance;
+		
+		expect(changeEventCount).toBe(0);
+		
+		state.update({
+			testVal: true
+		});
+		
+		expect(changeEventCount).toBe(1);
 		
 		testRenderer = TestRenderer.create(
 			<WrappedComponent />
@@ -42,7 +60,40 @@ describe('useProps', () => {
 			testVal: false
 		});
 		
-		expect(testInstance.findByType(InnerComponent).props.componentData.testVal).toBe(false);
+		expect(changeEventCount).toBe(2);
 		
+		expect(testInstance.findByType(InnerComponent).props.componentData.testVal).toBe(false);
+	});
+	
+	it('WrappedComponent should render the correct object state data before and after state updates', () => {
+		let testRenderer,
+			testInstance;
+		
+		const stateObj = {
+			testVal: {
+				foo: true
+			}
+		};
+		
+		expect(changeEventCount).toBe(0);
+		
+		state.update(stateObj);
+		
+		expect(changeEventCount).toBe(1);
+		
+		testRenderer = TestRenderer.create(
+			<WrappedComponent />
+		);
+		testInstance = testRenderer.root;
+		
+		expect(testInstance.findByType(InnerComponent).props.componentData.testVal.foo).toBe(true);
+		
+		// Update the state and see if the new state is reflected in the component
+		stateObj.testVal.foo = false;
+		state.update(stateObj);
+		
+		expect(changeEventCount).toBe(2);
+		
+		expect(testInstance.findByType(InnerComponent).props.componentData.testVal.foo).toBe(false);
 	});
 });
