@@ -1,7 +1,3 @@
-import Path from 'irrelon-path';
-
-const pathSolver = new Path();
-
 const mapToStateData = (obj, overrides = {}, debugLog) => {
 	return Object.keys(obj).reduce((acc, key) => {
 		acc[key] = overrides[key] || obj[key].value();
@@ -16,7 +12,6 @@ const getDisplayName = (WrappedComponent) => {
 };
 
 export {
-	pathSolver,
 	mapToStateData,
 	getDisplayName
-}
+};

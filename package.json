@@ -1,6 +1,6 @@
 {
   "name": "irrelon-nextstate",
-  "version": "1.1.13",
+  "version": "1.1.14",
   "description": "High performance state management for Next.js without the crazy mess that redux creates.",
   "main": "lib/index.js",
   "files": [
@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "irrelon-emitter": "^2.0.16",
-    "irrelon-path": "^1.0.2",
+    "irrelon-path": "^2.0.2",
     "react": "^16.6.3",
     "sinon": "^7.2.3"
   },
@@ -49,7 +49,7 @@
     "react-dom": "^16.3.2",
     "regenerator-runtime": "^0.13.1",
     "rimraf": "^2.6.2",
-	  "react-test-renderer": "latest"
+    "react-test-renderer": "latest"
   },
   "repository": {
     "type": "git",

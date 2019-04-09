@@ -1,5 +1,5 @@
 import Emitter from 'irrelon-emitter';
-import {pathSolver} from "./utils";
+const {get: pathGet} = require('irrelon-path');
 
 /**
  * The StateController class manages states including their data
@@ -84,7 +84,7 @@ class StateController {
 	}
 	
 	get (path) {
-		return pathSolver.get(this._data, path);
+		return pathGet(this._data, path);
 	}
 }
 
