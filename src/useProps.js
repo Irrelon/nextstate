@@ -35,35 +35,34 @@ const useProps = (stateControllerMap, ComponentToWrap, options = {debug: false})
 		constructor (props) {
 			super(props);
 			
-			this.debugLog('(constructor) Asking to map state controller data to props...');
+			this.debugLog(`(constructor) *${this.props.debugTag || this.constructor.displayName}* Asking to map state controller data to props...`);
 			this._changeHandlers = this._changeHandlers || {};
 			
 			this.state = {
 				...mapToStateData(stateControllerMap, this.props)
 			};
+			
+			// Only hook changes client-side
+			if (!process || !process.browser) {
+				this.debugLog(`(constructor) *${this.props.debugTag || this.constructor.displayName}* Event listeners not generated because we are running server-side`);
+				return;
+			}
+			
+			this.debugLog(`(constructor) *${this.props.debugTag || this.constructor.displayName}* Generating state event listeners...`);
+			
+			Object.keys(stateControllerMap).forEach((key) => {
+				const stateController = stateControllerMap[key];
+				this._changeHandlers[key] = this.generateHandleChangeByKey(this, key, stateController);
+				
+				stateController.debugLog(`(constructor) *${this.props.debugTag || this.constructor.displayName}* Hooking state change event for prop "${key}" in "${stateController.name()}"`);
+				stateController.on('change', this._changeHandlers[key]);
+			});
 		}
 		
 		debugLog (msg) {
 			if (options.debug) {
 				console.log(`NextState useProps :: ${msg}`);
 			}
-		}
-		
-		componentWillMount () {
-			// Only hook changes client-side
-			if (!process || !process.browser) {
-				this.debugLog('(componentWillMount) Event listeners not generated because we are running server-side');
-				return;
-			}
-			
-			this.debugLog('(componentWillMount) Generating state event listeners...');
-			
-			Object.keys(stateControllerMap).forEach((key) => {
-				this._changeHandlers[key] = this.generateHandleChangeByKey(this, key, stateControllerMap[key]);
-				
-				stateControllerMap[key].debugLog(`(componentWillMount) Hooking state change event for prop "${key}"`);
-				stateControllerMap[key].on('change', this._changeHandlers[key]);
-			});
 		}
 		
 		componentWillUnmount () {
@@ -73,18 +72,19 @@ const useProps = (stateControllerMap, ComponentToWrap, options = {debug: false})
 			}
 			
 			Object.keys(stateControllerMap).forEach((key) => {
-				const changeHandlers = this._changeHandlers[key];
+				const changeHandler = this._changeHandlers[key];
+				const stateController = stateControllerMap[key];
 				
-				stateControllerMap[key].debugLog(`(componentWillUnmount) Unhooking state change event for prop "${key}" (${changeHandlers.length} hooks found)`);
-				stateControllerMap[key].off('change', changeHandlers);
+				stateControllerMap[key].debugLog(`(componentWillUnmount) *${this.props.debugTag || this.constructor.displayName}* Unhooking state change event for prop "${key}" in "${stateController.name()}"`);
+				stateControllerMap[key].off('change', changeHandler);
 			});
 		}
 		
 		generateHandleChangeByKey (componentInstance, key, stateController) {
-			stateController.debugLog(`(generateHandleChangeByKey) Generating state change event handler for prop "${key}"`);
+			stateController.debugLog(`(generateHandleChangeByKey) *${componentInstance.props.debugTag || componentInstance.constructor.displayName}* Generating state change event handler for prop "${key} in "${stateController.name()}"`);
 			
 			return function changeHandler () {
-				stateController.debugLog(`(changeHandler) Updating prop "${key}" to ${JSON.stringify(stateController.value())}`);
+				stateController.debugLog(`(changeHandler) *${componentInstance.props.debugTag || componentInstance.constructor.displayName}* Updating prop "${key}" to ${JSON.stringify(stateController.value())}`);
 				
 				componentInstance.setState({
 					[key]: stateController.value()
