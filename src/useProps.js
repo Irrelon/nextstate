@@ -73,8 +73,10 @@ const useProps = (stateControllerMap, ComponentToWrap, options = {debug: false})
 			}
 			
 			Object.keys(stateControllerMap).forEach((key) => {
-				stateControllerMap[key].debugLog(`(componentWillUnmount) Unhooking state change event for prop "${key}"`);
-				stateControllerMap[key].off('change', this._changeHandlers[key]);
+				const changeHandlers = this._changeHandlers[key];
+				
+				stateControllerMap[key].debugLog(`(componentWillUnmount) Unhooking state change event for prop "${key}" (${changeHandlers.length} hooks found)`);
+				stateControllerMap[key].off('change', changeHandlers);
 			});
 		}
 		
