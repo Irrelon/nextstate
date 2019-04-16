@@ -12,7 +12,7 @@ import {mapToStateData, getDisplayName} from "./utils";
  * @param {Object=} options An options object used to set flags like debug.
  * @returns {React.PureComponent} The new HOC.
  */
-const useProps = (stateControllerMap, ComponentToWrap, options = {debug: false}) => {
+const useProps = (stateControllerMap, ComponentToWrap, options = {"debug": false}) => {
 	class IrrelonNextStateHOC extends React.PureComponent {
 		static getInitialProps (ctx) {
 			if (ComponentToWrap.getInitialProps) {
@@ -42,6 +42,8 @@ const useProps = (stateControllerMap, ComponentToWrap, options = {debug: false})
 				...mapToStateData(stateControllerMap, this.props)
 			};
 			
+			this.debugLog(`(constructor) *${this.props.debugTag || this.constructor.displayName}* Initial component internal state`, this.state);
+			
 			// Only hook changes client-side
 			if (!process || !process.browser) {
 				this.debugLog(`(constructor) *${this.props.debugTag || this.constructor.displayName}* Event listeners not generated because we are running server-side`);
@@ -55,7 +57,7 @@ const useProps = (stateControllerMap, ComponentToWrap, options = {debug: false})
 				this._changeHandlers[key] = this.generateHandleChangeByKey(this, key, stateController);
 				
 				stateController.debugLog(`(constructor) *${this.props.debugTag || this.constructor.displayName}* Hooking state change event for prop "${key}" in "${stateController.name()}"`);
-				stateController.on('change', this._changeHandlers[key]);
+				stateController.on("change", this._changeHandlers[key]);
 			});
 		}
 		
@@ -76,7 +78,7 @@ const useProps = (stateControllerMap, ComponentToWrap, options = {debug: false})
 				const stateController = stateControllerMap[key];
 				
 				stateControllerMap[key].debugLog(`(componentWillUnmount) *${this.props.debugTag || this.constructor.displayName}* Unhooking state change event for prop "${key}" in "${stateController.name()}"`);
-				stateControllerMap[key].off('change', changeHandler);
+				stateControllerMap[key].off("change", changeHandler);
 			});
 		}
 		
