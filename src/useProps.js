@@ -1,5 +1,6 @@
 import React from "react";
 import {mapToStateData, getDisplayName} from "./utils";
+import {NextStateStoreContext} from "./Context";
 
 /**
  * Wraps the given component in a HOC that controls the props for the wrapped
@@ -28,6 +29,10 @@ const useProps = (stateControllerMap, ComponentToWrap, options = {"debug": false
 						};
 					});
 			} else {
+				if (options.debug) {
+					console.log(`NextState useProps :: (getInitialProps) ComponentToWrap has no getIntialProps, asking to map state controller data to props...`);
+				}
+				
 				return mapToStateData(stateControllerMap);
 			}
 		}
@@ -98,11 +103,20 @@ const useProps = (stateControllerMap, ComponentToWrap, options = {"debug": false
 			const {forwardedRef, ...otherProps} = this.props;
 			
 			return (
-				<ComponentToWrap
-					ref={forwardedRef}
-					{...otherProps}
-					{...this.state}
-				/>
+				<NextStateStoreContext.Provider value={this.state}>
+					<NextStateStoreContext.Consumer>
+						{(consumerStateData) => {
+							console.log("Updating consumer data...", consumerStateData);
+							return (
+								<ComponentToWrap
+									ref={forwardedRef}
+									{...otherProps}
+									{...consumerStateData}
+								/>
+							);
+						}}
+					</NextStateStoreContext.Consumer>
+				</NextStateStoreContext.Provider>
 			);
 		}
 	}

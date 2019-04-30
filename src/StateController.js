@@ -4,16 +4,6 @@ import React from "react";
 const {"get": pathGet} = require("irrelon-path");
 const stateStore = require("./stateStore");
 
-// The current implementation of the state system doesn't allow for new contexts to be created
-// for each server request which is why we limit it to working client-side at the moment but
-// the best thing to do is allow the system to signal to us that we are dealing with a new
-// request server-side and to create a new context of some time that is short lived and only
-// exists as a reference for the life of the individual request currently running
-
-// Need to work out how to do that. At the moment we export singletons from the state folder
-// and those singletons will be long lived and apply to every request instead of only relating
-// to an individual request only.
-
 /**
  * The StateController class manages states including their data
  * and mutations.
@@ -98,7 +88,7 @@ class StateController {
 			stateStore.setState(name, data);
 		}
 		
-		this.debugLog(`(update) Update completed, new data ${JSON.stringify(this._data)}`);
+		this.debugLog(`(update) Update completed, new data ${JSON.stringify(stateStore.getState(name))}`);
 		this.debugLog(`(update) Emitting state change...`);
 		
 		this.emit("change");

@@ -8,10 +8,19 @@ const mapToStateData = (obj, overrides = {}, debugLog) => {
 };
 
 const getDisplayName = (WrappedComponent) => {
-	return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+	return WrappedComponent.displayName || WrappedComponent.name || "Component";
+};
+
+const decouple = (data) => {
+	if (typeof data !== "object") {
+		return data;
+	}
+	
+	return JSON.parse(JSON.stringify(data));
 };
 
 export {
 	mapToStateData,
-	getDisplayName
+	getDisplayName,
+	decouple
 };
