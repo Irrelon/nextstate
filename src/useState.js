@@ -2,9 +2,9 @@ import React from "react";
 
 const useState = (stateMap, ComponentToWrap) => {
 	return class UseStateHOC extends React.Component {
-		static getInitialProps (req) {
+		static getInitialProps (ctx) {
 			if (ComponentToWrap.getInitialProps) {
-				return ComponentToWrap.getInitialProps(req);
+				return ComponentToWrap.getInitialProps(ctx);
 			} else {
 				return {};
 			}
@@ -26,7 +26,7 @@ const useState = (stateMap, ComponentToWrap) => {
 				};
 			}, ComponentToWrap);
 			
-			return <ConsumedStates>{this.props.children}</ConsumedStates>;
+			return <ConsumedStates {...this.props}>{this.props.children}</ConsumedStates>;
 		}
 	};
 };

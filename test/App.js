@@ -13,7 +13,7 @@ class App extends React.PureComponent {
 	render () {
 		return (
 			<ProvideState stateArr={[state1, state2]}>
-				<InnerComponent>
+				<InnerComponent someProp={"true dat"}>
 					{this.props.children}
 				</InnerComponent>
 			</ProvideState>

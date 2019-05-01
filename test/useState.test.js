@@ -42,6 +42,7 @@ describe("useState", function () {
 		);
 		
 		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1, true);
+		assert.strictEqual(testRenderer.find("InnerComponent").props().someProp, "true dat");
 		
 		// Update the state and see if the new state is reflected in the component
 		state1.update(false);

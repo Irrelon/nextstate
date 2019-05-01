@@ -56,13 +56,13 @@ var useState = function useState(stateMap, ComponentToWrap) {
               });
             };
           }, ComponentToWrap);
-          return _react["default"].createElement(ConsumedStates, null, this.props.children);
+          return _react["default"].createElement(ConsumedStates, this.props, this.props.children);
         }
       }], [{
         key: "getInitialProps",
-        value: function getInitialProps(req) {
+        value: function getInitialProps(ctx) {
           if (ComponentToWrap.getInitialProps) {
-            return ComponentToWrap.getInitialProps(req);
+            return ComponentToWrap.getInitialProps(ctx);
           } else {
             return {};
           }
