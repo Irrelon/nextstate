@@ -1,6 +1,6 @@
 {
   "name": "irrelon-nextstate",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "High performance state management for Next.js without the crazy mess that redux creates.",
   "main": "dist/index.js",
   "files": [
