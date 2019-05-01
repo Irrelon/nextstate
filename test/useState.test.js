@@ -52,6 +52,30 @@ describe("useState", function () {
 		testRenderer.unmount();
 	});
 	
+	it("InnerComponent should be passed the correct number state data before and after state updates", function () {
+		let testRenderer;
+		
+		assert.strictEqual(changeEventCount, 0);
+		
+		state1.update(0);
+		
+		assert.strictEqual(changeEventCount, 1);
+		
+		testRenderer = mount(
+			<App />
+		);
+		
+		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1, 0);
+		
+		// Update the state and see if the new state is reflected in the component
+		state1.update(2);
+		
+		assert.strictEqual(changeEventCount, 2);
+		testRenderer.update();
+		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1, 2);
+		testRenderer.unmount();
+	});
+	
 	it("InnerComponent should be passed the correct object key/val boolean state data before and after state updates", () => {
 		let testRenderer,
 			testInstance;
