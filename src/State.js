@@ -9,9 +9,6 @@ import Provider from "./Provider";
 
 class State {
 	constructor (name, initialData, options) {
-		const Log = require("irrelon-log");
-		const log = new Log(`State :: ${name}`);
-		
 		this._Context = React.createContext(initialData);
 		this._name = name;
 		
@@ -24,22 +21,18 @@ class State {
 		this.update = (data) => {
 			if (typeof data === "function") {
 				// Call the function to get the update data
-				log.info("Asking function for new state data value...");
 				const newData = data(storeGetState(name));
 				
-				log.info("Asking store to update state value");
 				storeSetState(name, newData, options);
 				this.emit("change");
 				return;
 			}
 			
-			log.info("Asking store to update state value");
 			storeSetState(name, data, options);
 			this.emit("change");
 		};
 		
 		this.value = () => {
-			//log.info("Asking store for existing state value");
 			return storeGetState(name);
 		};
 		
@@ -48,7 +41,6 @@ class State {
 		};
 		
 		this.Provider = (props) => {
-			log.info("Rendering state provider");
 			return (
 				<Provider state={this}>
 					{props.children}

@@ -1,8 +1,6 @@
 import React from "react";
 
 const Context = React.createContext(null);
-const Log = require("irrelon-log");
-const log = new Log("Store");
 const Emitter = require("irrelon-emitter");
 const events = new Emitter();
 
@@ -11,7 +9,6 @@ let storeObj;
 const getStore = (initialData) => {
 	if (!process || !process.browser) {
 		// Init a new store object whenever we are on the server
-		log.info("Init on server");
 		storeObj = {...initialData};
 		events.emit("store");
 		return;
@@ -21,24 +18,20 @@ const getStore = (initialData) => {
 		return;
 	}
 	
-	log.info("Init on client");
 	storeObj = {...initialData};
 	events.emit("store");
 };
 
 const getState = (name) => {
 	if (!storeObj) {
-		log.info(`Ignoring store get state for "${name}" as we have no store object!`);
 		return;
 	}
 	
-	log.info(`Getting state for "${name}" as ${JSON.stringify(storeObj[name])}`);
 	return storeObj[name];
 };
 
 const setState = (name, val, options = {}) => {
 	if (storeObj) {
-		log.info(`Setting state for "${name}" to ${JSON.stringify(val)}`);
 		storeObj[name] = val;
 		events.emit("change");
 		return;
@@ -47,9 +40,7 @@ const setState = (name, val, options = {}) => {
 	// Hook when we get a store
 	if (!process || !process.browser) {
 		// On server, we listen for store init every time it is emitted
-		log.info(`Waiting for store to become available on server...`);
 		events.on("store", () => {
-			log.info(`Store became available on server`);
 			setState(name, val, options);
 		});
 		
@@ -63,9 +54,7 @@ const setState = (name, val, options = {}) => {
 	// initOnClient as true since we want the server to tell us
 	// what the initial value should be
 	if (options.initOnClient === true) {
-		log.info(`Waiting for store to become available on client...`);
 		events.once("store", () => {
-			log.info(`Store became available on client`);
 			setState(name, val, options);
 		});
 	}

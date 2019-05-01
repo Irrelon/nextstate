@@ -1,6 +1,4 @@
 import React from "react";
-const Log = require("irrelon-log");
-const log = new Log(`useState`);
 
 const useState = (stateMap, ComponentToWrap) => {
 	return class UseStateHOC extends React.Component {
@@ -22,7 +20,6 @@ const useState = (stateMap, ComponentToWrap) => {
 					
 					return (<Context.Consumer>
 						{(stateData) => {
-							log.info(`Consumed context data for ${stateName} as ${JSON.stringify(stateData)}`);
 							return <PreviousComponent {...stateRenderProps} {...{[stateName]: stateData}}>{stateRenderProps.children}</PreviousComponent>
 						}}
 					</Context.Consumer>)
