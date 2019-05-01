@@ -33,10 +33,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var Context = _react["default"].createContext(null);
 
-var Log = require("irrelon-log");
-
-var log = new Log("Store");
-
 var Emitter = require("irrelon-emitter");
 
 var events = new Emitter();
@@ -46,7 +42,6 @@ var storeObj;
 var getStore = function getStore(initialData) {
   if (!process || !process.browser) {
     // Init a new store object whenever we are on the server
-    log.info("Init on server");
     storeObj = _objectSpread({}, initialData);
     events.emit("store");
     return;
@@ -56,7 +51,6 @@ var getStore = function getStore(initialData) {
     return;
   }
 
-  log.info("Init on client");
   storeObj = _objectSpread({}, initialData);
   events.emit("store");
 };
@@ -65,11 +59,9 @@ exports.getStore = getStore;
 
 var getState = function getState(name) {
   if (!storeObj) {
-    log.info("Ignoring store get state for \"".concat(name, "\" as we have no store object!"));
     return;
   }
 
-  log.info("Getting state for \"".concat(name, "\" as ").concat(JSON.stringify(storeObj[name])));
   return storeObj[name];
 };
 
@@ -79,7 +71,6 @@ var setState = function setState(name, val) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   if (storeObj) {
-    log.info("Setting state for \"".concat(name, "\" to ").concat(JSON.stringify(val)));
     storeObj[name] = val;
     events.emit("change");
     return;
@@ -88,9 +79,7 @@ var setState = function setState(name, val) {
 
   if (!process || !process.browser) {
     // On server, we listen for store init every time it is emitted
-    log.info("Waiting for store to become available on server...");
     events.on("store", function () {
-      log.info("Store became available on server");
       setState(name, val, options);
     });
     return;
@@ -103,9 +92,7 @@ var setState = function setState(name, val) {
 
 
   if (options.initOnClient === true) {
-    log.info("Waiting for store to become available on client...");
     events.once("store", function () {
-      log.info("Store became available on client");
       setState(name, val, options);
     });
   }

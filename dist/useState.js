@@ -31,10 +31,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var Log = require("irrelon-log");
-
-var log = new Log("useState");
-
 var useState = function useState(stateMap, ComponentToWrap) {
   return (
     /*#__PURE__*/
@@ -56,7 +52,6 @@ var useState = function useState(stateMap, ComponentToWrap) {
               var stateItem = stateMap[stateName];
               var Context = stateItem.context();
               return _react["default"].createElement(Context.Consumer, null, function (stateData) {
-                log.info("Consumed context data for ".concat(stateName, " as ").concat(JSON.stringify(stateData)));
                 return _react["default"].createElement(PreviousComponent, _extends({}, stateRenderProps, _defineProperty({}, stateName, stateData)), stateRenderProps.children);
               });
             };

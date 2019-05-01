@@ -22,9 +22,6 @@ var State = function State(name, initialData, options) {
 
   _classCallCheck(this, State);
 
-  var Log = require("irrelon-log");
-
-  var log = new Log("State :: ".concat(name));
   this._Context = _react["default"].createContext(initialData);
   this._name = name;
   (0, _Store.setState)(name, initialData, options);
@@ -36,9 +33,7 @@ var State = function State(name, initialData, options) {
   this.update = function (data) {
     if (typeof data === "function") {
       // Call the function to get the update data
-      log.info("Asking function for new state data value...");
       var newData = data((0, _Store.getState)(name));
-      log.info("Asking store to update state value");
       (0, _Store.setState)(name, newData, options);
 
       _this.emit("change");
@@ -46,14 +41,12 @@ var State = function State(name, initialData, options) {
       return;
     }
 
-    log.info("Asking store to update state value");
     (0, _Store.setState)(name, data, options);
 
     _this.emit("change");
   };
 
   this.value = function () {
-    //log.info("Asking store for existing state value");
     return (0, _Store.getState)(name);
   };
 
@@ -62,7 +55,6 @@ var State = function State(name, initialData, options) {
   };
 
   this.Provider = function (props) {
-    log.info("Rendering state provider");
     return _react["default"].createElement(_Provider["default"], {
       state: _this
     }, props.children);
