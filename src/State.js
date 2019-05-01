@@ -19,9 +19,35 @@ class State {
 		};
 		
 		this.update = (data) => {
+			const currentState = storeGetState(name);
+			
 			if (typeof data === "function") {
 				// Call the function to get the update data
-				const newData = data(storeGetState(name));
+				const newData = data(currentState);
+				this.update(newData);
+				return;
+			}
+			
+			if (typeof currentState === "object" && typeof data === "object") {
+				// Spread the current state and the new data
+				this.overwrite({
+					...currentState,
+					...data
+				});
+				
+				return;
+			}
+			
+			// We're not setting an object, we are setting a primitive so
+			// simply overwrite the existing data
+			this.overwrite(data);
+		};
+		
+		this.overwrite = (data) => {
+			if (typeof data === "function") {
+				// Call the function to get the update data
+				const currentState = storeGetState(name);
+				const newData = data(currentState);
 				
 				storeSetState(name, newData, options);
 				this.emit("change");

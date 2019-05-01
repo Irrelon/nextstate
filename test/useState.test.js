@@ -110,6 +110,36 @@ describe("useState", function () {
 		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
 	});
 	
+	it("Doesn't wipe out the other keys when you update a single key calling update()", () => {
+		let testRenderer;
+		
+		assert.strictEqual(changeEventCount, 0);
+		
+		state1.update({
+			"testVal": true,
+			"otherVal": 12345
+		});
+		
+		assert.strictEqual(changeEventCount, 1);
+		
+		testRenderer = mount(
+			<App />
+		);
+		testRenderer.update();
+		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal, true);
+		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.otherVal, 12345);
+		
+		// Update the state and see if the new state is reflected in the component
+		state1.update({
+			"testVal": false
+		});
+		testRenderer.update();
+		assert.strictEqual(changeEventCount, 2);
+		
+		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal, false);
+		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.otherVal, 12345);
+	});
+	
 	it("InnerComponent should be passed the correct object sub-key/val state data before and after state updates", () => {
 		let testRenderer,
 			testInstance;
