@@ -5,12 +5,12 @@ class Provider extends React.PureComponent {
 		super(props);
 		
 		this.state = {
-			...props.state.value()
+			val: props.state.value()
 		};
 		
 		this.handleChange = () => {
 			this.setState({
-				...props.state.value()
+				val: props.state.value()
 			});
 		};
 		
@@ -25,7 +25,7 @@ class Provider extends React.PureComponent {
 		const Context = this.props.state.context();
 		
 		return (
-			<Context.Provider value={this.state}>
+			<Context.Provider value={this.state.val}>
 				{this.props.children}
 			</Context.Provider>
 		);

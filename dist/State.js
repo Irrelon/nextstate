@@ -25,7 +25,7 @@ var State = function State(name, initialData, options) {
   var Log = require("irrelon-log");
 
   var log = new Log("State :: ".concat(name));
-  this._Context = _react["default"].createContext(null);
+  this._Context = _react["default"].createContext(initialData);
   this._name = name;
   (0, _Store.setState)(name, initialData, options);
 

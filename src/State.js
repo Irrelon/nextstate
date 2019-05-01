@@ -12,7 +12,7 @@ class State {
 		const Log = require("irrelon-log");
 		const log = new Log(`State :: ${name}`);
 		
-		this._Context = React.createContext(null);
+		this._Context = React.createContext(initialData);
 		this._name = name;
 		
 		storeSetState(name, initialData, options);

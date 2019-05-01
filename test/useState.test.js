@@ -1,5 +1,10 @@
+// Ensure react components behave as client-side
+// in our components that need to check, they check
+// for process and process.browser flags
+process.browser = true;
+
+import {getStore} from "../dist/index";
 import React from "react";
-import TestRenderer from "react-test-renderer";
 import state1 from "./state1";
 import state2 from "./state2";
 import App from "./App";
@@ -7,31 +12,24 @@ import InnerComponent from "./InnerComponent";
 const assert = require("assert");
 import { mount, shallow } from 'enzyme';
 
-// Ensure react components behave as client-side
-// in our components that need to check, they check
-// for process and process.browser flags
-process.browser = true;
-
 let changeEventCount = 0;
 
 state1.on("change", () => {
-	debugger;
 	changeEventCount++;
 });
 
 state2.on("change", () => {
-	debugger;
 	changeEventCount++;
 });
 
 beforeEach(() => {
+	getStore();
 	changeEventCount = 0;
 });
 
 describe("useState", function () {
 	it("InnerComponent should be passed the correct boolean state data before and after state updates", function () {
-		let testRenderer,
-			testInstance;
+		let testRenderer;
 		
 		assert.strictEqual(changeEventCount, 0);
 		
