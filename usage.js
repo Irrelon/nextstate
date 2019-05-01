@@ -1,18 +1,24 @@
-const {StateController} = require('irrelon-nextstate');
+import {PsrovideState, useState} from "./src";
+
+const {State} = require('irrelon-nextstate');
 const React = require('react');
 
-let counter = new StateController(0);
+let counterState = new State("counter", {val: 0});
 
 setInterval(() => {
-	counter.update(counter.value() + 1);
+	counterState.update({val: counterState.value().val + 1});
 });
 
 class MyClass extends React.PureComponent {
 	render () {
 		return (
-			<div>{counter}</div>
+			<PsrovideState stateArr={[counterState]}>
+				<div>{counter.val}</div>
+			</PsrovideState>
 		);
 	}
 }
 
-export default MyClass;
+export default useState({
+	"counter": counterState
+}, MyClass);

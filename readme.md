@@ -15,11 +15,11 @@ You can create state for your component / page / whatever very easily:
 > ./store/state/myAwesomeState.js
 
 ```js
-const {StateController} = require("irrelon-nextstate");
+const {State} = require("irrelon-nextstate");
 
-// The argument for the StateController is the state's
+// The arguments for State are the state name and the state's
 // initial value, in this case an empty object {}
-const state = new StateController({});
+const state = new State("myAwesomeState", {});
 
 module.exports = state;
 ```
@@ -72,34 +72,34 @@ via this.props.
 ```js
 import React from 'react';
 import myAwesomeState from "./store/state/myAwesomeState";
-import {useProps} from "irrelon-nextstate";
+import {useState} from "irrelon-nextstate";
 
 class MyComponent extends React.PureComponent {
-	render () {
-		toggleLoading () {
-			const newVal = !myAwesomeState.get('loading');
-			
-			myAwesomeState.update({
-				loading: newVal			
-			});
-		}
+	toggleLoading = () => {
+		const newVal = !myAwesomeState.get('loading');
 		
+		myAwesomeState.update({
+			loading: newVal			
+		});
+	};
+    		
+	render () {
 		return (
-			<div onClick={this.toggleLoading.bind(this)}>{this.props.myAwesomeStateData.loading}</div>
+			<div onClick={this.toggleLoading}>{this.props.myAwesomeStateData.loading}</div>
 		);
 	}
 }
 
 // The name of the state data prop will be the key the state is
-// assigned to in the object passed to useProps as the first argument
-export default useProps({
+// assigned to in the object passed to useState as the first argument
+export default useState({
 	myAwesomeStateData: myAwesomeState,
 	someOtherStateData: someOtherState
 }, MyComponent);
 ```
 
 > Keep in mind that when you provide a react component the state data as
-props by using the useProps HOC, the props contain the *data object* the
+props by using the useState HOC, the props contain the *data object* the
 state instance contains, not the state instance itself. If you want to use
 the state instance from your react component code, call a method like the
 above example with toggleLoading().
@@ -110,7 +110,7 @@ conventions seem to work well for us.
 
 In the case of Irrelon NextState we have found that maintaining a ./store
 folder in the root of the project and keeping state objects in the
-./store/state folder is a faily clean pattern.
+./store/state folder is a fairly clean pattern.
 
 We put any global actions related to the states in the ./store/actions
 folder. For instance if you wanted to maintain actions that modified
@@ -123,9 +123,9 @@ Here are the theoretical files:
 
 > ./store/state/session.js
 ```js
-const {StateController} = require("irrelon-nextstate");
+const {State} = require("irrelon-nextstate");
 
-const state = new StateController({
+const state = new State("session", {
 	loggedIn: false
 });
 
