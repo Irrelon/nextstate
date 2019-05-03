@@ -36,7 +36,13 @@ Object.defineProperty(exports, "exportStore", {
 Object.defineProperty(exports, "ProvideState", {
   enumerable: true,
   get: function get() {
-    return _ProvideState["default"];
+    return _ProvideState.ProvideState;
+  }
+});
+Object.defineProperty(exports, "provideState", {
+  enumerable: true,
+  get: function get() {
+    return _ProvideState.provideState;
   }
 });
 Object.defineProperty(exports, "useState", {
@@ -50,7 +56,7 @@ var _State = _interopRequireDefault(require("./State"));
 
 var _Store = require("./Store");
 
-var _ProvideState = _interopRequireDefault(require("./ProvideState"));
+var _ProvideState = require("./ProvideState");
 
 var _useState = _interopRequireDefault(require("./useState"));
 

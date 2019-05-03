@@ -12,4 +12,25 @@ const ProvideState = (props) => {
 	return <ProvidedStates>{props.children}</ProvidedStates>;
 };
 
-export default ProvideState;
+const provideState = (stateArr, ComponentToWrap) => {
+	return class ProvideStateHOC extends React.Component {
+		static getInitialProps (ctx) {
+			if (ComponentToWrap.getInitialProps) {
+				return ComponentToWrap.getInitialProps(ctx);
+			} else {
+				return {};
+			}
+		}
+		
+		render () {
+			return <ProvideState stateArr={stateArr}>
+				<ComponentToWrap {...this.props}>{this.props.children}</ComponentToWrap>
+			</ProvideState>;
+		}
+	};
+};
+
+export {
+	ProvideState,
+	provideState
+};

@@ -5,7 +5,7 @@ import {
 	getState,
 	exportStore
 } from "./Store";
-import ProvideState from "./ProvideState";
+import {ProvideState, provideState} from "./ProvideState";
 import useState from "./useState";
 
 export {
@@ -14,6 +14,7 @@ export {
 	setState,
 	getState,
 	ProvideState,
+	provideState,
 	useState,
 	exportStore
 };
