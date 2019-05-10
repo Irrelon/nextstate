@@ -48,7 +48,13 @@ function (_React$PureComponent) {
       });
     };
 
-    props.state.on("change", _this.handleChange);
+    if (process && process.browser) {
+      // We only hook changes client-side since server-side the off()
+      // call would never fire since componentWillUnmount is never called
+      // server-side
+      props.state.on("change", _this.handleChange);
+    }
+
     return _this;
   }
 
