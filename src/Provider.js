@@ -14,7 +14,12 @@ class Provider extends React.PureComponent {
 			});
 		};
 		
-		props.state.on("change", this.handleChange);
+		if (process && process.browser) {
+			// We only hook changes client-side since server-side the off()
+			// call would never fire since componentWillUnmount is never called
+			// server-side
+			props.state.on("change", this.handleChange);
+		}
 	}
 	
 	componentWillUnmount () {
