@@ -1,16 +1,28 @@
 import React from "react";
+import Log from "irrelon-log";
+const log = new Log("Store");
 
-const Context = React.createContext(null);
+let Context;
 const Emitter = require("irrelon-emitter");
 const events = new Emitter();
 
 let storeObj;
 
+const newStore = (initialData) => {
+	log.info("Getting new store with initialData:", JSON.stringify(initialData));
+	Context = React.createContext(initialData);
+	storeObj = {...initialData};
+	events.emit("store");
+};
+
+const getContext = () => {
+	return Context;
+};
+
 const getStore = (initialData) => {
 	if (!process || !process.browser) {
 		// Init a new store object whenever we are on the server
-		storeObj = {...initialData};
-		events.emit("store");
+		newStore(initialData);
 		return;
 	}
 	
@@ -18,8 +30,7 @@ const getStore = (initialData) => {
 		return;
 	}
 	
-	storeObj = {...initialData};
-	events.emit("store");
+	newStore(initialData);
 };
 
 const getState = (name) => {
@@ -32,17 +43,22 @@ const getState = (name) => {
 
 const setState = (name, val, options = {}) => {
 	if (storeObj) {
+		log.info("Setting state:", name, JSON.stringify(val));
 		storeObj[name] = val;
 		events.emit("change");
 		return;
 	}
 	
+	log.info("Waiting to set state:", name, JSON.stringify(val));
+	
 	// Hook when we get a store
 	if (!process || !process.browser) {
 		// On server, we listen for store init every time it is emitted
-		events.on("store", () => {
+		events.once("store", () => {
+			log.info("Store now available, setting state:", name, JSON.stringify(val));
 			setState(name, val, options);
 		});
+		//setState(name, val, options);
 		
 		return;
 	}
@@ -55,6 +71,7 @@ const setState = (name, val, options = {}) => {
 	// what the initial value should be
 	if (options.initOnClient === true) {
 		events.once("store", () => {
+			log.info("Store now available, setting state:", name, JSON.stringify(val));
 			setState(name, val, options);
 		});
 	}
@@ -64,11 +81,12 @@ const exportStore = () => {
 	return JSON.parse(JSON.stringify(storeObj));
 };
 
-class Provider extends React.PureComponent {
+class ProvideState extends React.PureComponent {
 	constructor (props) {
 		super(props);
 		
 		this.state = exportStore();
+		log.info("Constructing ProvideState with state:", JSON.stringify(this.state));
 		
 		this.handleChange = () => {
 			this.setState({
@@ -76,7 +94,9 @@ class Provider extends React.PureComponent {
 			});
 		};
 		
-		events.on("change", this.handleChange);
+		if (process && process.browser) {
+			events.on("change", this.handleChange);
+		}
 	}
 	
 	componentWillUnmount () {
@@ -84,6 +104,7 @@ class Provider extends React.PureComponent {
 	}
 	
 	render () {
+		log.info('Rendering ProvideState with store data:', JSON.stringify(this.state));
 		return (
 			<Context.Provider value={this.state}>
 				{this.props.children}
@@ -97,6 +118,8 @@ export default {
 	setState,
 	getState,
 	exportStore,
+	getContext,
+	ProvideState,
 	events
 };
 
@@ -105,5 +128,7 @@ export {
 	setState,
 	getState,
 	exportStore,
+	getContext,
+	ProvideState,
 	events
 };

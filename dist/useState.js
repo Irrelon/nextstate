@@ -7,13 +7,15 @@ exports["default"] = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
+var _Store = require("./Store");
+
+var _irrelonLog = _interopRequireDefault(require("irrelon-log"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -31,6 +33,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+var log = new _irrelonLog["default"]("useState");
+
 var useState = function useState(stateMap, ComponentToWrap) {
   return (
     /*#__PURE__*/
@@ -46,17 +50,26 @@ var useState = function useState(stateMap, ComponentToWrap) {
       _createClass(UseStateHOC, [{
         key: "render",
         value: function render() {
-          var stateMapKeys = Object.keys(stateMap);
-          var ConsumedStates = stateMapKeys.reduce(function (PreviousComponent, stateName) {
-            return function (stateRenderProps) {
-              var stateItem = stateMap[stateName];
-              var Context = stateItem.context();
-              return _react["default"].createElement(Context.Consumer, null, function (stateData) {
-                return _react["default"].createElement(PreviousComponent, _extends({}, stateRenderProps, _defineProperty({}, stateName, stateData)), stateRenderProps.children);
-              });
-            };
-          }, ComponentToWrap);
-          return _react["default"].createElement(ConsumedStates, this.props, this.props.children);
+          var _this = this;
+
+          var Context = (0, _Store.getContext)();
+
+          if (!Context) {
+            log.warn("Attempted to use state but no ProvideState was found in the upper tree nodes!");
+            return _react["default"].createElement(ComponentToWrap, this.props);
+          }
+
+          return _react["default"].createElement(Context.Consumer, null, function (storeData) {
+            var stateMapKeys = Object.keys(stateMap);
+            var stateData = {};
+            log.info('Mapping state keys:', JSON.stringify(stateMapKeys), JSON.stringify(storeData));
+            stateMapKeys.forEach(function (stateKey) {
+              log.info("Assigning ".concat(stateKey, " as ").concat(storeData[stateMap[stateKey].name()]));
+              stateData[stateKey] = storeData[stateMap[stateKey].name()];
+            });
+            log.info('Passing state data to component:', JSON.stringify(stateData));
+            return _react["default"].createElement(ComponentToWrap, _extends({}, _this.props, stateData), _this.props.children);
+          });
         }
       }], [{
         key: "getInitialProps",

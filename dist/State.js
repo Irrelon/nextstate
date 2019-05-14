@@ -7,6 +7,8 @@ exports["default"] = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
+var _irrelonLog = _interopRequireDefault(require("irrelon-log"));
+
 var _Store = require("./Store");
 
 var _Provider = _interopRequireDefault(require("./Provider"));
@@ -22,6 +24,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var log = new _irrelonLog["default"]("State");
 
 var Emitter = require("irrelon-emitter");
 
@@ -74,6 +78,7 @@ var State = function State(name, initialData, options) {
       return;
     }
 
+    log.info("[".concat(_this.name(), "]"), "Overwriting state to:", JSON.stringify(data));
     (0, _Store.setState)(name, data, options);
 
     _this.emit("change");

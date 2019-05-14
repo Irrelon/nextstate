@@ -1,4 +1,6 @@
 import React from "react";
+import Log from "irrelon-log";
+const log = new Log("State");
 
 const Emitter = require("irrelon-emitter");
 import {
@@ -55,6 +57,7 @@ class State {
 				return;
 			}
 			
+			log.info(`[${this.name()}]`, "Overwriting state to:", JSON.stringify(data));
 			storeSetState(name, data, options);
 			this.emit("change");
 		};

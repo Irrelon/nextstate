@@ -1,6 +1,6 @@
 {
   "name": "irrelon-nextstate",
-  "version": "2.0.7",
+  "version": "3.0.0",
   "description": "High performance state management for Next.js without the crazy mess that redux creates.",
   "main": "dist/index.js",
   "files": [
@@ -8,7 +8,9 @@
   ],
   "scripts": {
     "build": "babel src --out-dir dist",
-    "test": "npm run build && NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --require @babel/register --require @babel/core --require @babel/polyfill --require ./test/setup.js **/*.test.js"
+    "test": "npm run build && npm run testBrowser && npm run testServer",
+    "testBrowser": "NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --require @babel/register --require @babel/core --require @babel/polyfill --require ./test/setup.js **/*.browser.test.js",
+    "testServer": "NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --require @babel/register --require @babel/core --require @babel/polyfill --require ./test/setup.js **/*.server.test.js"
   },
   "author": "Rob Evans - Irrelon Software Limited",
   "license": "MIT",

@@ -3,9 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.events = exports.exportStore = exports.getState = exports.setState = exports.getStore = exports["default"] = void 0;
+exports.events = exports.ProvideState = exports.getContext = exports.exportStore = exports.getState = exports.setState = exports.getStore = exports["default"] = void 0;
 
 var _react = _interopRequireDefault(require("react"));
+
+var _irrelonLog = _interopRequireDefault(require("irrelon-log"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -31,7 +33,8 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var Context = _react["default"].createContext(null);
+var log = new _irrelonLog["default"]("Store");
+var Context;
 
 var Emitter = require("irrelon-emitter");
 
@@ -39,11 +42,23 @@ var events = new Emitter();
 exports.events = events;
 var storeObj;
 
+var newStore = function newStore(initialData) {
+  log.info("Getting new store with initialData:", JSON.stringify(initialData));
+  Context = _react["default"].createContext(initialData);
+  storeObj = _objectSpread({}, initialData);
+  events.emit("store");
+};
+
+var getContext = function getContext() {
+  return Context;
+};
+
+exports.getContext = getContext;
+
 var getStore = function getStore(initialData) {
   if (!process || !process.browser) {
     // Init a new store object whenever we are on the server
-    storeObj = _objectSpread({}, initialData);
-    events.emit("store");
+    newStore(initialData);
     return;
   }
 
@@ -51,8 +66,7 @@ var getStore = function getStore(initialData) {
     return;
   }
 
-  storeObj = _objectSpread({}, initialData);
-  events.emit("store");
+  newStore(initialData);
 };
 
 exports.getStore = getStore;
@@ -71,17 +85,21 @@ var setState = function setState(name, val) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   if (storeObj) {
+    log.info("Setting state:", name, JSON.stringify(val));
     storeObj[name] = val;
     events.emit("change");
     return;
-  } // Hook when we get a store
+  }
 
+  log.info("Waiting to set state:", name, JSON.stringify(val)); // Hook when we get a store
 
   if (!process || !process.browser) {
     // On server, we listen for store init every time it is emitted
-    events.on("store", function () {
+    events.once("store", function () {
+      log.info("Store now available, setting state:", name, JSON.stringify(val));
       setState(name, val, options);
-    });
+    }); //setState(name, val, options);
+
     return;
   } // On client we only want to hook the store event once
   // and only listen to the event if the dev told us to init
@@ -93,6 +111,7 @@ var setState = function setState(name, val) {
 
   if (options.initOnClient === true) {
     events.once("store", function () {
+      log.info("Store now available, setting state:", name, JSON.stringify(val));
       setState(name, val, options);
     });
   }
@@ -106,28 +125,32 @@ var exportStore = function exportStore() {
 
 exports.exportStore = exportStore;
 
-var Provider =
+var ProvideState =
 /*#__PURE__*/
 function (_React$PureComponent) {
-  _inherits(Provider, _React$PureComponent);
+  _inherits(ProvideState, _React$PureComponent);
 
-  function Provider(props) {
+  function ProvideState(props) {
     var _this;
 
-    _classCallCheck(this, Provider);
+    _classCallCheck(this, ProvideState);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Provider).call(this, props));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(ProvideState).call(this, props));
     _this.state = exportStore();
+    log.info("Constructing ProvideState with state:", JSON.stringify(_this.state));
 
     _this.handleChange = function () {
       _this.setState(_objectSpread({}, exportStore()));
     };
 
-    events.on("change", _this.handleChange);
+    if (process && process.browser) {
+      events.on("change", _this.handleChange);
+    }
+
     return _this;
   }
 
-  _createClass(Provider, [{
+  _createClass(ProvideState, [{
     key: "componentWillUnmount",
     value: function componentWillUnmount() {
       events.off("change", this.handleChange);
@@ -135,20 +158,24 @@ function (_React$PureComponent) {
   }, {
     key: "render",
     value: function render() {
+      log.info('Rendering ProvideState with store data:', JSON.stringify(this.state));
       return _react["default"].createElement(Context.Provider, {
         value: this.state
       }, this.props.children);
     }
   }]);
 
-  return Provider;
+  return ProvideState;
 }(_react["default"].PureComponent);
 
+exports.ProvideState = ProvideState;
 var _default = {
   getStore: getStore,
   setState: setState,
   getState: getState,
   exportStore: exportStore,
+  getContext: getContext,
+  ProvideState: ProvideState,
   events: events
 };
 exports["default"] = _default;
