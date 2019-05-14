@@ -36,6 +36,7 @@ var State = function State(name, initialData, options) {
 
   this._Context = _react["default"].createContext(initialData);
   this._name = name;
+  log.info("[".concat(name, "] State constructor with initialData"), initialData);
   (0, _Store.setState)(name, initialData, options);
 
   this.name = function () {
@@ -47,23 +48,17 @@ var State = function State(name, initialData, options) {
 
     if (typeof data === "function") {
       // Call the function to get the update data
-      var newData = data(currentState);
-
-      _this.update(newData);
-
-      return;
+      return _this.update(data(currentState));
     }
 
     if (_typeof(currentState) === "object" && _typeof(data) === "object") {
       // Spread the current state and the new data
-      _this.overwrite(_objectSpread({}, currentState, data));
-
-      return;
+      return _this.overwrite(_objectSpread({}, currentState, data));
     } // We're not setting an object, we are setting a primitive so
     // simply overwrite the existing data
 
 
-    _this.overwrite(data);
+    return _this.overwrite(data);
   };
 
   this.overwrite = function (data) {
@@ -71,17 +66,13 @@ var State = function State(name, initialData, options) {
       // Call the function to get the update data
       var currentState = (0, _Store.getState)(name);
       var newData = data(currentState);
-      (0, _Store.setState)(name, newData, options);
-
-      _this.emit("change");
-
-      return;
+      return _this.overwrite(newData);
     }
 
     log.info("[".concat(_this.name(), "]"), "Overwriting state to:", JSON.stringify(data));
-    (0, _Store.setState)(name, data, options);
-
-    _this.emit("change");
+    (0, _Store.setState)(name, data, _objectSpread({}, options, {
+      stateInstance: _this
+    }));
   };
 
   this.get = function (path, defaultVal) {

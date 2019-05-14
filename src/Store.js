@@ -9,7 +9,7 @@ const events = new Emitter();
 let storeObj;
 
 const newStore = (initialData) => {
-	log.info("Getting new store with initialData:", JSON.stringify(initialData));
+	log.info("Creating new store with initialData:", JSON.stringify(initialData));
 	Context = React.createContext(initialData);
 	storeObj = {...initialData};
 	events.emit("store");
@@ -27,6 +27,7 @@ const getStore = (initialData) => {
 	}
 	
 	if (storeObj) {
+		log.info("Already have a store, using existing one");
 		return;
 	}
 	
@@ -42,42 +43,49 @@ const getState = (name) => {
 };
 
 const setState = (name, val, options = {}) => {
+	const resolve = () => {
+		if (options && options.stateInstance) {
+			options.stateInstance.emit("change");
+		}
+	};
+	
 	if (storeObj) {
-		log.info("Setting state:", name, JSON.stringify(val));
+		log.info(`[${name}] Setting state:`, JSON.stringify(val));
 		storeObj[name] = val;
 		events.emit("change");
-		return Promise.resolve();
+		
+		return resolve();
 	}
 	
-	return new Promise((resolve) => {
-		log.info("Waiting to set state:", name, JSON.stringify(val));
-		
-		// Hook when we get a store
-		if (!process || !process.browser) {
-			// On server, we listen for store init every time it is emitted
-			events.once("store", () => {
-				log.info("Store now available, setting state:", name, JSON.stringify(val));
-				return resolve(setState(name, val, options));
-			});
+	log.info(`[${name}] Waiting to set state:`, JSON.stringify(val));
+	
+	// Hook when we get a store
+	if (!process || !process.browser) {
+		// On server, we listen for store init every time it is emitted
+		events.once("store", () => {
+			log.info(`[${name}] Store now available, setting state:`, JSON.stringify(val));
+			setState(name, val, options);
 			
 			return;
-		}
+		});
 		
-		// On client we only want to hook the store event once
-		// and only listen to the event if the dev told us to init
-		// the value on the client instead of using the data sent
-		// from the server - usually you don't want to specify
-		// initOnClient as true since we want the server to tell us
-		// what the initial value should be
-		if (options.initOnClient === true) {
-			events.once("store", () => {
-				log.info("Store now available, setting state:", name, JSON.stringify(val));
-				return resolve(setState(name, val, options));
-			});
+		return;
+	}
+	
+	// On client we only want to hook the store event once
+	// and only listen to the event if the dev told us to init
+	// the value on the client instead of using the data sent
+	// from the server - usually you don't want to specify
+	// initOnClient as true since we want the server to tell us
+	// what the initial value should be
+	if (options.initOnClient === true) {
+		events.once("store", () => {
+			log.info(`[${name}] Store now available, setting state:`, JSON.stringify(val));
+			setState(name, val, options);
 			
 			return;
-		}
-	});
+		});
+	}
 };
 
 const exportStore = () => {

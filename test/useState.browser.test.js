@@ -11,18 +11,23 @@ import App from "./App";
 import InnerComponent from "./InnerComponent";
 const assert = require("assert");
 import { mount, shallow } from 'enzyme';
+import Log from "irrelon-log";
+const log = new Log("useState.browser.test");
 
 let changeEventCount = 0;
 
 state1.on("change", () => {
+	log.info('state1 change event fired');
 	changeEventCount++;
 });
 
 state2.on("change", () => {
+	log.info('state2 change event fired');
 	changeEventCount++;
 });
 
 beforeEach(() => {
+	log.info("Getting store...");
 	getStore();
 	changeEventCount = 0;
 });
@@ -33,8 +38,10 @@ describe("useState", function () {
 		
 		assert.strictEqual(changeEventCount, 0);
 		
+		log.info("CALLING UPDATE");
 		state1.update(true);
 		
+		log.info("SHOULD HAVE EMITTED BY NOW");
 		assert.strictEqual(changeEventCount, 1);
 		
 		testRenderer = mount(

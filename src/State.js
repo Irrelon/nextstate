@@ -15,6 +15,7 @@ class State {
 		this._Context = React.createContext(initialData);
 		this._name = name;
 		
+		log.info(`[${name}] State constructor with initialData`, initialData);
 		storeSetState(name, initialData, options);
 		
 		this.name = () => {
@@ -26,24 +27,20 @@ class State {
 			
 			if (typeof data === "function") {
 				// Call the function to get the update data
-				const newData = data(currentState);
-				this.update(newData);
-				return;
+				return this.update(data(currentState));
 			}
 			
 			if (typeof currentState === "object" && typeof data === "object") {
 				// Spread the current state and the new data
-				this.overwrite({
+				return this.overwrite({
 					...currentState,
 					...data
 				});
-				
-				return;
 			}
 			
 			// We're not setting an object, we are setting a primitive so
 			// simply overwrite the existing data
-			this.overwrite(data);
+			return this.overwrite(data);
 		};
 		
 		this.overwrite = (data) => {
@@ -52,14 +49,12 @@ class State {
 				const currentState = storeGetState(name);
 				const newData = data(currentState);
 				
-				storeSetState(name, newData, options);
-				this.emit("change");
-				return;
+				return this.overwrite(newData);
 			}
 			
 			log.info(`[${this.name()}]`, "Overwriting state to:", JSON.stringify(data));
-			storeSetState(name, data, options);
-			this.emit("change");
+			
+			storeSetState(name, data, {...options, stateInstance: this});
 		};
 		
 		this.get = (path, defaultVal) => {
