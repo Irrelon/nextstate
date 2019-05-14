@@ -6,6 +6,7 @@ import {
 	setState as storeSetState
 } from "./Store";
 import Provider from "./Provider";
+import {get as pathGet} from "irrelon-path";
 
 class State {
 	constructor (name, initialData, options) {
@@ -56,6 +57,11 @@ class State {
 			
 			storeSetState(name, data, options);
 			this.emit("change");
+		};
+		
+		this.get = (path, defaultVal) => {
+			const val = this.value();
+			return pathGet(val, path, defaultVal);
 		};
 		
 		this.value = () => {

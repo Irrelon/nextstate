@@ -11,6 +11,8 @@ var _Store = require("./Store");
 
 var _Provider = _interopRequireDefault(require("./Provider"));
 
+var _irrelonPath = require("irrelon-path");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
@@ -75,6 +77,12 @@ var State = function State(name, initialData, options) {
     (0, _Store.setState)(name, data, options);
 
     _this.emit("change");
+  };
+
+  this.get = function (path, defaultVal) {
+    var val = _this.value();
+
+    return (0, _irrelonPath.get)(val, path, defaultVal);
   };
 
   this.value = function () {
