@@ -88,33 +88,35 @@ var setState = function setState(name, val) {
     log.info("Setting state:", name, JSON.stringify(val));
     storeObj[name] = val;
     events.emit("change");
-    return;
+    return Promise.resolve();
   }
 
-  log.info("Waiting to set state:", name, JSON.stringify(val)); // Hook when we get a store
+  return new Promise(function (resolve) {
+    log.info("Waiting to set state:", name, JSON.stringify(val)); // Hook when we get a store
 
-  if (!process || !process.browser) {
-    // On server, we listen for store init every time it is emitted
-    events.once("store", function () {
-      log.info("Store now available, setting state:", name, JSON.stringify(val));
-      setState(name, val, options);
-    }); //setState(name, val, options);
+    if (!process || !process.browser) {
+      // On server, we listen for store init every time it is emitted
+      events.once("store", function () {
+        log.info("Store now available, setting state:", name, JSON.stringify(val));
+        return resolve(setState(name, val, options));
+      });
+      return;
+    } // On client we only want to hook the store event once
+    // and only listen to the event if the dev told us to init
+    // the value on the client instead of using the data sent
+    // from the server - usually you don't want to specify
+    // initOnClient as true since we want the server to tell us
+    // what the initial value should be
 
-    return;
-  } // On client we only want to hook the store event once
-  // and only listen to the event if the dev told us to init
-  // the value on the client instead of using the data sent
-  // from the server - usually you don't want to specify
-  // initOnClient as true since we want the server to tell us
-  // what the initial value should be
 
-
-  if (options.initOnClient === true) {
-    events.once("store", function () {
-      log.info("Store now available, setting state:", name, JSON.stringify(val));
-      setState(name, val, options);
-    });
-  }
+    if (options.initOnClient === true) {
+      events.once("store", function () {
+        log.info("Store now available, setting state:", name, JSON.stringify(val));
+        return resolve(setState(name, val, options));
+      });
+      return;
+    }
+  });
 };
 
 exports.setState = setState;
