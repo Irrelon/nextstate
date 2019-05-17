@@ -36,188 +36,190 @@ beforeEach(() => {
 	changeEventCount = 0;
 });
 
-describe("useState", function () {
-	it("InnerComponent should be passed the correct boolean state data before and after state updates", function () {
-		let testRenderer;
-		
-		assert.strictEqual(changeEventCount, 0);
-		
-		log.debug("CALLING UPDATE");
-		stateStore.update("state1", true);
-		
-		log.debug("SHOULD HAVE EMITTED BY NOW");
-		assert.strictEqual(changeEventCount, 1);
-		
-		assert.strictEqual(stateStore.get("state1"), true, "The store data for state1 has the correct value");
-		
-		testRenderer = mount(
-			<App stateStore={stateStore} />
-		);
-		
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1, true);
-		assert.strictEqual(testRenderer.find("InnerComponent").props().someProp, "true dat");
-		
-		// Update the state and see if the new state is reflected in the component
-		stateStore.update("state1", false);
-		
-		assert.strictEqual(changeEventCount, 2);
-		testRenderer.update();
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1, false);
-		testRenderer.unmount();
-	});
-	
-	it("InnerComponent should be passed the correct number state data before and after state updates", function () {
-		let testRenderer;
-		
-		assert.strictEqual(changeEventCount, 0);
-		
-		stateStore.update("state1", 0);
-		
-		assert.strictEqual(changeEventCount, 1);
-		
-		testRenderer = mount(
-			<App stateStore={stateStore} />
-		);
-		
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1, 0);
-		
-		// Update the state and see if the new state is reflected in the component
-		stateStore.update("state1", 2);
-		
-		assert.strictEqual(changeEventCount, 2);
-		testRenderer.update();
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1, 2);
-		testRenderer.unmount();
-	});
-	
-	it("InnerComponent should be passed the correct object key/val boolean state data before and after state updates", () => {
-		let testRenderer,
-			testInstance;
-		
-		assert.strictEqual(changeEventCount, 0);
-		
-		stateStore.update("state1", {
-			"testVal": true
-		});
-		stateStore.update("state2", {
-			"testVal": true
+describe("Browser", () => {
+	describe("useState", function () {
+		it("InnerComponent should be passed the correct boolean state data before and after state updates", function () {
+			let testRenderer;
+			
+			assert.strictEqual(changeEventCount, 0);
+			
+			log.debug("CALLING UPDATE");
+			stateStore.update("state1", true);
+			
+			log.debug("SHOULD HAVE EMITTED BY NOW");
+			assert.strictEqual(changeEventCount, 1);
+			
+			assert.strictEqual(stateStore.get("state1"), true, "The store data for state1 has the correct value");
+			
+			testRenderer = mount(
+				<App stateStore={stateStore} />
+			);
+			
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1, true);
+			assert.strictEqual(testRenderer.find("InnerComponent").props().someProp, "true dat");
+			
+			// Update the state and see if the new state is reflected in the component
+			stateStore.update("state1", false);
+			
+			assert.strictEqual(changeEventCount, 2);
+			testRenderer.update();
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1, false);
+			testRenderer.unmount();
 		});
 		
-		assert.strictEqual(changeEventCount, 2);
-		
-		testRenderer = mount(
-			<App stateStore={stateStore} />
-		);
-		testRenderer.update();
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal, true);
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
-		
-		// Update the state and see if the new state is reflected in the component
-		stateStore.update("state1", {
-			"testVal": false
-		});
-		testRenderer.update();
-		assert.strictEqual(changeEventCount, 3);
-		
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal, false);
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
-	});
-	
-	it("Doesn't wipe out the other keys when you update a single key calling update()", () => {
-		let testRenderer;
-		
-		assert.strictEqual(changeEventCount, 0);
-		
-		stateStore.update("state1", {
-			"testVal": true,
-			"otherVal": 12345
+		it("InnerComponent should be passed the correct number state data before and after state updates", function () {
+			let testRenderer;
+			
+			assert.strictEqual(changeEventCount, 0);
+			
+			stateStore.update("state1", 0);
+			
+			assert.strictEqual(changeEventCount, 1);
+			
+			testRenderer = mount(
+				<App stateStore={stateStore} />
+			);
+			
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1, 0);
+			
+			// Update the state and see if the new state is reflected in the component
+			stateStore.update("state1", 2);
+			
+			assert.strictEqual(changeEventCount, 2);
+			testRenderer.update();
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1, 2);
+			testRenderer.unmount();
 		});
 		
-		assert.strictEqual(changeEventCount, 1);
-		
-		testRenderer = mount(
-			<App stateStore={stateStore} />
-		);
-		testRenderer.update();
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal, true);
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.otherVal, 12345);
-		
-		// Update the state and see if the new state is reflected in the component
-		stateStore.update("state1", {
-			"testVal": false
+		it("InnerComponent should be passed the correct object key/val boolean state data before and after state updates", () => {
+			let testRenderer,
+				testInstance;
+			
+			assert.strictEqual(changeEventCount, 0);
+			
+			stateStore.update("state1", {
+				"testVal": true
+			});
+			stateStore.update("state2", {
+				"testVal": true
+			});
+			
+			assert.strictEqual(changeEventCount, 2);
+			
+			testRenderer = mount(
+				<App stateStore={stateStore} />
+			);
+			testRenderer.update();
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal, true);
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
+			
+			// Update the state and see if the new state is reflected in the component
+			stateStore.update("state1", {
+				"testVal": false
+			});
+			testRenderer.update();
+			assert.strictEqual(changeEventCount, 3);
+			
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal, false);
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
 		});
-		testRenderer.update();
-		assert.strictEqual(changeEventCount, 2);
 		
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal, false);
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.otherVal, 12345);
-	});
-	
-	it("InnerComponent should be passed the correct object sub-key/val state data before and after state updates", () => {
-		let testRenderer,
-			testInstance;
+		it("Doesn't wipe out the other keys when you update a single key calling update()", () => {
+			let testRenderer;
+			
+			assert.strictEqual(changeEventCount, 0);
+			
+			stateStore.update("state1", {
+				"testVal": true,
+				"otherVal": 12345
+			});
+			
+			assert.strictEqual(changeEventCount, 1);
+			
+			testRenderer = mount(
+				<App stateStore={stateStore} />
+			);
+			testRenderer.update();
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal, true);
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.otherVal, 12345);
+			
+			// Update the state and see if the new state is reflected in the component
+			stateStore.update("state1", {
+				"testVal": false
+			});
+			testRenderer.update();
+			assert.strictEqual(changeEventCount, 2);
+			
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal, false);
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.otherVal, 12345);
+		});
 		
-		const stateObj = {
-			"testVal": {
-				"foo": true
-			}
-		};
+		it("InnerComponent should be passed the correct object sub-key/val state data before and after state updates", () => {
+			let testRenderer,
+				testInstance;
+			
+			const stateObj = {
+				"testVal": {
+					"foo": true
+				}
+			};
+			
+			assert.strictEqual(changeEventCount, 0);
+			
+			stateStore.update("state1", stateObj);
+			
+			assert.strictEqual(changeEventCount, 1);
+			
+			testRenderer = mount(
+				<App stateStore={stateStore} />
+			);
+			
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal.foo, true);
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
+			
+			// Update the state and see if the new state is reflected in the component
+			stateObj.testVal.foo = false;
+			stateStore.update("state1", stateObj);
+			testRenderer.update();
+			assert.strictEqual(changeEventCount, 2);
+			
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal.foo, false);
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
+		});
 		
-		assert.strictEqual(changeEventCount, 0);
-		
-		stateStore.update("state1", stateObj);
-		
-		assert.strictEqual(changeEventCount, 1);
-		
-		testRenderer = mount(
-			<App stateStore={stateStore} />
-		);
-		
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal.foo, true);
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
-		
-		// Update the state and see if the new state is reflected in the component
-		stateObj.testVal.foo = false;
-		stateStore.update("state1", stateObj);
-		testRenderer.update();
-		assert.strictEqual(changeEventCount, 2);
-		
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal.foo, false);
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
-	});
-	
-	it("InnerComponent should be passed the correct object data state before and after state updates with two state updates", () => {
-		let testRenderer,
-			testInstance;
-		
-		const stateObj = {
-			"testVal": {
-				"foo": true
-			}
-		};
-		
-		assert.strictEqual(changeEventCount, 0);
-		
-		stateStore.update("state1", stateObj);
-		stateStore.update("state2", {"testVal": false});
-		
-		assert.strictEqual(changeEventCount, 2);
-		
-		testRenderer = mount(
-			<App stateStore={stateStore} />
-		);
-		
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal.foo, true);
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, false);
-		
-		// Update the state and see if the new state is reflected in the component
-		stateObj.testVal.foo = false;
-		stateStore.update("state1", stateObj);
-		stateStore.update("state2", {"testVal": true});
-		testRenderer.update();
-		assert.strictEqual(changeEventCount, 4);
-		
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal.foo, false);
-		assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
+		it("InnerComponent should be passed the correct object data state before and after state updates with two state updates", () => {
+			let testRenderer,
+				testInstance;
+			
+			const stateObj = {
+				"testVal": {
+					"foo": true
+				}
+			};
+			
+			assert.strictEqual(changeEventCount, 0);
+			
+			stateStore.update("state1", stateObj);
+			stateStore.update("state2", {"testVal": false});
+			
+			assert.strictEqual(changeEventCount, 2);
+			
+			testRenderer = mount(
+				<App stateStore={stateStore} />
+			);
+			
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal.foo, true);
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, false);
+			
+			// Update the state and see if the new state is reflected in the component
+			stateObj.testVal.foo = false;
+			stateStore.update("state1", stateObj);
+			stateStore.update("state2", {"testVal": true});
+			testRenderer.update();
+			assert.strictEqual(changeEventCount, 4);
+			
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.testVal.foo, false);
+			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
+		});
 	});
 });
