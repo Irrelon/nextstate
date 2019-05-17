@@ -1,145 +1,155 @@
 import React from "react";
+import Emitter from "irrelon-emitter";
+import {get as pathGet, set as pathSet} from "irrelon-path";
 import Log from "irrelon-log";
+
 const log = new Log("Store");
+const _context = React.createContext(null);
 
-let Context;
-const Emitter = require("irrelon-emitter");
-const events = new Emitter();
-
-let storeObj;
-
-const newStore = (initialData) => {
-	log.info("Creating new store with initialData:", JSON.stringify(initialData));
-	Context = React.createContext(initialData);
-	storeObj = {...initialData};
-	events.emit("store");
+const decouple = (obj) => {
+	return JSON.parse(JSON.stringify(obj));
 };
 
 const getContext = () => {
-	return Context;
+	return _context;
 };
 
 const getStore = (initialData) => {
 	if (!process || !process.browser) {
 		// Init a new store object whenever we are on the server
-		newStore(initialData);
-		return;
+		return create(initialData);
 	}
 	
-	if (storeObj) {
-		log.info("Already have a store, using existing one");
-		return;
+	if (window._nextStateStore) {
+		log.debug("Already have a store, using existing one");
+		return window._nextStateStore;
 	}
 	
-	newStore(initialData);
+	window._nextStateStore = create(initialData);
+	return window._nextStateStore;
 };
 
-const getState = (name) => {
-	if (!storeObj) {
-		return;
+const get = (store, path) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot get() without passing a store retrieved with getStore()!");
 	}
 	
-	return storeObj[name];
+	if (!path) {
+		throw new Error("Cannot get() without state name or state path in path argument!");
+	}
+	
+	return pathGet(store._data, path);
 };
 
-const setState = (name, val, options = {}) => {
-	const resolve = () => {
-		if (options && options.stateInstance) {
-			options.stateInstance.emit("change");
-		}
+const set = (store, path, newState, options = {}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot call set() without passing a store retrieved with getStore()!");
+	}
+	
+	if (!path) {
+		throw new Error("Cannot set() without state name or state path in path argument!");
+	}
+	
+	log.debug(`[${path}] Setting state:`, JSON.stringify(newState));
+	pathSet(store._data, path, newState);
+	
+	store.events.emitId("change", path, newState);
+};
+
+const update = (store, path, newState, options = {}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot update() without passing a store retrieved with getStore()!");
+	}
+	
+	const currentState = get(store, path);
+	
+	if (typeof newState === "function") {
+		// Call the function to get the update data
+		return update(newState(store, path, currentState, options));
+	}
+	
+	if (typeof currentState === "object" && typeof newState === "object") {
+		// Spread the current state and the new data
+		return set(store, path, {
+			...currentState,
+			...decouple(newState)
+		}, options);
+	}
+	
+	// We're not setting an object, we are setting a primitive so
+	// simply overwrite the existing data
+	return set(store, path, newState, options);
+};
+
+const value = (store) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot value() without passing a store retrieved with getStore()!");
+	}
+	
+	return store._data;
+};
+
+const exportData = (store) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot exportData() without passing a store retrieved with getStore()!");
+	}
+	
+	return decouple(store._data);
+};
+
+const create = (initialData) => {
+	log.debug("Creating new store with initialData:", JSON.stringify(initialData));
+	
+	const newStoreData = {...initialData};
+	const storeObj = {_data: newStoreData,
+		events: new Emitter(),
+		__isNextStateStore: true
 	};
 	
-	if (storeObj) {
-		log.info(`[${name}] Setting state:`, JSON.stringify(val));
-		storeObj[name] = val;
-		events.emit("change");
-		
-		return resolve();
-	}
+	// Add shortcut methods to the store object
+	storeObj.get = (path, options) => {
+		return get(storeObj, path, options);
+	};
 	
-	log.info(`[${name}] Waiting to set state:`, JSON.stringify(val));
+	storeObj.set = (path, newState, options) => {
+		return set(storeObj, path, newState, options);
+	};
 	
-	// Hook when we get a store
-	if (!process || !process.browser) {
-		// On server, we listen for store init every time it is emitted
-		events.once("store", () => {
-			log.info(`[${name}] Store now available, setting state:`, JSON.stringify(val));
-			setState(name, val, options);
-			
-			return;
-		});
-		
-		return;
-	}
+	storeObj.update = (path, newState, options) => {
+		return update(storeObj, path, newState, options);
+	};
 	
-	// On client we only want to hook the store event once
-	// and only listen to the event if the dev told us to init
-	// the value on the client instead of using the data sent
-	// from the server - usually you don't want to specify
-	// initOnClient as true since we want the server to tell us
-	// what the initial value should be
-	if (options.initOnClient === true) {
-		events.once("store", () => {
-			log.info(`[${name}] Store now available, setting state:`, JSON.stringify(val));
-			setState(name, val, options);
-			
-			return;
-		});
-	}
+	storeObj.value = (path) => {
+		return value(storeObj, path);
+	};
+	
+	storeObj.exportData = () => {
+		return exportData(storeObj);
+	};
+	
+	storeObj.getContext = () => {
+		return getContext();
+	};
+	
+	return storeObj;
 };
-
-const exportStore = () => {
-	return JSON.parse(JSON.stringify(storeObj));
-};
-
-class ProvideState extends React.PureComponent {
-	constructor (props) {
-		super(props);
-		
-		this.state = exportStore();
-		log.info("Constructing ProvideState with state:", JSON.stringify(this.state));
-		
-		this.handleChange = () => {
-			this.setState({
-				...exportStore()
-			});
-		};
-		
-		if (process && process.browser) {
-			events.on("change", this.handleChange);
-		}
-	}
-	
-	componentWillUnmount () {
-		events.off("change", this.handleChange);
-	}
-	
-	render () {
-		log.info('Rendering ProvideState with store data:', JSON.stringify(this.state));
-		return (
-			<Context.Provider value={this.state}>
-				{this.props.children}
-			</Context.Provider>
-		);
-	}
-}
 
 export default {
 	getStore,
-	setState,
-	getState,
-	exportStore,
-	getContext,
-	ProvideState,
-	events
+	get,
+	set,
+	update,
+	value,
+	exportData,
+	getContext
 };
 
 export {
 	getStore,
-	setState,
-	getState,
-	exportStore,
-	getContext,
-	ProvideState,
-	events
+	get,
+	set,
+	update,
+	value,
+	exportData,
+	getContext
 };

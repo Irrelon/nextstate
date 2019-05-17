@@ -1,6 +1,6 @@
 {
   "name": "irrelon-nextstate",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "description": "High performance state management for Next.js without the crazy mess that redux creates.",
   "main": "dist/index.js",
   "files": [
@@ -8,15 +8,17 @@
   ],
   "scripts": {
     "build": "babel src --out-dir dist",
-    "test": "npm run build && npm run testBrowser && npm run testServer",
+    "test": "npm run build && npm run testBrowser && npm run testServer && npm run testMockServer",
     "testBrowser": "NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --require @babel/register --require @babel/core --require @babel/polyfill --require ./test/setup.js **/*.browser.test.js",
-    "testServer": "NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --require @babel/register --require @babel/core --require @babel/polyfill --require ./test/setup.js **/*.server.test.js"
+    "testServer": "NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --require @babel/register --require @babel/core --require @babel/polyfill --require ./test/setup.js **/*.server.test.js",
+    "testParallel": "NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha-parallel-tests --require @babel/register --require @babel/core --require @babel/polyfill --require ./test/setup.js **/*.parallel.*.test.js",
+    "testMockServer": "NODE_ENV=test BABEL_DISABLE_CACHE=1 node ./test/server.js"
   },
   "author": "Rob Evans - Irrelon Software Limited",
   "license": "MIT",
   "dependencies": {
-    "irrelon-emitter": "^2.1.2",
-    "irrelon-log": "^1.0.9",
+    "irrelon-emitter": "^2.1.4",
+    "irrelon-log": "^1.0.12",
     "irrelon-path": "^2.0.4"
   },
   "devDependencies": {
@@ -30,11 +32,14 @@
     "babel-loader": "^8.0.5",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.12.1",
+    "express": "^4.16.4",
     "jsdom": "^15.0.0",
     "mocha": "^6.1.4",
+    "mocha-parallel-tests": "^2.1.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-test-renderer": "^16.8.6",
+    "request": "latest",
     "webpack": "^4.30.0",
     "webpack-cli": "^3.3.1"
   },

@@ -1,19 +1,32 @@
-import State from "./State";
+import ProvideState from "./ProvideState";
 import {
 	getStore,
-	setState,
-	getState,
-	exportStore,
-	ProvideState
+	get,
+	set,
+	value,
+	update,
+	exportData
 } from "./Store";
 import useState from "./useState";
 
-export {
-	State,
+export default {
 	getStore,
-	setState,
-	getState,
-	ProvideState,
+	get,
+	set,
+	update,
+	value,
 	useState,
-	exportStore
+	exportData,
+	ProvideState
+};
+
+export {
+	getStore,
+	get,
+	set,
+	update,
+	value,
+	useState,
+	exportData,
+	ProvideState
 };

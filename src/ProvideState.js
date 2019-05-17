@@ -1,36 +1,43 @@
 import React from "react";
+import {getContext} from "./Store";
+import Log from "irrelon-log";
 
-const ProvideState = (props) => {
-	const ProvidedStates = props.stateArr.reduce((PreviousComponent, stateArrItem) => {
-		if (PreviousComponent === null) {
-			return (stateRenderProps) => <stateArrItem.Provider>{stateRenderProps.children}</stateArrItem.Provider>;
+const log = new Log("ProvideState");
+
+class ProvideState extends React.PureComponent {
+	constructor (props) {
+		super(props);
+		
+		if (!props.stateStore) {
+			throw new Error("No stateStore prop passed to ProvideState, cannot continue!");
 		}
 		
-		return (stateRenderProps) => <stateArrItem.Provider><PreviousComponent>{stateRenderProps.children}</PreviousComponent></stateArrItem.Provider>;
-	}, null);
+		this.state = {stateStore: {...props.stateStore}};
+		log.debug("Constructing with state:", JSON.stringify(this.state));
+		
+		this.handleChange = () => {
+			this.setState({stateStore: {...props.stateStore}});
+		};
+		
+		if (process && process.browser) {
+			props.stateStore.events.on("change", this.handleChange);
+		}
+	}
 	
-	return <ProvidedStates>{props.children}</ProvidedStates>;
-};
-
-const provideState = (stateArr, ComponentToWrap) => {
-	return class ProvideStateHOC extends React.Component {
-		static getInitialProps (ctx) {
-			if (ComponentToWrap.getInitialProps) {
-				return ComponentToWrap.getInitialProps(ctx);
-			} else {
-				return {};
-			}
-		}
+	componentWillUnmount () {
+		this.props.stateStore.events.off("change", this.handleChange);
+	}
+	
+	render () {
+		log.debug('Rendering with store data:', JSON.stringify(this.state.stateStore.exportData()));
+		const Context = getContext();
 		
-		render () {
-			return <ProvideState stateArr={stateArr}>
-				<ComponentToWrap {...this.props}>{this.props.children}</ComponentToWrap>
-			</ProvideState>;
-		}
-	};
-};
+		return (
+			<Context.Provider value={this.state.stateStore}>
+				{this.props.children}
+			</Context.Provider>
+		);
+	}
+}
 
-export {
-	ProvideState,
-	provideState
-};
+export default ProvideState;

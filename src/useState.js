@@ -22,18 +22,26 @@ const useState = (stateMap, ComponentToWrap) => {
 			}
 			
 			return (<Context.Consumer>
-				{(storeData) => {
+				{(store) => {
+					if (!store) {
+						return <ComponentToWrap {...this.props}>{this.props.children}</ComponentToWrap>
+					}
+					
 					const stateMapKeys = Object.keys(stateMap);
 					const stateData = {};
 					
-					log.info('Mapping state keys:', JSON.stringify(stateMapKeys), JSON.stringify(storeData));
+					log.debug('Mapping state keys:', JSON.stringify(stateMapKeys));
 					
-					stateMapKeys.forEach((stateKey) => {
-						log.info(`Assigning ${stateKey} as ${storeData[stateMap[stateKey].name()]}`);
-						stateData[stateKey] = storeData[stateMap[stateKey].name()];
+					stateMapKeys.forEach((propName) => {
+						const stateName = stateMap[propName];
+						log.debug(`Assigning state ${stateName} to prop ${propName}`);
+						stateData[propName] = store.get(stateName);
 					});
 					
-					log.info('Passing state data to component:', JSON.stringify(stateData));
+					// Add the store to the prop "stateStore"
+					stateData.stateStore = store;
+					
+					log.debug('Passing state data to component:', JSON.stringify(stateData));
 					
 					return <ComponentToWrap {...this.props} {...stateData}>{this.props.children}</ComponentToWrap>
 				}}
