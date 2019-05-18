@@ -17,7 +17,11 @@ class State {
 			throw new Error("Cannot get() without passing a store retrieved with getStore()!");
 		}
 		
-		return store.get(this._name, path, options);
+		if (!path) {
+			throw new Error("Cannot get() without passing a path argument!");
+		}
+		
+		return store.get(`${this._name}.${path}`, options);
 	}
 	
 	set (store, path, newVal, options) {
@@ -25,7 +29,11 @@ class State {
 			throw new Error("Cannot set() without passing a store retrieved with getStore()!");
 		}
 		
-		return store.set(this._name, path, options);
+		if (!path) {
+			throw new Error("Cannot set() without passing a path argument!");
+		}
+		
+		return store.set(`${this._name}.${path}`, options);
 	}
 	
 	update (store, newVal, options) {

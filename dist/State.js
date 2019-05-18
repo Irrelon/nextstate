@@ -37,7 +37,11 @@ function () {
         throw new Error("Cannot get() without passing a store retrieved with getStore()!");
       }
 
-      return store.get(this._name, path, options);
+      if (!path) {
+        throw new Error("Cannot get() without passing a path argument!");
+      }
+
+      return store.get("".concat(this._name, ".").concat(path), options);
     }
   }, {
     key: "set",
@@ -46,7 +50,11 @@ function () {
         throw new Error("Cannot set() without passing a store retrieved with getStore()!");
       }
 
-      return store.set(this._name, path, options);
+      if (!path) {
+        throw new Error("Cannot set() without passing a path argument!");
+      }
+
+      return store.set("".concat(this._name, ".").concat(path), options);
     }
   }, {
     key: "update",
