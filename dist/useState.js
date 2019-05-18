@@ -69,6 +69,11 @@ var useState = function useState(stateMap, ComponentToWrap) {
             log.debug('Mapping state keys:', JSON.stringify(stateMapKeys));
             stateMapKeys.forEach(function (propName) {
               var stateName = stateMap[propName];
+
+              if (typeof stateName !== "string") {
+                throw new Error("Cannot map a state object to a prop name that is not a string!");
+              }
+
               log.debug("Assigning state ".concat(stateName, " to prop ").concat(propName));
               stateData[propName] = store.get(stateName);
             }); // Add the store to the prop "stateStore"

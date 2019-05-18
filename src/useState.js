@@ -34,6 +34,11 @@ const useState = (stateMap, ComponentToWrap) => {
 					
 					stateMapKeys.forEach((propName) => {
 						const stateName = stateMap[propName];
+						
+						if (typeof stateName !== "string") {
+							throw new Error("Cannot map a state object to a prop name that is not a string!");
+						}
+						
 						log.debug(`Assigning state ${stateName} to prop ${propName}`);
 						stateData[propName] = store.get(stateName);
 					});

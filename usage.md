@@ -1,15 +1,3 @@
-> ./state/counter.js
-```js
-const {State} = require('irrelon-nextstate');
-const React = require('react');
-
-let counterState = new State("counter", {val: 0});
-
-setInterval(() => {
-	counterState.update({val: counterState.value().val + 1});
-});
-```
-
 > ./components/MyCounterOutput.js
 ```js
 const React = require('react');
@@ -39,7 +27,7 @@ import MyCounterOutput from "./components/MyCounterOutput";
 class MyApp extends React.PureComponent {
 	render () {
 		return (
-			<ProvideState stateArr={[counterState]}>
+			<ProvideState stateStore={this.props.stateStore}>
 				<MyCounterOutput />
 			</ProvideState>
 		);

@@ -1,3 +1,4 @@
+import State from "./State";
 import ProvideState from "./ProvideState";
 import {
 	getStore,
@@ -17,7 +18,8 @@ export default {
 	value,
 	useState,
 	exportData,
-	ProvideState
+	ProvideState,
+	State
 };
 
 export {
@@ -28,5 +30,6 @@ export {
 	value,
 	useState,
 	exportData,
-	ProvideState
+	ProvideState,
+	State
 };

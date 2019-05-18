@@ -7,6 +7,10 @@ const log = new Log("Store");
 const _context = React.createContext(null);
 
 const decouple = (obj) => {
+	if (typeof obj !== "object") {
+		return obj;
+	}
+	
 	return JSON.parse(JSON.stringify(obj));
 };
 
@@ -81,12 +85,16 @@ const update = (store, path, newState, options = {}) => {
 	return set(store, path, newState, options);
 };
 
-const value = (store) => {
+const value = (store, key) => {
 	if (!store || !store.__isNextStateStore) {
-		throw new Error("Cannot value() without passing a store retrieved with getStore()!");
+		throw new Error("Cannot call value() without passing a store retrieved with getStore()!");
 	}
 	
-	return store._data;
+	if (!key) {
+		throw new Error("Cannot call value() without passing a key to retrieve!");
+	}
+	
+	return store._data[key];
 };
 
 const exportData = (store) => {

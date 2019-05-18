@@ -3,6 +3,12 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+Object.defineProperty(exports, "State", {
+  enumerable: true,
+  get: function get() {
+    return _State["default"];
+  }
+});
 Object.defineProperty(exports, "ProvideState", {
   enumerable: true,
   get: function get() {
@@ -53,6 +59,8 @@ Object.defineProperty(exports, "useState", {
 });
 exports["default"] = void 0;
 
+var _State = _interopRequireDefault(require("./State"));
+
 var _ProvideState = _interopRequireDefault(require("./ProvideState"));
 
 var _Store = require("./Store");
@@ -69,6 +77,7 @@ var _default = {
   value: _Store.value,
   useState: _useState["default"],
   exportData: _Store.exportData,
-  ProvideState: _ProvideState["default"]
+  ProvideState: _ProvideState["default"],
+  State: _State["default"]
 };
 exports["default"] = _default;

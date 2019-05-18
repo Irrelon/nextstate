@@ -26,6 +26,10 @@ var log = new _irrelonLog["default"]("Store");
 var _context = _react["default"].createContext(null);
 
 var decouple = function decouple(obj) {
+  if (_typeof(obj) !== "object") {
+    return obj;
+  }
+
   return JSON.parse(JSON.stringify(obj));
 };
 
@@ -110,12 +114,16 @@ var update = function update(store, path, newState) {
 
 exports.update = update;
 
-var value = function value(store) {
+var value = function value(store, key) {
   if (!store || !store.__isNextStateStore) {
-    throw new Error("Cannot value() without passing a store retrieved with getStore()!");
+    throw new Error("Cannot call value() without passing a store retrieved with getStore()!");
   }
 
-  return store._data;
+  if (!key) {
+    throw new Error("Cannot call value() without passing a key to retrieve!");
+  }
+
+  return store._data[key];
 };
 
 exports.value = value;
