@@ -1,8 +1,8 @@
 import React from "react";
 import {getContext} from "./Store";
-import Log from "irrelon-log";
+import {init as initLog} from "irrelon-log";
 
-const log = new Log("ProvideState");
+const log = initLog("ProvideState");
 
 class ProvideState extends React.PureComponent {
 	constructor (props) {

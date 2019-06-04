@@ -1,9 +1,9 @@
 import React from "react";
 import Emitter from "irrelon-emitter";
 import {get as pathGet, set as pathSet} from "irrelon-path";
-import Log from "irrelon-log";
+import {init as initLog} from "irrelon-log";
 
-const log = new Log("Store");
+const log = initLog("Store");
 const _context = React.createContext(null);
 
 const decouple = (obj) => {

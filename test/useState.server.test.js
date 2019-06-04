@@ -7,8 +7,8 @@ import App from "./App";
 import InnerComponent from "./InnerComponent";
 const assert = require("assert");
 import { mount } from 'enzyme/build';
-import Log from "irrelon-log";
-const log = new Log("useState.server.test");
+import {init as initLog} from "irrelon-log";
+const log = initLog("useState.server.test");
 
 let changeEventCount = 0;
 let stateStore;

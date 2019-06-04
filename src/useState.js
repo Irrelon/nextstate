@@ -1,7 +1,7 @@
 import React from "react";
 import {getContext} from "./Store";
-import Log from "irrelon-log";
-const log = new Log("useState");
+import {init as initLog} from "irrelon-log";
+const log = initLog("useState");
 
 const useState = (stateMap, ComponentToWrap) => {
 	return class UseStateHOC extends React.Component {

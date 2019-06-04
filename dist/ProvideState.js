@@ -9,7 +9,7 @@ var _react = _interopRequireDefault(require("react"));
 
 var _Store = require("./Store");
 
-var _irrelonLog = _interopRequireDefault(require("irrelon-log"));
+var _irrelonLog = require("irrelon-log");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -35,7 +35,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var log = new _irrelonLog["default"]("ProvideState");
+var log = (0, _irrelonLog.init)("ProvideState");
 
 var ProvideState =
 /*#__PURE__*/

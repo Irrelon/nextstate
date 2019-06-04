@@ -11,7 +11,7 @@ var _irrelonEmitter = _interopRequireDefault(require("irrelon-emitter"));
 
 var _irrelonPath = require("irrelon-path");
 
-var _irrelonLog = _interopRequireDefault(require("irrelon-log"));
+var _irrelonLog = require("irrelon-log");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -21,7 +21,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-var log = new _irrelonLog["default"]("Store");
+var log = (0, _irrelonLog.init)("Store");
 
 var _context = _react["default"].createContext(null);
 

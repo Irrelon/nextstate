@@ -1,7 +1,7 @@
 // Tell process we are on node
 process.browser = false;
 
-const Log = require("irrelon-log");
+const {init: initLog} = require("irrelon-log");
 const request = require("request");
 const express = require("express");
 const assert = require("assert");
@@ -10,7 +10,7 @@ const {getStore} = require("../dist/index");
 
 const events = new Emitter();
 const app = express();
-const log = new Log("Server parallel tests");
+const log = initLog("Server parallel tests");
 
 app.get("/", (req, res) => {
 	try {
