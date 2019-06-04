@@ -7,6 +7,14 @@ to pepper your project with horrible action constants and reducer code.
 npm i irrelon-nextstate
 ```
 
+## Debug Logs
+If you want to see debug output showing all the stuff Irrelon NextState is
+doing while it is running, set an environment variable:
+
+```bash
+IRRELON_LOG="ProvideState=*,Store=*,useState=*"
+```
+
 ## Usage
 
 #### Creating a State Instance
