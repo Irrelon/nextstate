@@ -7,14 +7,6 @@ to pepper your project with horrible action constants and reducer code.
 npm i irrelon-nextstate
 ```
 
-## Debug Logs
-If you want to see debug output showing all the stuff Irrelon NextState is
-doing while it is running, set an environment variable:
-
-```bash
-IRRELON_LOG="ProvideState=*,Store=*,useState=*"
-```
-
 ## Usage
 
 #### Creating a State Instance
@@ -32,61 +24,22 @@ const state = new State("myAwesomeState", {});
 module.exports = state;
 ```
 
-You can use your new state in various ways:
-
-#### Setting and Updating State Data
-```js
-import myAwesomeState from "./store/state/myAwesomeState";
-
-// Call to update the state. This data is spread internally
-// so it's like doing:
-//
-// state = {
-// 	...currentState,
-// 	...JSON.parse(
-// 		JSON.stringify(newState)
-// 	)
-// }
-myAwesomeState.update({
-	loading: true,
-	show: {
-		app1: true,
-		app2: false
-	}
-});
-
-// You can also completely overwrite the state data, in this
-// case, resetting it to an empty object
-myAwesomeState.overwrite({});
-```
-
-#### Reading State Data
-```js
-import myAwesomeState from "./store/state/myAwesomeState.js";
-
-// Via dot path notation (see https://github.com/Irrelon/irrelon-path)
-const app1Val = myAwesomeState.get('show.app1');
-
-// The whole state object
-const stateData = myAwesomeState.value();
-```
-
 #### Usage in a React Component
-You can wrap your component in the higher-order-component "useProps"
+You can wrap your component in the higher-order-component "useState"
 provided with Irrelon NextState and include as many states as you
 like. These will be passed into your component as props, accessible
 via this.props.
 
 ```js
 import React from 'react';
-import myAwesomeState from "./store/state/myAwesomeState";
+import myAwesomeState from "./store/state/myAwesomeState.js";
 import {useState} from "irrelon-nextstate";
 
 class MyComponent extends React.PureComponent {
 	toggleLoading = () => {
-		const newVal = !myAwesomeState.get('loading');
+		const newVal = !this.props.myAwesomeStateData.loading;
 		
-		myAwesomeState.update({
+		myAwesomeState.update(this.props.stateStore, {
 			loading: newVal			
 		});
 	};
@@ -98,19 +51,29 @@ class MyComponent extends React.PureComponent {
 	}
 }
 
-// The name of the state data prop will be the key the state is
-// assigned to in the object passed to useState as the first argument
+// useState takes an object with key/value pairs. You are mapping the state by the name
+// of (key) to the prop name (value) that the component will be passed.
+// e.g. if you pass { "foo": "bar" } you are telling NextState to map the data in
+// the state called "foo" to a prop in the component called "bar" which can then
+// be accessed in the component via "this.props.bar".
 export default useState({
-	myAwesomeStateData: myAwesomeState,
-	someOtherStateData: someOtherState
+	"myAwesomeState": "myAwesomeStateData",
+	"someOtherState": "someOtherStateData"
 }, MyComponent);
 ```
 
 > Keep in mind that when you provide a react component the state data as
-props by using the useState HOC, the props contain the *data object* the
+props by using the useState HOC, the props contain the *data* the
 state instance contains, not the state instance itself. If you want to use
 the state instance from your react component code, call a method like the
 above example with toggleLoading().
+
+When using useState() the target component will also automatically receive a prop called
+"stateStore". This is very useful for modifying state inside components as it must be 
+passed with any CRUD method calls.
+
+> WARNING do not cache stateStore or maintain a reference to it. Doing so could cause
+memory leaks and potential cross-contamination of state data between renders.
 
 # Conventions
 While we try to be unopinionated in our modules we have found that some
@@ -120,9 +83,9 @@ In the case of Irrelon NextState we have found that maintaining a ./store
 folder in the root of the project and keeping state objects in the
 ./store/state folder is a fairly clean pattern.
 
-We put any global actions related to the states in the ./store/actions
-folder. For instance if you wanted to maintain actions that modified
-a user session state object you could have two files:
+We put any actions related to the states in the ./store/actions folder.
+For instance if you wanted to maintain actions that modified a user session
+state object you could have two files:
 
 * ./store/state/session.js
 * ./store/actions/session.js
@@ -144,23 +107,23 @@ module.exports = state;
 ```js
 const state = require('../state/session');
 
-const login = () => {
+const login = (stateStore) => {
 	fetch('some-login-url')
 		.then((userData) => {
-			state.update({
+			state.update(stateStore, {
 				...userData,
 				loggedIn: true
 			});
 		})
 		.catch((err) => {
-			state.update({
+			state.update(stateStore, {
 				sessionErr: err
 			});
 		});
 };
 
-const logout = () => {
-	state.overwrite({
+const logout = (stateStore) => {
+	state.overwrite(stateStore, {
 		loggedIn: false
 	});
 };
@@ -174,6 +137,44 @@ module.exports = {
 This convention allows us to create some actions that modify the state
 data for us. If you want, you can centrally locate all your "actions" into
 these sorts of files related to the state data they modify.
+
+# State
+## Methods
+### update
+>state.update(store<Store>, newValue<*>);
+
+Changes the current value of the state to the new value passed.
+
+#### Usage
+```js
+state.update(stateStore, "hello");
+```
+
+### set
+>state.set(store<Store>, path<String>, newValue<*>);
+
+Changes the current value in the specified path of the current state object
+to the new value.
+
+#### Usage
+```js
+state.update(stateStore, {
+	foo: {
+		bar: true
+	}
+});
+
+state.set(store, path, newValue);
+```
+
+# Debugging & Logs
+If you want to see debug output showing all the stuff Irrelon NextState is
+doing while it is running, set an environment variable:
+
+```bash
+IRRELON_LOG="ProvideState=*,Store=*,useState=*"
+```
+
 
 # Internals
 Internally Irrelon NextState uses a couple of other Irrelon modules that
