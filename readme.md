@@ -24,7 +24,48 @@ const state = new State("myAwesomeState", {});
 module.exports = state;
 ```
 
+#### Wrap Your App in The Store Provider
+```js
+import MyApp from './MyApp';
+import {getStore, ProvideState} from "irrelon-nextstate";
+
+class MyApp extends React.Component {
+	static getInitialProps = () => {
+		const myStore = getStore({
+			"session": {
+				"loggedIn": false
+			},
+			"lang": "th",
+			"currency": "thb"
+		});
+		
+		return {
+			_storeData: myStore.exportData()
+		};
+	};
+	
+	constructor (props) {
+		super(props);
+		this.stateStore = getStore(props._storeData);
+	}
+	
+	render() {
+		return <ProvideState stateStore={this.stateStore}>
+			<MyApp />
+		</ProvideState>
+	}
+}
+
+export default MyApp;
+```
+
 #### Usage in a React Component
+Before you can use the state system you must instantiate a store that
+all state is kept in. This store is passed into the React component
+tree via a React context much like react-redux does.
+
+
+
 You can wrap your component in the higher-order-component "useState"
 provided with Irrelon NextState and include as many states as you
 like. These will be passed into your component as props, accessible
