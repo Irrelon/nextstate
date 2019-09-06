@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _path = require("@irrelon/path");
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -37,11 +39,11 @@ function () {
         throw new Error("Cannot get() without passing a store retrieved with getStore()!");
       }
 
-      if (!path) {
+      if (path === undefined) {
         throw new Error("Cannot get() without passing a path argument!");
       }
 
-      return store.get("".concat(this._name, ".").concat(path), options);
+      return store.get((0, _path.join)(this._name, path), options);
     }
   }, {
     key: "set",
@@ -50,11 +52,11 @@ function () {
         throw new Error("Cannot set() without passing a store retrieved with getStore()!");
       }
 
-      if (!path) {
+      if (path === undefined) {
         throw new Error("Cannot set() without passing a path argument!");
       }
 
-      return store.set("".concat(this._name, ".").concat(path), newVal, options);
+      return store.set((0, _path.join)(this._name, path), newVal, options);
     }
   }, {
     key: "update",

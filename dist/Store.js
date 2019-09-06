@@ -67,7 +67,7 @@ var get = function get(store, path) {
     throw new Error("Cannot get() without passing a store retrieved with getStore()!");
   }
 
-  if (!path) {
+  if (path === undefined) {
     throw new Error("Cannot get() without state name or state path in path argument!");
   }
 
@@ -83,7 +83,7 @@ var set = function set(store, path, newState) {
     throw new Error("Cannot call set() without passing a store retrieved with getStore()!");
   }
 
-  if (!path) {
+  if (path === undefined) {
     throw new Error("Cannot set() without state name or state path in path argument!");
   }
 
