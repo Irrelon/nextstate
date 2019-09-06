@@ -51,6 +51,12 @@ Object.defineProperty(exports, "exportData", {
     return _Store.exportData;
   }
 });
+Object.defineProperty(exports, "setLogLevel", {
+  enumerable: true,
+  get: function get() {
+    return _Store.setLogLevel;
+  }
+});
 Object.defineProperty(exports, "useState", {
   enumerable: true,
   get: function get() {
@@ -77,6 +83,7 @@ var _default = {
   value: _Store.value,
   useState: _useState["default"],
   exportData: _Store.exportData,
+  setLogLevel: _Store.setLogLevel,
   ProvideState: _ProvideState["default"],
   State: _State["default"]
 };

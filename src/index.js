@@ -6,7 +6,8 @@ import {
 	set,
 	value,
 	update,
-	exportData
+	exportData,
+	setLogLevel
 } from "./Store";
 import useState from "./useState";
 
@@ -18,6 +19,7 @@ export default {
 	value,
 	useState,
 	exportData,
+	setLogLevel,
 	ProvideState,
 	State
 };
@@ -30,6 +32,7 @@ export {
 	value,
 	useState,
 	exportData,
+	setLogLevel,
 	ProvideState,
 	State
 };

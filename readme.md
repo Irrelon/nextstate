@@ -246,6 +246,7 @@ const val = state.value(store); // val will equal: { foo: { bar: true } }
 ```
 
 # Debugging & Logs
+### Server Side
 If you want to see debug output showing all the stuff Irrelon NextState is
 doing while it is running, set an environment variable:
 
@@ -253,6 +254,14 @@ doing while it is running, set an environment variable:
 IRRELON_LOG="ProvideState=*,Store=*,useState=*"
 ```
 
+### Client Side
+On the client-side use the `setLogLevel()` function exported from
+the module:
+
+```js
+const {setLogLevel} = require("irrelon-nextstate");
+setLogLevel("ProvideState=*,Store=*,useState=*");
+```
 
 # Internals
 Internally Irrelon NextState uses a couple of other Irrelon modules that

@@ -3,6 +3,12 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+Object.defineProperty(exports, "setLogLevel", {
+  enumerable: true,
+  get: function get() {
+    return _irrelonLog.setLevel;
+  }
+});
 exports.getContext = exports.exportData = exports.value = exports.update = exports.set = exports.get = exports.getStore = exports["default"] = void 0;
 
 var _react = _interopRequireDefault(require("react"));
@@ -183,6 +189,7 @@ var _default = {
   update: update,
   value: value,
   exportData: exportData,
-  getContext: getContext
+  getContext: getContext,
+  setLogLevel: _irrelonLog.setLevel
 };
 exports["default"] = _default;

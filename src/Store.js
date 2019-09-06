@@ -1,7 +1,7 @@
 import React from "react";
 import Emitter from "@irrelon/emitter";
 import {get as pathGet, setImmutable as pathSet} from "@irrelon/path";
-import {init as initLog} from "irrelon-log";
+import {init as initLog, setLevel as setLogLevel} from "irrelon-log";
 
 const log = initLog("Store");
 const _context = React.createContext(null);
@@ -149,7 +149,8 @@ export default {
 	update,
 	value,
 	exportData,
-	getContext
+	getContext,
+	setLogLevel
 };
 
 export {
@@ -159,5 +160,6 @@ export {
 	update,
 	value,
 	exportData,
-	getContext
+	getContext,
+	setLogLevel
 };
