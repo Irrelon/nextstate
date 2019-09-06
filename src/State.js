@@ -1,3 +1,5 @@
+import {join as pathJoin} from "@irrelon/path";
+
 class State {
 	constructor (name) {
 		this.name(name);
@@ -17,11 +19,11 @@ class State {
 			throw new Error("Cannot get() without passing a store retrieved with getStore()!");
 		}
 		
-		if (!path) {
+		if (path === undefined) {
 			throw new Error("Cannot get() without passing a path argument!");
 		}
 		
-		return store.get(`${this._name}.${path}`, options);
+		return store.get(pathJoin(this._name, path), options);
 	}
 	
 	set (store, path, newVal, options) {
@@ -29,11 +31,11 @@ class State {
 			throw new Error("Cannot set() without passing a store retrieved with getStore()!");
 		}
 		
-		if (!path) {
+		if (path === undefined) {
 			throw new Error("Cannot set() without passing a path argument!");
 		}
 		
-		return store.set(`${this._name}.${path}`, newVal, options);
+		return store.set(pathJoin(this._name, path), newVal, options);
 	}
 	
 	update (store, newVal, options) {
