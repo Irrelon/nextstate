@@ -7,9 +7,9 @@ exports.getContext = exports.exportData = exports.value = exports.update = expor
 
 var _react = _interopRequireDefault(require("react"));
 
-var _irrelonEmitter = _interopRequireDefault(require("irrelon-emitter"));
+var _emitter = _interopRequireDefault(require("@irrelon/emitter"));
 
-var _irrelonPath = require("irrelon-path");
+var _path = require("@irrelon/path");
 
 var _irrelonLog = require("irrelon-log");
 
@@ -65,7 +65,7 @@ var get = function get(store, path) {
     throw new Error("Cannot get() without state name or state path in path argument!");
   }
 
-  return (0, _irrelonPath.get)(store._data, path);
+  return (0, _path.get)(store._data, path);
 };
 
 exports.get = get;
@@ -82,7 +82,7 @@ var set = function set(store, path, newState) {
   }
 
   log.debug("[".concat(path, "] Setting state:"), JSON.stringify(newState));
-  (0, _irrelonPath.set)(store._data, path, newState);
+  store._data = (0, _path.setImmutable)(store._data, path, newState);
   store.events.emitId("change", path, newState);
 };
 
@@ -145,7 +145,7 @@ var create = function create(initialData) {
 
   var storeObj = {
     _data: newStoreData,
-    events: new _irrelonEmitter["default"](),
+    events: new _emitter["default"](),
     __isNextStateStore: true
   }; // Add shortcut methods to the store object
 

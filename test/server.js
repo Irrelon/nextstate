@@ -5,7 +5,7 @@ const {init: initLog} = require("irrelon-log");
 const request = require("request");
 const express = require("express");
 const assert = require("assert");
-const Emitter = require("irrelon-emitter");
+const Emitter = require("@irrelon/emitter");
 const {getStore} = require("../dist/index");
 
 const events = new Emitter();

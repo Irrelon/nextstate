@@ -1,6 +1,6 @@
 import React from "react";
-import Emitter from "irrelon-emitter";
-import {get as pathGet, set as pathSet} from "irrelon-path";
+import Emitter from "@irrelon/emitter";
+import {get as pathGet, setImmutable as pathSet} from "@irrelon/path";
 import {init as initLog} from "irrelon-log";
 
 const log = initLog("Store");
@@ -55,7 +55,7 @@ const set = (store, path, newState, options = {}) => {
 	}
 	
 	log.debug(`[${path}] Setting state:`, JSON.stringify(newState));
-	pathSet(store._data, path, newState);
+	store._data = pathSet(store._data, path, newState);
 	
 	store.events.emitId("change", path, newState);
 };

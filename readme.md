@@ -180,13 +180,15 @@ data for us. If you want, you can centrally locate all your "actions" into
 these sorts of files related to the state data they modify.
 
 # State
+A state represents a namespaced section of the store that can
+be accessed via helper methods.
+
 ## Methods
 ### update
 >state.update(store<Store>, newValue<*>);
 
 Changes the current value of the state to the new value passed.
 
-#### Usage
 ```js
 state.update(stateStore, "hello");
 ```
@@ -197,15 +199,50 @@ state.update(stateStore, "hello");
 Changes the current value in the specified path of the current state object
 to the new value.
 
-#### Usage
 ```js
+// Assuming a state that has been updated to this object:
 state.update(stateStore, {
 	foo: {
 		bar: true
 	}
 });
 
-state.set(store, path, newValue);
+// You can directly modify the value of foo's bar value via:
+state.set(store, "foo.bar", false);
+```
+
+### get
+>state.get(store<Store>, path<String>);
+
+Gets the current value in the specified path of the current state object.
+
+```js
+// Assuming a state that has been updated to this object:
+state.update(stateStore, {
+	foo: {
+		bar: true
+	}
+});
+
+// You can get foo's bar value via:
+const val = state.get(store, "foo.bar"); // val will equal: true
+```
+
+### value
+>state.value(store<Store>);
+
+Gets the current state (this is not the same as the whole store).
+
+```js
+// Assuming a state that has been updated to this object:
+state.update(stateStore, {
+	foo: {
+		bar: true
+	}
+});
+
+// You can get the whole state via:
+const val = state.value(store); // val will equal: { foo: { bar: true } }
 ```
 
 # Debugging & Logs
