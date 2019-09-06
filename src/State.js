@@ -33,7 +33,7 @@ class State {
 			throw new Error("Cannot set() without passing a path argument!");
 		}
 		
-		return store.set(`${this._name}.${path}`, options);
+		return store.set(`${this._name}.${path}`, newVal, options);
 	}
 	
 	update (store, newVal, options) {

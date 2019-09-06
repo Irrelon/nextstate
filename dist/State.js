@@ -54,7 +54,7 @@ function () {
         throw new Error("Cannot set() without passing a path argument!");
       }
 
-      return store.set("".concat(this._name, ".").concat(path), options);
+      return store.set("".concat(this._name, ".").concat(path), newVal, options);
     }
   }, {
     key: "update",
