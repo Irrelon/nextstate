@@ -35,7 +35,7 @@ class State {
 			throw new Error("Cannot set() without passing a path argument!");
 		}
 		
-		return store.set(pathJoin(this._name, path), newVal, options);
+		return store.value(store.set(pathJoin(this._name, path), newVal, options));
 	}
 	
 	update (store, newVal, options) {

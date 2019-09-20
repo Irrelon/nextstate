@@ -58,6 +58,7 @@ const set = (store, path, newState, options = {}) => {
 	store._data = pathSet(store._data, path, newState);
 	
 	store.events.emitId("change", path, newState);
+	return store._data;
 };
 
 const update = (store, path, newState, options = {}) => {

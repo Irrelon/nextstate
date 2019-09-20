@@ -56,7 +56,7 @@ function () {
         throw new Error("Cannot set() without passing a path argument!");
       }
 
-      return store.set((0, _path.join)(this._name, path), newVal, options);
+      return store.value(store.set((0, _path.join)(this._name, path), newVal, options));
     }
   }, {
     key: "update",

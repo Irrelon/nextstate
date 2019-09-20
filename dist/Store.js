@@ -90,6 +90,7 @@ var set = function set(store, path, newState) {
   log.debug("[".concat(path, "] Setting state:"), JSON.stringify(newState));
   store._data = (0, _path.setImmutable)(store._data, path, newState);
   store.events.emitId("change", path, newState);
+  return store._data;
 };
 
 exports.set = set;
