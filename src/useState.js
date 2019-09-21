@@ -4,7 +4,7 @@ import {init as initLog} from "irrelon-log";
 const log = initLog("useState");
 
 const useState = (stateMap, ComponentToWrap) => {
-	return class UseStateHOC extends React.Component {
+	return class UseStateHOC extends React.PureComponent {
 		static getInitialProps (ctx) {
 			if (ComponentToWrap.getInitialProps) {
 				return ComponentToWrap.getInitialProps(ctx);
@@ -22,11 +22,12 @@ const useState = (stateMap, ComponentToWrap) => {
 			}
 			
 			return (<Context.Consumer>
-				{(store) => {
-					if (!store) {
+				{(storeContainer) => {
+					if (!storeContainer || !storeContainer.stateStore) {
 						return <ComponentToWrap {...this.props}>{this.props.children}</ComponentToWrap>
 					}
 					
+					const store = storeContainer.stateStore;
 					const stateMapKeys = Object.keys(stateMap);
 					const stateData = {};
 					

@@ -12,11 +12,16 @@ class ProvideState extends React.PureComponent {
 			throw new Error("No stateStore prop passed to ProvideState, cannot continue!");
 		}
 		
-		this.state = {stateStore: {...props.stateStore}};
-		log.debug("Constructing with state:", JSON.stringify(this.state));
+		this.state = {
+			storeContainer: this.generateNewStoreContainer(props.stateStore)
+		};
+		
+		log.debug("Constructing with state:", JSON.stringify(this.state.storeContainer));
 		
 		this.handleChange = () => {
-			this.setState({stateStore: {...props.stateStore}});
+			this.setState({
+				storeContainer: this.generateNewStoreContainer(props.stateStore)
+			});
 		};
 		
 		if (process && process.browser) {
@@ -24,16 +29,22 @@ class ProvideState extends React.PureComponent {
 		}
 	}
 	
+	generateNewStoreContainer = (stateStore) => {
+		return {
+			stateStore
+		};
+	};
+	
 	componentWillUnmount () {
 		this.props.stateStore.events.off("change", this.handleChange);
 	}
 	
 	render () {
-		log.debug('Rendering with store data:', JSON.stringify(this.state.stateStore.exportData()));
+		log.debug('Rendering with store data:', JSON.stringify(this.state.storeContainer.stateStore.exportData()));
 		const Context = getContext();
 		
 		return (
-			<Context.Provider value={this.state.stateStore}>
+			<Context.Provider value={this.state.storeContainer}>
 				{this.props.children}
 			</Context.Provider>
 		);

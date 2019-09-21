@@ -36,6 +36,10 @@ var decouple = function decouple(obj) {
     return obj;
   }
 
+  if (obj.__isNextStateStore === true) {
+    log.error("Attempting to decouple a primary store object!");
+  }
+
   return JSON.parse(JSON.stringify(obj));
 };
 
@@ -90,7 +94,7 @@ var set = function set(store, path, newState) {
   log.debug("[".concat(path, "] Setting state:"), JSON.stringify(newState));
   store._data = (0, _path.setImmutable)(store._data, path, newState);
   store.events.emitId("change", path, newState);
-  return store._data;
+  return store;
 };
 
 exports.set = set;
@@ -153,7 +157,8 @@ var create = function create(initialData) {
   var storeObj = {
     _data: newStoreData,
     events: new _emitter["default"](),
-    __isNextStateStore: true
+    __isNextStateStore: true,
+    __storeCreated: new Date().toISOString()
   }; // Add shortcut methods to the store object
 
   storeObj.get = function (path, options) {

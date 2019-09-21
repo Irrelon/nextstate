@@ -38,8 +38,8 @@ var log = (0, _irrelonLog.init)("useState");
 var useState = function useState(stateMap, ComponentToWrap) {
   return (
     /*#__PURE__*/
-    function (_React$Component) {
-      _inherits(UseStateHOC, _React$Component);
+    function (_React$PureComponent) {
+      _inherits(UseStateHOC, _React$PureComponent);
 
       function UseStateHOC() {
         _classCallCheck(this, UseStateHOC);
@@ -59,11 +59,12 @@ var useState = function useState(stateMap, ComponentToWrap) {
             return _react["default"].createElement(ComponentToWrap, this.props);
           }
 
-          return _react["default"].createElement(Context.Consumer, null, function (store) {
-            if (!store) {
+          return _react["default"].createElement(Context.Consumer, null, function (storeContainer) {
+            if (!storeContainer || !storeContainer.stateStore) {
               return _react["default"].createElement(ComponentToWrap, _this.props, _this.props.children);
             }
 
+            var store = storeContainer.stateStore;
             var stateMapKeys = Object.keys(stateMap);
             var stateData = {};
             log.debug('Mapping state keys:', JSON.stringify(stateMapKeys));
@@ -95,7 +96,7 @@ var useState = function useState(stateMap, ComponentToWrap) {
       }]);
 
       return UseStateHOC;
-    }(_react["default"].Component)
+    }(_react["default"].PureComponent)
   );
 };
 
