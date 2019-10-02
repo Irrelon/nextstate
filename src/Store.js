@@ -1,6 +1,6 @@
 import React from "react";
 import Emitter from "@irrelon/emitter";
-import {get as pathGet, setImmutable as pathSet} from "@irrelon/path";
+import {get as pathGet, setImmutable as pathSet, diff as pathDiff} from "@irrelon/path";
 import {init as initLog, setLevel as setLogLevel} from "irrelon-log";
 
 const log = initLog("Store");
@@ -58,8 +58,18 @@ const set = (store, path, newState, options = {}) => {
 		throw new Error("Cannot set() without state name or state path in path argument!");
 	}
 	
+	// Check if new state is same as old
+	const currentState = pathGet(store._data, path);
+	const diff = pathDiff(currentState, newState);
+	
 	log.debug(`[${path}] Setting state:`, JSON.stringify(newState));
 	store._data = pathSet(store._data, path, newState);
+	
+	if (!diff) {
+		log.debug(`[${path}] Diff was the same so no change event`);
+		return store;
+	}
+	
 	store.events.emitId("change", path, newState);
 	
 	return store;

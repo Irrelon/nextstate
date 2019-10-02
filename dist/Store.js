@@ -89,10 +89,19 @@ var set = function set(store, path, newState) {
 
   if (path === undefined) {
     throw new Error("Cannot set() without state name or state path in path argument!");
-  }
+  } // Check if new state is same as old
 
+
+  var currentState = (0, _path.get)(store._data, path);
+  var diff = (0, _path.diff)(currentState, newState);
   log.debug("[".concat(path, "] Setting state:"), JSON.stringify(newState));
   store._data = (0, _path.setImmutable)(store._data, path, newState);
+
+  if (!diff) {
+    log.debug("[".concat(path, "] Diff was the same so no change event"));
+    return store;
+  }
+
   store.events.emitId("change", path, newState);
   return store;
 };
