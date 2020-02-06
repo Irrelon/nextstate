@@ -1,6 +1,6 @@
 import React from "react";
 import Emitter from "@irrelon/emitter";
-import {get as pathGet, setImmutable as pathSet, diff as pathDiff} from "@irrelon/path";
+import {get as pathGet, setImmutable as pathSet, diff as pathDiff, decouple as pathDecouple} from "@irrelon/path";
 import {init as initLog, setLevel as setLogLevel} from "irrelon-log";
 
 const log = initLog("Store");
@@ -90,16 +90,16 @@ const update = (store, path, newState, options = {}) => {
 	if (typeof currentState === "object" && typeof newState === "object") {
 		// Spread the current state and the new data
 		// TODO: Can we use setImmutable from @irrelon/path here instead?
-		if (Array.isArray(currentState)) {
+		if (Array.isArray(newState)) {
 			return set(store, path, [
 				...currentState,
-				...decouple(newState)
+				...pathDecouple(newState, {immutable: true})
 			], options);
 		}
 		
 		return set(store, path, {
 			...currentState,
-			...decouple(newState)
+			...pathDecouple(newState, {immutable: true})
 		}, options);
 	}
 	

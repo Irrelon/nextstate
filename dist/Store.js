@@ -133,11 +133,15 @@ var update = function update(store, path, newState) {
   if (_typeof(currentState) === "object" && _typeof(newState) === "object") {
     // Spread the current state and the new data
     // TODO: Can we use setImmutable from @irrelon/path here instead?
-    if (Array.isArray(currentState)) {
-      return set(store, path, [].concat(_toConsumableArray(currentState), _toConsumableArray(decouple(newState))), options);
+    if (Array.isArray(newState)) {
+      return set(store, path, [].concat(_toConsumableArray(currentState), _toConsumableArray((0, _path.decouple)(newState, {
+        immutable: true
+      }))), options);
     }
 
-    return set(store, path, _objectSpread({}, currentState, decouple(newState)), options);
+    return set(store, path, _objectSpread({}, currentState, (0, _path.decouple)(newState, {
+      immutable: true
+    })), options);
   } // We're not setting an object, we are setting a primitive so
   // simply overwrite the existing data
 
