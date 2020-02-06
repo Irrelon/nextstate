@@ -89,6 +89,14 @@ const update = (store, path, newState, options = {}) => {
 	
 	if (typeof currentState === "object" && typeof newState === "object") {
 		// Spread the current state and the new data
+		// TODO: Can we use setImmutable from @irrelon/path here instead?
+		if (Array.isArray(currentState)) {
+			return set(store, path, [
+				...currentState,
+				...decouple(newState)
+			], options);
+		}
+		
 		return set(store, path, {
 			...currentState,
 			...decouple(newState)

@@ -25,6 +25,14 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 var log = (0, _irrelonLog.init)("Store");
@@ -124,6 +132,11 @@ var update = function update(store, path, newState) {
 
   if (_typeof(currentState) === "object" && _typeof(newState) === "object") {
     // Spread the current state and the new data
+    // TODO: Can we use setImmutable from @irrelon/path here instead?
+    if (Array.isArray(currentState)) {
+      return set(store, path, [].concat(_toConsumableArray(currentState), _toConsumableArray(decouple(newState))), options);
+    }
+
     return set(store, path, _objectSpread({}, currentState, decouple(newState)), options);
   } // We're not setting an object, we are setting a primitive so
   // simply overwrite the existing data
