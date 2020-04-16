@@ -1,46 +1,40 @@
 import React from 'react'
-import Home from '../components/Home'
-import {getStore, ProvideState} from "irrelon-nextstate";
+import projectState from "../state/projectState"
+import {irrelonNextState} from "../nextstate";
+import Test from "../components/Test";
+const {setLogLevel} = require("../nextstate");
+setLogLevel("ProvideState=*,State=*,Store=*,useState=*,irrelonNextState=*");
 
-const AppIndex = (props) => {
-    const stateStore = getStore(props._storeData);
+const Home = (props) => {
+    const {project, updateProject} = props;
     
     return (
-        <ProvideState stateStore={stateStore}>
-          <Home />
-        </ProvideState>
+        <div>
+            Home Page has state {JSON.stringify(project)}
+            <Test />
+            <button onClick={() => {
+                updateProject({
+                    name:"Next Thing"
+                });
+            }}>Update</button>
+        </div>
     );
 };
 
-AppIndex.getInitialProps = () => {
-    const stateStore = getStore({
-        data: {
-            test1: {
-                val1: {
-                    val1: "Hello1",
-                    val2: "Hello1"
-                },
-                val2: {
-                    val1: "Hello1",
-                    val2: "Hello1"
-                }
-            },
-            test2: {
-                val1: {
-                    val1: "Hello2",
-                    val2: "Hello2"
-                },
-                val2: {
-                    val1: "Hello1",
-                    val2: "Hello1"
-                }
-            }
-        }
+Home.getInitialProps = ({updateProject}) => {
+    const cookieVal = "My Cookie Project";
+    
+    updateProject({
+        name: cookieVal
     });
     
     return {
-        _storeData: stateStore.exportData()
+        someNextJsProp: "foo",
+        cookieVal
     };
 };
 
-export default AppIndex;
+export default irrelonNextState({
+    "project": projectState,
+    "updateProject": projectState.update
+}, Home);

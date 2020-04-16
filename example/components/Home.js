@@ -1,6 +1,7 @@
-import {useState, State} from "irrelon-nextstate";
+import {irrelonNextState} from "../nextstate";
 import React from "react";
 import {RowFunctional, RowComponent} from "./Row";
+import projectState from "../state/projectState";
 
 const Home = (props) => {
 	const {data} = props;
@@ -28,6 +29,6 @@ const Home = (props) => {
 	);
 };
 
-export default useState({
-	"data": "data"
+export default irrelonNextState({
+	"project": projectState
 }, Home);
