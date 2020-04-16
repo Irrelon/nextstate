@@ -9,7 +9,7 @@ Object.defineProperty(exports, "setLogLevel", {
     return _irrelonLog.setLevel;
   }
 });
-exports.getContext = exports.exportData = exports.value = exports.update = exports.set = exports.get = exports.getStore = exports["default"] = void 0;
+exports.getContext = exports.exportData = exports.value = exports.patch = exports.set = exports.get = exports.getStore = exports["default"] = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
@@ -74,7 +74,7 @@ var getStore = function getStore(initialData) {
 
 exports.getStore = getStore;
 
-var get = function get(store, path) {
+var get = function get(store, path, defaultVal, options) {
   if (!store || !store.__isNextStateStore) {
     throw new Error("Cannot get() without passing a store retrieved with getStore()!");
   }
@@ -83,7 +83,7 @@ var get = function get(store, path) {
     throw new Error("Cannot get() without state name or state path in path argument!");
   }
 
-  return (0, _path.get)(store._data, path);
+  return (0, _path.get)(store._data, path, defaultVal);
 };
 
 exports.get = get;
@@ -116,18 +116,18 @@ var set = function set(store, path, newState) {
 
 exports.set = set;
 
-var update = function update(store, path, newState) {
+var patch = function patch(store, path, newState) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   if (!store || !store.__isNextStateStore) {
-    throw new Error("Cannot update() without passing a store retrieved with getStore()!");
+    throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
   }
 
   var currentState = get(store, path);
 
   if (typeof newState === "function") {
-    // Call the function to get the update data
-    return update(newState(store, path, currentState, options));
+    // Call the function to get the patch data
+    return patch(newState(store, path, currentState, options));
   }
 
   if (_typeof(currentState) === "object" && _typeof(newState) === "object") {
@@ -149,7 +149,26 @@ var update = function update(store, path, newState) {
   return set(store, path, newState, options);
 };
 
-exports.update = update;
+exports.patch = patch;
+
+var put = function put(store, path, newState) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  if (!store || !store.__isNextStateStore) {
+    throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
+  }
+
+  var currentState = get(store, path);
+
+  if (typeof newState === "function") {
+    // Call the function to get the patch data
+    return put(newState(store, path, currentState, options));
+  } // We're not setting an object, we are setting a primitive so
+  // simply overwrite the existing data
+
+
+  return set(store, path, newState, options);
+};
 
 var value = function value(store, key) {
   if (!store || !store.__isNextStateStore) {
@@ -184,19 +203,24 @@ var create = function create(initialData) {
     _data: newStoreData,
     events: new _emitter["default"](),
     __isNextStateStore: true,
-    __storeCreated: new Date().toISOString()
+    __storeCreated: new Date().toISOString(),
+    __initCache: {}
   }; // Add shortcut methods to the store object
 
-  storeObj.get = function (path, options) {
-    return get(storeObj, path, options);
+  storeObj.get = function (path, defaultVal, options) {
+    return get(storeObj, path, defaultVal, options);
   };
 
   storeObj.set = function (path, newState, options) {
     return set(storeObj, path, newState, options);
   };
 
-  storeObj.update = function (path, newState, options) {
-    return update(storeObj, path, newState, options);
+  storeObj.patch = function (path, newState, options) {
+    return patch(storeObj, path, newState, options);
+  };
+
+  storeObj.put = function (path, newState, options) {
+    return put(storeObj, path, newState, options);
   };
 
   storeObj.value = function (path) {
@@ -218,7 +242,7 @@ var _default = {
   getStore: getStore,
   get: get,
   set: set,
-  update: update,
+  patch: patch,
   value: value,
   exportData: exportData,
   getContext: getContext,

@@ -10,7 +10,7 @@
     "build": "babel src --out-dir dist",
     "test": "npm run build && npm run testBrowser && npm run testServer && npm run testMockServer",
     "testBrowser": "NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --require @babel/register --require @babel/core --require @babel/polyfill --require ./test/setup.js **/*.browser.test.js",
-    "testServer": "NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --require @babel/register --require @babel/core --require @babel/polyfill --require ./test/setup.js **/*.server.test.js",
+    "testServer": "npm run build && NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha --require @babel/register --require @babel/core --require @babel/polyfill --require ./test/setup.js **/*.server.test.js",
     "testParallel": "NODE_ENV=test BABEL_DISABLE_CACHE=1 mocha-parallel-tests --require @babel/register --require @babel/core --require @babel/polyfill --require ./test/setup.js **/*.parallel.*.test.js",
     "testMockServer": "NODE_ENV=test BABEL_DISABLE_CACHE=1 node ./test/server.js"
   },
@@ -18,7 +18,7 @@
   "license": "MIT",
   "dependencies": {
     "@irrelon/emitter": "^3.0.0",
-    "@irrelon/path": "^4.2.2",
+    "@irrelon/path": "^4.4.2",
     "irrelon-log": "^2.0.3"
   },
   "devDependencies": {

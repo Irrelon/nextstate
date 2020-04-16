@@ -37,7 +37,7 @@ const getStore = (initialData) => {
 	return window._nextStateStore;
 };
 
-const get = (store, path) => {
+const get = (store, path, defaultVal, options) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot get() without passing a store retrieved with getStore()!");
 	}
@@ -46,7 +46,7 @@ const get = (store, path) => {
 		throw new Error("Cannot get() without state name or state path in path argument!");
 	}
 	
-	return pathGet(store._data, path);
+	return pathGet(store._data, path, defaultVal);
 };
 
 const set = (store, path, newState, options = {}) => {
@@ -75,16 +75,16 @@ const set = (store, path, newState, options = {}) => {
 	return store;
 };
 
-const update = (store, path, newState, options = {}) => {
+const patch = (store, path, newState, options = {}) => {
 	if (!store || !store.__isNextStateStore) {
-		throw new Error("Cannot update() without passing a store retrieved with getStore()!");
+		throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
 	}
 	
 	const currentState = get(store, path);
 	
 	if (typeof newState === "function") {
-		// Call the function to get the update data
-		return update(newState(store, path, currentState, options));
+		// Call the function to get the patch data
+		return patch(newState(store, path, currentState, options));
 	}
 	
 	if (typeof currentState === "object" && typeof newState === "object") {
@@ -101,6 +101,23 @@ const update = (store, path, newState, options = {}) => {
 			...currentState,
 			...pathDecouple(newState, {immutable: true})
 		}, options);
+	}
+	
+	// We're not setting an object, we are setting a primitive so
+	// simply overwrite the existing data
+	return set(store, path, newState, options);
+};
+
+const put = (store, path, newState, options = {}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
+	}
+	
+	const currentState = get(store, path);
+	
+	if (typeof newState === "function") {
+		// Call the function to get the patch data
+		return put(newState(store, path, currentState, options));
 	}
 	
 	// We're not setting an object, we are setting a primitive so
@@ -140,16 +157,20 @@ const create = (initialData) => {
 	};
 	
 	// Add shortcut methods to the store object
-	storeObj.get = (path, options) => {
-		return get(storeObj, path, options);
+	storeObj.get = (path, defaultVal, options) => {
+		return get(storeObj, path, defaultVal, options);
 	};
 	
 	storeObj.set = (path, newState, options) => {
 		return set(storeObj, path, newState, options);
 	};
 	
-	storeObj.update = (path, newState, options) => {
-		return update(storeObj, path, newState, options);
+	storeObj.patch = (path, newState, options) => {
+		return patch(storeObj, path, newState, options);
+	};
+	
+	storeObj.put = (path, newState, options) => {
+		return put(storeObj, path, newState, options);
 	};
 	
 	storeObj.value = (path) => {
@@ -171,7 +192,7 @@ export default {
 	getStore,
 	get,
 	set,
-	update,
+	patch,
 	value,
 	exportData,
 	getContext,
@@ -182,7 +203,7 @@ export {
 	getStore,
 	get,
 	set,
-	update,
+	patch,
 	value,
 	exportData,
 	getContext,

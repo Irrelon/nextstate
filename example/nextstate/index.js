@@ -1,9 +1,10 @@
 import irrelonNextState from "./irrelonNextState";
 import State from "./State";
-import {setLogLevel} from "./Store";
+import {getStore, setLogLevel} from "./Store";
 
 export {
 	irrelonNextState,
 	State,
-	setLogLevel
+	setLogLevel,
+	getStore
 };

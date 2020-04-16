@@ -1,66 +1,60 @@
 import {join as pathJoin} from "@irrelon/path";
+import {init as initLog} from "irrelon-log";
 
-class State {
-	constructor (name) {
-		this.name(name);
-	}
+const log = initLog("State");
+
+function State (name, initialData) {
+	const _initialData = initialData;
 	
-	name (newName) {
-		if (newName === undefined) {
-			return this._name;
-		}
+	const init = function (store) {
+		if (store.__initCache[name]) return;
 		
-		this._name = newName;
-		return this;
-	}
+		log.debug(`[${name}] Setting initial data...`);
+		
+		store.__initCache[name] = true;
+		store.set(name, _initialData);
+	};
 	
-	get (store, path, options) {
-		if (!store || !store.__isNextStateStore) {
-			throw new Error("Cannot get() without passing a store retrieved with getStore()!");
-		}
-		
-		if (path === undefined) {
-			throw new Error("Cannot get() without passing a path argument!");
-		}
-		
-		return store.get(pathJoin(this._name, path), options);
-	}
+	const stateInstance = function (store) {
+		return store.get(name);
+	};
 	
-	set (store, path, newVal, options) {
-		if (!store || !store.__isNextStateStore) {
-			throw new Error("Cannot set() without passing a store retrieved with getStore()!");
-		}
-		
-		if (path === undefined) {
-			throw new Error("Cannot set() without passing a path argument!");
-		}
-		
-		return store.set(pathJoin(this._name, path), newVal, options);
-	}
+	stateInstance.patch = function (store) {
+		return (newVal) => {
+			store.patch(name, newVal);
+		};
+	};
 	
-	update (store, newVal, options) {
-		if (!store || !store.__isNextStateStore) {
-			throw new Error("Cannot update() without passing a store retrieved with getStore()!");
-		}
-		
-		return store.update(this._name, newVal, options);
-	}
+	stateInstance.put = function (store) {
+		return (newVal) => {
+			store.put(name, newVal);
+		};
+	};
 	
-	overwrite (store, newVal, options) {
-		if (!store || !store.__isNextStateStore) {
-			throw new Error("Cannot overwrite() without passing a store retrieved with getStore()!");
-		}
-		
-		return store.set(this._name, newVal, options);
-	}
+	stateInstance.read = function (store) {
+		return store.get(name);
+	};
 	
-	value (store, options) {
-		if (!store || !store.__isNextStateStore) {
-			throw new Error("Cannot value() without passing a store retrieved with getStore()!");
-		}
-		
-		return store.value(this._name, options);
-	}
+	stateInstance.get = function (store) {
+		return (path = "", defaultVal) => {
+			store.get(pathJoin(name, path), defaultVal);
+		};
+	};
+	
+	stateInstance.set = function (store) {
+		return (path = "", newVal) => {
+			store.set(pathJoin(name, path), newVal);
+		};
+	};
+	
+	stateInstance.init = init;
+	stateInstance.patch.init = init;
+	stateInstance.put.init = init;
+	stateInstance.get.init = init;
+	stateInstance.set.init = init;
+	stateInstance.read.init = init;
+	
+	return stateInstance;
 }
 
 export default State;

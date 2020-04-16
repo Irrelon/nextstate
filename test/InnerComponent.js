@@ -1,9 +1,13 @@
 import React from "react";
-import {useState} from "../dist/index";
+import {irrelonNextState} from "../dist/index";
+import state1 from "./state1";
+import state2 from "./state2";
 
 class InnerComponent extends React.Component {
 	changeState () {
-		this.props.stateStore("state1", {
+		const {updateState1} = this.props;
+		
+		updateState1({
 			foo: true
 		});
 	}
@@ -15,7 +19,8 @@ class InnerComponent extends React.Component {
 	}
 }
 
-export default useState({
-	"stateProp1": "state1",
-	"stateProp2": "state2"
+export default irrelonNextState({
+	"stateProp1": state1,
+	"stateProp2": state2,
+	"updateState1": state1.patch
 }, InnerComponent);

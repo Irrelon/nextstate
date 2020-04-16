@@ -7,88 +7,64 @@ exports["default"] = void 0;
 
 var _path = require("@irrelon/path");
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _irrelonLog = require("irrelon-log");
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+var log = (0, _irrelonLog.init)("State");
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function State(name, initialData) {
+  var _initialData = initialData;
 
-var State =
-/*#__PURE__*/
-function () {
-  function State(name) {
-    _classCallCheck(this, State);
+  var init = function init(store) {
+    if (store.__initCache[name]) return;
+    log.debug("[".concat(name, "] Setting initial data..."));
+    store.__initCache[name] = true;
+    store.set(name, _initialData);
+  };
 
-    this.name(name);
-  }
+  var stateInstance = function stateInstance(store) {
+    return store.get(name);
+  };
 
-  _createClass(State, [{
-    key: "name",
-    value: function name(newName) {
-      if (newName === undefined) {
-        return this._name;
-      }
+  stateInstance.patch = function (store) {
+    return function (newVal) {
+      store.patch(name, newVal);
+    };
+  };
 
-      this._name = newName;
-      return this;
-    }
-  }, {
-    key: "get",
-    value: function get(store, path, options) {
-      if (!store || !store.__isNextStateStore) {
-        throw new Error("Cannot get() without passing a store retrieved with getStore()!");
-      }
+  stateInstance.put = function (store) {
+    return function (newVal) {
+      store.put(name, newVal);
+    };
+  };
 
-      if (path === undefined) {
-        throw new Error("Cannot get() without passing a path argument!");
-      }
+  stateInstance.read = function (store) {
+    return store.get(name);
+  };
 
-      return store.get((0, _path.join)(this._name, path), options);
-    }
-  }, {
-    key: "set",
-    value: function set(store, path, newVal, options) {
-      if (!store || !store.__isNextStateStore) {
-        throw new Error("Cannot set() without passing a store retrieved with getStore()!");
-      }
+  stateInstance.get = function (store) {
+    return function () {
+      var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+      var defaultVal = arguments.length > 1 ? arguments[1] : undefined;
+      store.get((0, _path.join)(name, path), defaultVal);
+    };
+  };
 
-      if (path === undefined) {
-        throw new Error("Cannot set() without passing a path argument!");
-      }
+  stateInstance.set = function (store) {
+    return function () {
+      var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+      var newVal = arguments.length > 1 ? arguments[1] : undefined;
+      store.set((0, _path.join)(name, path), newVal);
+    };
+  };
 
-      return store.set((0, _path.join)(this._name, path), newVal, options);
-    }
-  }, {
-    key: "update",
-    value: function update(store, newVal, options) {
-      if (!store || !store.__isNextStateStore) {
-        throw new Error("Cannot update() without passing a store retrieved with getStore()!");
-      }
-
-      return store.update(this._name, newVal, options);
-    }
-  }, {
-    key: "overwrite",
-    value: function overwrite(store, newVal, options) {
-      if (!store || !store.__isNextStateStore) {
-        throw new Error("Cannot overwrite() without passing a store retrieved with getStore()!");
-      }
-
-      return store.set(this._name, newVal, options);
-    }
-  }, {
-    key: "value",
-    value: function value(store, options) {
-      if (!store || !store.__isNextStateStore) {
-        throw new Error("Cannot value() without passing a store retrieved with getStore()!");
-      }
-
-      return store.value(this._name, options);
-    }
-  }]);
-
-  return State;
-}();
+  stateInstance.init = init;
+  stateInstance.patch.init = init;
+  stateInstance.put.init = init;
+  stateInstance.get.init = init;
+  stateInstance.set.init = init;
+  stateInstance.read.init = init;
+  return stateInstance;
+}
 
 var _default = State;
 exports["default"] = _default;

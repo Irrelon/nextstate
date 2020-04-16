@@ -6,25 +6,36 @@ const {setLogLevel} = require("../nextstate");
 setLogLevel("ProvideState=*,State=*,Store=*,useState=*,irrelonNextState=*");
 
 const Home = (props) => {
-    const {project, updateProject} = props;
+    const {project, patchProject} = props;
     
     return (
-        <div>
+        <div className="body">
             Home Page has state {JSON.stringify(project)}
             <Test />
             <button onClick={() => {
-                updateProject({
+                patchProject({
                     name:"Next Thing"
                 });
             }}>Update</button>
+            <style jsx>{`
+                .body {
+                    flex-direction: column;
+                    display: flex;
+                    flex: 1;
+                    width: 100vw;
+                    height: 100vh;
+                    background-color: #555;
+                    color: #fff;
+                }
+            `}</style>
         </div>
     );
 };
 
-Home.getInitialProps = ({updateProject}) => {
+Home.getInitialProps = ({patchProject}) => {
     const cookieVal = "My Cookie Project";
     
-    updateProject({
+    patchProject({
         name: cookieVal
     });
     
@@ -35,6 +46,6 @@ Home.getInitialProps = ({updateProject}) => {
 };
 
 export default irrelonNextState({
-    "project": projectState,
-    "updateProject": projectState.update
+    "project": projectState.read,
+    "patchProject": projectState.patch
 }, Home);

@@ -43,8 +43,8 @@ describe("Browser", () => {
 			
 			assert.strictEqual(changeEventCount, 0);
 			
-			log.debug("CALLING UPDATE");
-			stateStore.update("state1", true);
+			log.debug("CALLING PATCH");
+			stateStore.patch("state1", true);
 			
 			log.debug("SHOULD HAVE EMITTED BY NOW");
 			assert.strictEqual(changeEventCount, 1);
@@ -59,7 +59,7 @@ describe("Browser", () => {
 			assert.strictEqual(testRenderer.find("InnerComponent").props().someProp, "true dat");
 			
 			// Update the state and see if the new state is reflected in the component
-			stateStore.update("state1", false);
+			stateStore.patch("state1", false);
 			
 			assert.strictEqual(changeEventCount, 2);
 			testRenderer.update();
@@ -72,7 +72,7 @@ describe("Browser", () => {
 			
 			assert.strictEqual(changeEventCount, 0);
 			
-			stateStore.update("state1", 0);
+			stateStore.patch("state1", 0);
 			
 			assert.strictEqual(changeEventCount, 1);
 			
@@ -83,7 +83,7 @@ describe("Browser", () => {
 			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1, 0);
 			
 			// Update the state and see if the new state is reflected in the component
-			stateStore.update("state1", 2);
+			stateStore.patch("state1", 2);
 			
 			assert.strictEqual(changeEventCount, 2);
 			testRenderer.update();
@@ -97,10 +97,10 @@ describe("Browser", () => {
 			
 			assert.strictEqual(changeEventCount, 0);
 			
-			stateStore.update("state1", {
+			stateStore.patch("state1", {
 				"testVal": true
 			});
-			stateStore.update("state2", {
+			stateStore.patch("state2", {
 				"testVal": true
 			});
 			
@@ -114,7 +114,7 @@ describe("Browser", () => {
 			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
 			
 			// Update the state and see if the new state is reflected in the component
-			stateStore.update("state1", {
+			stateStore.patch("state1", {
 				"testVal": false
 			});
 			testRenderer.update();
@@ -124,12 +124,12 @@ describe("Browser", () => {
 			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
 		});
 		
-		it("Doesn't wipe out the other keys when you update a single key calling update()", () => {
+		it("Doesn't wipe out the other keys when you update a single key calling patch()", () => {
 			let testRenderer;
 			
 			assert.strictEqual(changeEventCount, 0);
 			
-			stateStore.update("state1", {
+			stateStore.patch("state1", {
 				"testVal": true,
 				"otherVal": 12345
 			});
@@ -144,7 +144,7 @@ describe("Browser", () => {
 			assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.otherVal, 12345);
 			
 			// Update the state and see if the new state is reflected in the component
-			stateStore.update("state1", {
+			stateStore.patch("state1", {
 				"testVal": false
 			});
 			testRenderer.update();
@@ -166,7 +166,7 @@ describe("Browser", () => {
 			
 			assert.strictEqual(changeEventCount, 0);
 			
-			stateStore.update("state1", stateObj);
+			stateStore.patch("state1", stateObj);
 			
 			assert.strictEqual(changeEventCount, 1);
 			
@@ -179,7 +179,7 @@ describe("Browser", () => {
 			
 			// Update the state and see if the new state is reflected in the component
 			stateObj.testVal.foo = false;
-			stateStore.update("state1", stateObj);
+			stateStore.patch("state1", stateObj);
 			testRenderer.update();
 			assert.strictEqual(changeEventCount, 2);
 			
@@ -199,8 +199,8 @@ describe("Browser", () => {
 			
 			assert.strictEqual(changeEventCount, 0);
 			
-			stateStore.update("state1", stateObj);
-			stateStore.update("state2", {"testVal": false});
+			stateStore.patch("state1", stateObj);
+			stateStore.patch("state2", {"testVal": false});
 			
 			assert.strictEqual(changeEventCount, 2);
 			
@@ -213,8 +213,8 @@ describe("Browser", () => {
 			
 			// Update the state and see if the new state is reflected in the component
 			stateObj.testVal.foo = false;
-			stateStore.update("state1", stateObj);
-			stateStore.update("state2", {"testVal": true});
+			stateStore.patch("state1", stateObj);
+			stateStore.patch("state2", {"testVal": true});
 			testRenderer.update();
 			assert.strictEqual(changeEventCount, 4);
 			

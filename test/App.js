@@ -1,5 +1,5 @@
 import React from "react";
-import {ProvideState} from "../dist/index";
+import {irrelonNextState} from "../dist/index";
 import InnerComponent from "./InnerComponent";
 
 class App extends React.PureComponent {
@@ -9,13 +9,13 @@ class App extends React.PureComponent {
 	
 	render () {
 		return (
-			<ProvideState stateStore={this.props.stateStore}>
-				<InnerComponent someProp={"true dat"}>
-					{this.props.children}
-				</InnerComponent>
-			</ProvideState>
+			<InnerComponent someProp={"true dat"}>
+				{this.props.children}
+			</InnerComponent>
 		);
 	}
 }
 
-export default App;
+export default irrelonNextState({
+
+}, App);

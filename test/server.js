@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 		});
 		
 		// Update a state, the store should then have the updated state
-		store1.update("testState", {
+		store1.patch("testState", {
 			"testVal2": "foo"
 		});
 		
@@ -48,7 +48,7 @@ app.get("/", (req, res) => {
 		
 		setTimeout(() => {
 			// Update a state, the store should then have the updated state
-			store2.update("testState", {
+			store2.patch("testState", {
 				"testVal2": "bar"
 			});
 			

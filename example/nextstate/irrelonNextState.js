@@ -73,6 +73,7 @@ const irrelonNextState = (stateMap, ComponentToWrap) => {
 				// We already have a provider
 				log.debug(`DecisionWrapper(${ComponentToWrap.name}) render, we have a context, rendering component...`);
 				const stateData = resolveMapping(stateMap, this.context.stateStore, false);
+				
 				return (
 					<ComponentToWrap {...this.props} {...stateData}>
 						{this.props.children}
@@ -82,14 +83,27 @@ const irrelonNextState = (stateMap, ComponentToWrap) => {
 			
 			// We don't have a provider, render one
 			log.debug(`DecisionWrapper(${ComponentToWrap.name}) render, we DO NOT have a context, rendering provider...`);
-			this.stateStore = getStore(this.props._serverSideState);
-			const stateData = resolveMapping(stateMap, this.stateStore, false);
+			
+			if (this.props.stateStore) {
+				this.stateStore = this.props.stateStore;
+			} else {
+				this.stateStore = getStore(this.props._serverSideState);
+			}
 			
 			return (
-				<ProvideState stateStore={this.stateStore}>
-					<ComponentToWrap {...this.props} {...stateData}>
-						{this.props.children}
-					</ComponentToWrap>
+				<ProvideState stateStore={this.stateStore} >
+					<Context.Consumer>
+						{(stateContainer) => {
+							log.debug(`${ComponentToWrap.name} Provider consumer re-render`);
+							const stateData = resolveMapping(stateMap, stateContainer.stateStore, false);
+							
+							return (
+								<ComponentToWrap {...this.props} {...stateData}>
+									{this.props.children}
+								</ComponentToWrap>
+							);
+						}}
+					</Context.Consumer>
 				</ProvideState>
 			)
 		}

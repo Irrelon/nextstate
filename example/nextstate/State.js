@@ -1,4 +1,5 @@
-import {init as initLog, setLevel as setLogLevel} from "irrelon-log";
+import {join as pathJoin} from "@irrelon/path";
+import {init as initLog} from "irrelon-log";
 
 const log = initLog("State");
 
@@ -18,15 +19,40 @@ function State (name, initialData) {
 		return store.get(name);
 	};
 	
-	stateInstance.init = init;
-	
-	stateInstance.update = function (store) {
+	stateInstance.patch = function (store) {
 		return (newVal) => {
-			store.update(name, newVal);
+			store.patch(name, newVal);
 		};
 	};
 	
-	stateInstance.update.init = init;
+	stateInstance.put = function (store) {
+		return (newVal) => {
+			store.put(name, newVal);
+		};
+	};
+	
+	stateInstance.read = function (store) {
+		return store.get(name);
+	};
+	
+	stateInstance.get = function (store) {
+		return (path = "", defaultVal) => {
+			store.get(pathJoin(name, path), defaultVal);
+		};
+	};
+	
+	stateInstance.set = function (store) {
+		return (path = "", newVal) => {
+			store.set(pathJoin(name, path), newVal);
+		};
+	};
+	
+	stateInstance.init = init;
+	stateInstance.patch.init = init;
+	stateInstance.put.init = init;
+	stateInstance.get.init = init;
+	stateInstance.set.init = init;
+	stateInstance.read.init = init;
 	
 	return stateInstance;
 }

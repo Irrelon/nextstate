@@ -13,5 +13,5 @@ const Test = (props) => {
 };
 
 export default irrelonNextState({
-	"project": projectState
+	"project": projectState.read
 }, Test);
