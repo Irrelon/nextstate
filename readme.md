@@ -52,19 +52,27 @@ export default irrelonNextState({
 }, MyPage);
 ```
 
-## State Methods
+# State Methods
 > State methods can be used to provide a function as a prop to your page or component
   that allows you to operate on the state inside your component code.
 
-### patch
+## patch
 > state.patch(newValue<*>);
 
 Patches the current state with the new data passed. If the current state is an
 array or an object and the new value is also an array or object, the new data
 is spread on top of the old data.
 
+### Get It
 ```js
-state.patch("hello");
+export default irrelonNextState({
+    "somePropName": myState.patch
+}, MyPage);
+```
+
+### Use It
+```js
+somePropName.patch("hello");
 ```
 
 > When updating objects or arrays, new data is spread on top of old data:
@@ -85,8 +93,16 @@ any previous state data.
 > If you want to update your state and maintain existing structures then
   see the `patch` method instead.
 
+### Get It
 ```js
-state.put({
+export default irrelonNextState({
+    "somePropName": myState.put
+}, MyPage);
+```
+
+### Use It
+```js
+somePropName.put({
 	foo: {
 		bar: true
 	}
@@ -100,16 +116,24 @@ Changes the current value in the specified path of the current state object
 to the new value. Paths are dot-notation based. This operates in the same way
 to the `put` method but is directed at a path within the current state.
 
+### Get It
 ```js
-// Assuming a state that has been updated to this object:
-state.put({
+export default irrelonNextState({
+    "somePropName": myState.set
+}, MyPage);
+```
+
+### Use It
+```js
+// Assuming a state that has been defined like this:
+somePropName.put({
 	foo: {
 		bar: true
 	}
 });
 
 // You can directly modify the value of foo's bar value via:
-state.set("foo.bar", false);
+propName.set("foo.bar", false);
 ```
 
 ### get
@@ -119,18 +143,26 @@ Gets the current value in the specified path of the current state object.
 If the value at the specified path is undefined and a defaultVal argument
 is provided, it is returned instead.
 
+### Get It
+```js
+export default irrelonNextState({
+    "somePropName": myState.get
+}, MyPage);
+```
+
+### Use It
 ```js
 // Assuming a state that has been updated to this object:
-state.put({
+somePropName.put({
 	foo: {
 		bar: true
 	}
 });
 
 // You can get foo's bar value via:
-const val = state.get("foo.bar"); // val will equal: `true`
-const otherVal = state.get("this.path.does.not.exist", "myDefaultVal"); // otherVal will equal: `myDefaultVal`
-const all = state.get(); // all will equal: `{foo: {bar: true}}`
+const val = somePropName.get("foo.bar"); // val will equal: `true`
+const otherVal = somePropName.get("this.path.does.not.exist", "myDefaultVal"); // otherVal will equal: `myDefaultVal`
+const all = somePropName.get(); // all will equal: `{foo: {bar: true}}`
 ```
 
 ## Accessor Methods
