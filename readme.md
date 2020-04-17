@@ -53,8 +53,11 @@ export default irrelonNextState({
 ```
 
 # State Methods
-> State methods can be used to provide a function as a prop to your page or component
-  that allows you to operate on the state inside your component code.
+State methods can be used to provide a function as a prop to your page or component
+that allows you to operate on the state inside your component code.
+
+All methods operate on data in an immutable fashion. For more information see the
+@irrelon/path package which does the store object modification under the hood.
 
 ## patch
 > state.patch(newValue<*>);
@@ -75,14 +78,14 @@ export default irrelonNextState({
 somePropName.patch("hello");
 ```
 
-> When updating objects or arrays, new data is spread on top of old data:
+When updating objects or arrays, new data is spread on top of old data:
 
 ```js
 newData = {...oldData, ...newData};
 ```
 
-> If you don't want to spread data and would prefer to completely overwrite it,
-  please use the `put` or `set` methods instead of `patch`.
+If you don't want to spread data and would prefer to completely overwrite it,
+please use the `put` or `set` methods instead of `patch`.
 
 ## put
 > state.put(newValue<*>);
@@ -90,8 +93,8 @@ newData = {...oldData, ...newData};
 Changes the current value in the state to the new passed value, overwriting
 any previous state data.
 
-> If you want to update your state and maintain existing structures then
-  see the `patch` method instead.
+If you want to update your state and maintain existing structures then
+see the `patch` method instead.
 
 ### Get It
 ```js

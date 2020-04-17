@@ -1,5 +1,7 @@
 "use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -11,6 +13,12 @@ Object.defineProperty(exports, "setLogLevel", {
 });
 exports.getContext = exports.exportData = exports.value = exports.patch = exports.set = exports.get = exports.getStore = exports["default"] = void 0;
 
+var _objectSpread2 = _interopRequireDefault(require("@babel/runtime/helpers/objectSpread"));
+
+var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
+
+var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
+
 var _react = _interopRequireDefault(require("react"));
 
 var _emitter = _interopRequireDefault(require("@irrelon/emitter"));
@@ -19,28 +27,12 @@ var _path = require("@irrelon/path");
 
 var _irrelonLog = require("irrelon-log");
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 var log = (0, _irrelonLog.init)("Store");
 
 var _context = _react["default"].createContext(null);
 
 var decouple = function decouple(obj) {
-  if (_typeof(obj) !== "object") {
+  if ((0, _typeof2["default"])(obj) !== "object") {
     return obj;
   }
 
@@ -130,16 +122,16 @@ var patch = function patch(store, path, newState) {
     return patch(newState(store, path, currentState, options));
   }
 
-  if (_typeof(currentState) === "object" && _typeof(newState) === "object") {
+  if ((0, _typeof2["default"])(currentState) === "object" && (0, _typeof2["default"])(newState) === "object") {
     // Spread the current state and the new data
     // TODO: Can we use setImmutable from @irrelon/path here instead?
     if (Array.isArray(newState)) {
-      return set(store, path, [].concat(_toConsumableArray(currentState), _toConsumableArray((0, _path.decouple)(newState, {
+      return set(store, path, [].concat((0, _toConsumableArray2["default"])(currentState), (0, _toConsumableArray2["default"])((0, _path.decouple)(newState, {
         immutable: true
       }))), options);
     }
 
-    return set(store, path, _objectSpread({}, currentState, (0, _path.decouple)(newState, {
+    return set(store, path, (0, _objectSpread2["default"])({}, currentState, (0, _path.decouple)(newState, {
       immutable: true
     })), options);
   } // We're not setting an object, we are setting a primitive so
@@ -196,9 +188,7 @@ exports.exportData = exportData;
 
 var create = function create(initialData) {
   log.debug("Creating new store with initialData:", JSON.stringify(initialData));
-
-  var newStoreData = _objectSpread({}, initialData);
-
+  var newStoreData = (0, _objectSpread2["default"])({}, initialData);
   var storeObj = {
     _data: newStoreData,
     events: new _emitter["default"](),
