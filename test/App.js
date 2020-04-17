@@ -1,5 +1,5 @@
 import React from "react";
-import {irrelonNextState} from "../dist/index";
+import {irrelonNextState} from "../src/index";
 import InnerComponent from "./InnerComponent";
 
 class App extends React.PureComponent {

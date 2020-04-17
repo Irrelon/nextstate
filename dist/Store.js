@@ -125,10 +125,22 @@ var patch = function patch(store, path, newState) {
   if ((0, _typeof2["default"])(currentState) === "object" && (0, _typeof2["default"])(newState) === "object") {
     // Spread the current state and the new data
     // TODO: Can we use setImmutable from @irrelon/path here instead?
-    if (Array.isArray(newState)) {
-      return set(store, path, [].concat((0, _toConsumableArray2["default"])(currentState), (0, _toConsumableArray2["default"])((0, _path.decouple)(newState, {
+    if (Array.isArray(currentState)) {
+      if (Array.isArray(newState)) {
+        return set(store, path, [].concat((0, _toConsumableArray2["default"])(currentState), (0, _toConsumableArray2["default"])((0, _path.decouple)(newState, {
+          immutable: true
+        }))), options);
+      }
+
+      return set(store, path, (0, _objectSpread2["default"])({}, (0, _path.decouple)(newState, {
         immutable: true
-      }))), options);
+      })), options);
+    } else {
+      if (Array.isArray(newState)) {
+        return set(store, path, (0, _toConsumableArray2["default"])((0, _path.decouple)(newState, {
+          immutable: true
+        })), options);
+      }
     }
 
     return set(store, path, (0, _objectSpread2["default"])({}, currentState, (0, _path.decouple)(newState, {
@@ -159,6 +171,34 @@ var put = function put(store, path, newState) {
   // simply overwrite the existing data
 
 
+  return set(store, path, newState, options);
+};
+
+var push = function push(store, path, newVal) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  if (!store || !store.__isNextStateStore) {
+    throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
+  }
+
+  var currentState = get(store, path);
+  var newState = (0, _path.pushValImmutable)(currentState, "", newVal);
+  return set(store, path, newState, options);
+};
+
+var pull = function pull(store, path, val) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
+    strict: false
+  };
+
+  if (!store || !store.__isNextStateStore) {
+    throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
+  }
+
+  log.debug("PULL----", val, options);
+  var currentState = get(store, path);
+  var newState = (0, _path.pullValImmutable)(currentState, "", val, options);
+  log.debug("PULL----newstate", newState);
   return set(store, path, newState, options);
 };
 
@@ -211,6 +251,14 @@ var create = function create(initialData) {
 
   storeObj.put = function (path, newState, options) {
     return put(storeObj, path, newState, options);
+  };
+
+  storeObj.push = function (path, newVal, options) {
+    return push(storeObj, path, newVal, options);
+  };
+
+  storeObj.pull = function (path, val, options) {
+    return pull(storeObj, path, val, options);
   };
 
   storeObj.value = function (path) {

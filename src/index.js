@@ -1,6 +1,7 @@
 import irrelonNextState from "./irrelonNextState";
 import State from "./State";
-import {getStore, setLogLevel} from "./Store";
+import {getStore} from "./Store";
+import {setLevel as setLogLevel} from "irrelon-log";
 
 export {
 	irrelonNextState,

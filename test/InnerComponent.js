@@ -1,5 +1,5 @@
 import React from "react";
-import {irrelonNextState} from "../dist/index";
+import {irrelonNextState} from "../src/index";
 import state1 from "./state1";
 import state2 from "./state2";
 

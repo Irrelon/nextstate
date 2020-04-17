@@ -57,12 +57,35 @@ function State(name, initialData) {
     };
   };
 
+  stateInstance.push = function (store) {
+    return function () {
+      var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+      var newVal = arguments.length > 1 ? arguments[1] : undefined;
+      store.push((0, _path.join)(name, path), newVal);
+    };
+  };
+
+  stateInstance.pull = function (store) {
+    return function () {
+      var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+      var val = arguments.length > 1 ? arguments[1] : undefined;
+      log.debug("PULL----", val, {
+        strict: false
+      });
+      store.pull((0, _path.join)(name, path), val, {
+        strict: false
+      });
+    };
+  };
+
   stateInstance.init = init;
   stateInstance.patch.init = init;
   stateInstance.put.init = init;
   stateInstance.get.init = init;
   stateInstance.set.init = init;
   stateInstance.read.init = init;
+  stateInstance.push.init = init;
+  stateInstance.pull.init = init;
   return stateInstance;
 }
 

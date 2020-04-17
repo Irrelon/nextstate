@@ -26,7 +26,7 @@ Object.defineProperty(exports, "getStore", {
 Object.defineProperty(exports, "setLogLevel", {
   enumerable: true,
   get: function get() {
-    return _Store.setLogLevel;
+    return _irrelonLog.setLevel;
   }
 });
 
@@ -35,3 +35,5 @@ var _irrelonNextState = _interopRequireDefault(require("./irrelonNextState"));
 var _State = _interopRequireDefault(require("./State"));
 
 var _Store = require("./Store");
+
+var _irrelonLog = require("irrelon-log");

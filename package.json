@@ -1,6 +1,6 @@
 {
   "name": "@irrelon/nextstate",
-  "version": "6.0.3",
+  "version": "6.0.4",
   "description": "High performance state management for Next.js without the crazy mess that redux creates.",
   "main": "dist/index.js",
   "files": [
@@ -19,7 +19,7 @@
   "dependencies": {
     "@babel/runtime": "^7.9.2",
     "@irrelon/emitter": "^3.0.0",
-    "@irrelon/path": "^4.4.2",
+    "@irrelon/path": "^4.5.2",
     "irrelon-log": "^2.0.3"
   },
   "devDependencies": {
