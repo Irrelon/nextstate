@@ -12,7 +12,9 @@ function State (name, initialData) {
 		log.debug(`[${name}] Setting initial data...`);
 		
 		store.__initCache[name] = true;
-		store.set(name, _initialData);
+		if (store.get(name) === undefined) {
+			store.set(name, _initialData);
+		}
 	};
 	
 	const stateInstance = function (store) {

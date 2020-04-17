@@ -18,7 +18,10 @@ function State(name, initialData) {
     if (store.__initCache[name]) return;
     log.debug("[".concat(name, "] Setting initial data..."));
     store.__initCache[name] = true;
-    store.set(name, _initialData);
+
+    if (store.get(name) === undefined) {
+      store.set(name, _initialData);
+    }
   };
 
   var stateInstance = function stateInstance(store) {

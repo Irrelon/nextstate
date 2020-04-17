@@ -72,7 +72,7 @@ const irrelonNextState = (stateMap, ComponentToWrap) => {
 			if (this.context && this.context.stateStore) {
 				// We already have a provider
 				log.debug(`DecisionWrapper(${ComponentToWrap.name}) render, we have a context, rendering component...`);
-				const stateData = resolveMapping(stateMap, this.context.stateStore, false);
+				const stateData = resolveMapping(stateMap, this.context.stateStore, true);
 				
 				return (
 					<ComponentToWrap {...this.props} {...stateData}>

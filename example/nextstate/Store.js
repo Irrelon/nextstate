@@ -1,6 +1,13 @@
 import React from "react";
 import Emitter from "@irrelon/emitter";
-import {get as pathGet, setImmutable as pathSet, diff as pathDiff, decouple as pathDecouple} from "@irrelon/path";
+import {
+	get as pathGet,
+	setImmutable as pathSet,
+	pushValImmutable as pathPush,
+	pullValImmutable as pathPull,
+	diff as pathDiff,
+	decouple as pathDecouple
+} from "@irrelon/path";
 import {init as initLog, setLevel as setLogLevel} from "irrelon-log";
 
 const log = initLog("Store");
@@ -90,11 +97,23 @@ const patch = (store, path, newState, options = {}) => {
 	if (typeof currentState === "object" && typeof newState === "object") {
 		// Spread the current state and the new data
 		// TODO: Can we use setImmutable from @irrelon/path here instead?
-		if (Array.isArray(newState)) {
-			return set(store, path, [
-				...currentState,
+		if (Array.isArray(currentState)) {
+			if (Array.isArray(newState)) {
+				return set(store, path, [
+					...currentState,
+					...pathDecouple(newState, {immutable: true})
+				], options);
+			}
+			
+			return set(store, path, {
 				...pathDecouple(newState, {immutable: true})
-			], options);
+			}, options);
+		} else {
+			if (Array.isArray(newState)) {
+				return set(store, path, [
+					...pathDecouple(newState, {immutable: true})
+				], options);
+			}
 		}
 		
 		return set(store, path, {
@@ -122,6 +141,30 @@ const put = (store, path, newState, options = {}) => {
 	
 	// We're not setting an object, we are setting a primitive so
 	// simply overwrite the existing data
+	return set(store, path, newState, options);
+};
+
+const push = (store, path, newVal, options = {}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
+	}
+	
+	const currentState = get(store, path);
+	const newState = pathPush(currentState, "", newVal);
+	
+	return set(store, path, newState, options);
+};
+
+const pull = (store, path, val, options = {strict: false}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
+	}
+	
+	log.debug("PULL----", val, options);
+	const currentState = get(store, path);
+	const newState = pathPull(currentState, "", val, options);
+	log.debug("PULL----newstate", newState);
+	
 	return set(store, path, newState, options);
 };
 
@@ -171,6 +214,14 @@ const create = (initialData) => {
 	
 	storeObj.put = (path, newState, options) => {
 		return put(storeObj, path, newState, options);
+	};
+	
+	storeObj.push = (path, newVal, options) => {
+		return push(storeObj, path, newVal, options);
+	};
+	
+	storeObj.pull = (path, val, options) => {
+		return pull(storeObj, path, val, options);
 	};
 	
 	storeObj.value = (path) => {

@@ -82,7 +82,7 @@ var irrelonNextState = function irrelonNextState(stateMap, ComponentToWrap) {
         if (this.context && this.context.stateStore) {
           // We already have a provider
           log.debug("DecisionWrapper(".concat(ComponentToWrap.name, ") render, we have a context, rendering component..."));
-          var stateData = resolveMapping(stateMap, this.context.stateStore, false);
+          var stateData = resolveMapping(stateMap, this.context.stateStore, true);
           return _react["default"].createElement(ComponentToWrap, (0, _extends2["default"])({}, this.props, stateData), this.props.children);
         } // We don't have a provider, render one
 

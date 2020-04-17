@@ -12,7 +12,9 @@ function State (name, initialData) {
 		log.debug(`[${name}] Setting initial data...`);
 		
 		store.__initCache[name] = true;
-		store.set(name, _initialData);
+		if (store.get(name) === undefined) {
+			store.set(name, _initialData);
+		}
 	};
 	
 	const stateInstance = function (store) {
@@ -47,12 +49,27 @@ function State (name, initialData) {
 		};
 	};
 	
+	stateInstance.push = function (store) {
+		return (path = "", newVal) => {
+			store.push(pathJoin(name, path), newVal);
+		};
+	};
+	
+	stateInstance.pull = function (store) {
+		return (path = "", val) => {
+			log.debug("PULL----", val, {strict: false});
+			store.pull(pathJoin(name, path), val, {strict: false});
+		};
+	};
+	
 	stateInstance.init = init;
 	stateInstance.patch.init = init;
 	stateInstance.put.init = init;
 	stateInstance.get.init = init;
 	stateInstance.set.init = init;
 	stateInstance.read.init = init;
+	stateInstance.push.init = init;
+	stateInstance.pull.init = init;
 	
 	return stateInstance;
 }
