@@ -9,7 +9,7 @@ npm i @irrelon/nextstate
 
 ## Usage
 
-#### Define States
+### Define States
 > states/projectState.js
 
 ```js
@@ -24,7 +24,7 @@ const projectState = new State("project", {
 export default projectState;
 ```
 
-#### Next.js / React Pages and Components
+### Next.js / React Pages and Components
 > pages/MyPage.js
 
 ```js
@@ -84,7 +84,7 @@ newData = {...oldData, ...newData};
 > If you don't want to spread data and would prefer to completely overwrite it,
   please use the `put` or `set` methods instead of `patch`.
 
-### put
+## put
 > state.put(newValue<*>);
 
 Changes the current value in the state to the new passed value, overwriting
@@ -109,7 +109,7 @@ somePropName.put({
 });
 ```
 
-### set
+## set
 > state.set(path<String>, newValue<*>);
 
 Changes the current value in the specified path of the current state object
@@ -136,7 +136,7 @@ somePropName.put({
 propName.set("foo.bar", false);
 ```
 
-### get
+## get
 > state.get([path<String>], [defaultVal<*>]);
 
 Gets the current value in the specified path of the current state object.
