@@ -69,7 +69,6 @@ const set = (store, path, newState, options = {}) => {
 	const currentState = pathGet(store._data, path);
 	const diff = pathDiff(currentState, newState);
 	
-	log.debug(`[${path}] Setting state:`, JSON.stringify(newState));
 	store._data = pathSet(store._data, path, newState);
 	
 	if (!diff) {
@@ -160,10 +159,8 @@ const pull = (store, path, val, options = {strict: false}) => {
 		throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
 	}
 	
-	log.debug("PULL----", val, options);
 	const currentState = get(store, path);
 	const newState = pathPull(currentState, "", val, options);
-	log.debug("PULL----newstate", newState);
 	
 	return set(store, path, newState, options);
 };

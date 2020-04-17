@@ -94,7 +94,6 @@ var set = function set(store, path, newState) {
 
   var currentState = (0, _path.get)(store._data, path);
   var diff = (0, _path.diff)(currentState, newState);
-  log.debug("[".concat(path, "] Setting state:"), JSON.stringify(newState));
   store._data = (0, _path.setImmutable)(store._data, path, newState);
 
   if (!diff) {
@@ -195,10 +194,8 @@ var pull = function pull(store, path, val) {
     throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
   }
 
-  log.debug("PULL----", val, options);
   var currentState = get(store, path);
   var newState = (0, _path.pullValImmutable)(currentState, "", val, options);
-  log.debug("PULL----newstate", newState);
   return set(store, path, newState, options);
 };
 
