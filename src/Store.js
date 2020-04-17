@@ -186,7 +186,7 @@ const exportData = (store) => {
 };
 
 const create = (initialData) => {
-	log.debug("Creating new store with initialData:", JSON.stringify(initialData));
+	//log.debug("Creating new store with initialData:", JSON.stringify(initialData));
 	
 	const newStoreData = {...initialData};
 	const storeObj = {_data: newStoreData,

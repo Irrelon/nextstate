@@ -10,7 +10,7 @@ const resolveMapping = (stateMap, store, init = false) => {
 	const stateMapKeys = Object.keys(stateMap);
 	const stateData = {};
 	
-	log.debug(`(init: ${init}) Mapping state keys:`, JSON.stringify(stateMapKeys));
+	//log.debug(`(init: ${init}) Mapping state keys:`, JSON.stringify(stateMapKeys));
 	
 	stateMapKeys.forEach((propName) => {
 		const stateInstanceFunction = stateMap[propName];

@@ -16,7 +16,7 @@ class ProvideState extends React.PureComponent {
 			storeContainer: this.generateNewStoreContainer(props.stateStore)
 		};
 		
-		log.debug("Constructing with state:", JSON.stringify(this.state.storeContainer));
+		//log.debug("Constructing with state:", JSON.stringify(this.state.storeContainer));
 		
 		this.handleChange = () => {
 			this.setState({
@@ -40,7 +40,7 @@ class ProvideState extends React.PureComponent {
 	}
 	
 	render () {
-		log.debug('Rendering with store data:', JSON.stringify(this.state.storeContainer.stateStore.exportData()));
+		//log.debug('Rendering with store data:', JSON.stringify(this.state.storeContainer.stateStore.exportData()));
 		const Context = getContext();
 		
 		return (

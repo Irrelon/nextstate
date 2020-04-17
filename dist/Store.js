@@ -224,7 +224,7 @@ var exportData = function exportData(store) {
 exports.exportData = exportData;
 
 var create = function create(initialData) {
-  log.debug("Creating new store with initialData:", JSON.stringify(initialData));
+  //log.debug("Creating new store with initialData:", JSON.stringify(initialData));
   var newStoreData = (0, _objectSpread2["default"])({}, initialData);
   var storeObj = {
     _data: newStoreData,

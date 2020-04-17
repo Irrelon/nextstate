@@ -39,8 +39,8 @@ var Context = (0, _Store.getContext)();
 var resolveMapping = function resolveMapping(stateMap, store) {
   var init = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
   var stateMapKeys = Object.keys(stateMap);
-  var stateData = {};
-  log.debug("(init: ".concat(init, ") Mapping state keys:"), JSON.stringify(stateMapKeys));
+  var stateData = {}; //log.debug(`(init: ${init}) Mapping state keys:`, JSON.stringify(stateMapKeys));
+
   stateMapKeys.forEach(function (propName) {
     var stateInstanceFunction = stateMap[propName];
     log.debug("Mapping ".concat(propName, "..."));

@@ -51,8 +51,7 @@ function (_React$PureComponent) {
 
     _this.state = {
       storeContainer: _this.generateNewStoreContainer(props.stateStore)
-    };
-    log.debug("Constructing with state:", JSON.stringify(_this.state.storeContainer));
+    }; //log.debug("Constructing with state:", JSON.stringify(this.state.storeContainer));
 
     _this.handleChange = function () {
       _this.setState({
@@ -75,7 +74,7 @@ function (_React$PureComponent) {
   }, {
     key: "render",
     value: function render() {
-      log.debug('Rendering with store data:', JSON.stringify(this.state.storeContainer.stateStore.exportData()));
+      //log.debug('Rendering with store data:', JSON.stringify(this.state.storeContainer.stateStore.exportData()));
       var Context = (0, _Store.getContext)();
       return _react["default"].createElement(Context.Provider, {
         value: this.state.storeContainer
