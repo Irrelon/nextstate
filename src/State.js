@@ -17,84 +17,99 @@ function State (name, initialData) {
 		}
 	};
 	
-	const stateInstance = (store) => {
+	// These functions all have to be non-arrow functions as
+	// we utilise them as objects and apply a .init() function
+	// to each one
+	const stateInstance = function (store) {
 		return store.get(name);
 	};
 	
-	stateInstance.read = (store) => {
+	stateInstance.read = function (store) {
 		return store.get(name);
 	};
 	
-	stateInstance.put = (store) => {
+	stateInstance.put = function (store) {
 		return (newVal) => {
 			store.put(name, newVal);
 		};
 	};
 	
-	stateInstance.patch = (store) => {
+	stateInstance.patch = function (store) {
 		return (newVal) => {
 			store.patch(name, newVal);
 		};
 	};
 	
-	stateInstance.get = (store) => {
+	stateInstance.get = function (store) {
 		return (path = "", defaultVal) => {
 			store.get(pathJoin(name, path), defaultVal);
 		};
 	};
 	
-	stateInstance.set = (store) => {
+	stateInstance.set = function (store) {
 		return (path = "", newVal) => {
 			store.set(pathJoin(name, path), newVal);
 		};
 	};
 	
-	stateInstance.push = (store) => {
+	stateInstance.push = function (store) {
 		return (path = "", newVal) => {
 			store.push(pathJoin(name, path), newVal);
 		};
 	};
 	
-	stateInstance.pull = (store) => {
+	stateInstance.pull = function (store) {
 		return (path = "", val) => {
 			store.pull(pathJoin(name, path), val, {strict: false});
 		};
 	};
 	
-	stateInstance.putByPath = (path = "") => (store) => {
-		return (newVal) => {
-			store.put(pathJoin(name, path), newVal);
+	stateInstance.putByPath = function (path = "") {
+		return (store) => {
+			return (newVal) => {
+				store.put(pathJoin(name, path), newVal);
+			};
+		};
+	}
+	
+	stateInstance.patchByPath = function (path = "") {
+		return (store) => {
+			return (newVal) => {
+				store.patch(pathJoin(name, path), newVal);
+			};
 		};
 	};
 	
-	stateInstance.patchByPath = (path = "") => (store) => {
-		return (newVal) => {
-			store.patch(pathJoin(name, path), newVal);
+	stateInstance.pushByPath = function (path = "") {
+		return (store) => {
+			return (newVal) => {
+				store.push(pathJoin(name, path), newVal);
+			};
 		};
 	};
 	
-	stateInstance.pushByPath = (path = "") => (store) => {
-		return (newVal) => {
-			store.push(pathJoin(name, path), newVal);
+	stateInstance.pullByPath = function (path = "") {
+		return (store) => {
+			return (val) => {
+				store.pull(pathJoin(name, path), val, {strict: false});
+			};
 		};
 	};
 	
-	stateInstance.pullByPath = (path = "") => (store) => {
-		return (val) => {
-			store.pull(pathJoin(name, path), val, {strict: false});
+	stateInstance.setByPath = function (path = "") {
+		return (store) => {
+			return (val) => {
+				log.debug("PULL----", val, {strict: false});
+				store.pull(pathJoin(name, path), val, {strict: false});
+			};
 		};
 	};
 	
-	stateInstance.setByPath = (path = "") => (store) => {
-		return (val) => {
-			log.debug("PULL----", val, {strict: false});
-			store.pull(pathJoin(name, path), val, {strict: false});
-		};
-	};
-	
-	stateInstance.getByPath = (path = "") => (store) => {
-		return (defaultVal) => {
-			store.get(pathJoin(name, path), defaultVal);
+	stateInstance.getByPath = function (path = "") {
+		return (store) => {
+			return (defaultVal) => {
+				store.get(pathJoin(name, path), defaultVal);
+			};
 		};
 	};
 	

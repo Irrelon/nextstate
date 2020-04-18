@@ -22,7 +22,10 @@ function State(name, initialData) {
     if (store.get(name) === undefined) {
       store.set(name, _initialData);
     }
-  };
+  }; // These functions all have to be non-arrow functions as
+  // we utilise them as objects and apply a .init() function
+  // to each one
+
 
   var stateInstance = function stateInstance(store) {
     return store.get(name);
