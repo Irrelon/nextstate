@@ -140,9 +140,6 @@ function State(name, initialData) {
 
     var setByPath = function setByPath(store) {
       return function (val) {
-        log.debug("PULL----", val, {
-          strict: false
-        });
         store.pull((0, _path.join)(name, path), val, {
           strict: false
         });
@@ -155,11 +152,10 @@ function State(name, initialData) {
 
   stateInstance.getByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+    var defaultVal = arguments.length > 1 ? arguments[1] : undefined;
 
     var getByPath = function getByPath(store) {
-      return function (defaultVal) {
-        store.get((0, _path.join)(name, path), defaultVal);
-      };
+      return store.get((0, _path.join)(name, path), defaultVal);
     };
 
     getByPath.init = init;
