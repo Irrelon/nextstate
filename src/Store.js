@@ -5,6 +5,7 @@ import {
 	setImmutable as pathSet,
 	pushValImmutable as pathPush,
 	pullValImmutable as pathPull,
+	findOnePath as pathFindOnePath,
 	diff as pathDiff,
 	decouple as pathDecouple
 } from "@irrelon/path";
@@ -165,6 +166,21 @@ const pull = (store, path, val, options = {strict: false}) => {
 	return set(store, path, newState, options);
 };
 
+const find = (store, path, query, options = {strict: false}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
+	}
+	
+	const currentState = get(store, path);
+	const matchResult = pathFindOnePath(currentState, query);
+	
+	if (matchResult.match) {
+		return pathGet(currentState, matchResult.path);
+	} else {
+		return undefined;
+	}
+};
+
 const value = (store, key) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call value() without passing a store retrieved with getStore()!");
@@ -219,6 +235,10 @@ const create = (initialData) => {
 	
 	storeObj.pull = (path, val, options) => {
 		return pull(storeObj, path, val, options);
+	};
+	
+	storeObj.find = (path, query, options) => {
+		return find(storeObj, path, query, options);
 	};
 	
 	storeObj.value = (path) => {

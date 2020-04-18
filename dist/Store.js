@@ -199,6 +199,25 @@ var pull = function pull(store, path, val) {
   return set(store, path, newState, options);
 };
 
+var find = function find(store, path, query) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
+    strict: false
+  };
+
+  if (!store || !store.__isNextStateStore) {
+    throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
+  }
+
+  var currentState = get(store, path);
+  var matchResult = (0, _path.findOnePath)(currentState, query);
+
+  if (matchResult.match) {
+    return (0, _path.get)(currentState, matchResult.path);
+  } else {
+    return undefined;
+  }
+};
+
 var value = function value(store, key) {
   if (!store || !store.__isNextStateStore) {
     throw new Error("Cannot call value() without passing a store retrieved with getStore()!");
@@ -256,6 +275,10 @@ var create = function create(initialData) {
 
   storeObj.pull = function (path, val, options) {
     return pull(storeObj, path, val, options);
+  };
+
+  storeObj.find = function (path, query, options) {
+    return find(storeObj, path, query, options);
   };
 
   storeObj.value = function (path) {

@@ -64,6 +64,12 @@ function State (name, initialData) {
 		};
 	};
 	
+	stateInstance.find = function (store) {
+		return (query) => {
+			store.find(pathJoin(name), query, {strict: false});
+		};
+	};
+	
 	stateInstance.putByPath = function (path = "") {
 		const putByPath = function (store) {
 			return (newVal) => {
@@ -143,6 +149,7 @@ function State (name, initialData) {
 	stateInstance.set.init = init;
 	stateInstance.push.init = init;
 	stateInstance.pull.init = init;
+	stateInstance.find.init = init;
 	
 	return stateInstance;
 }

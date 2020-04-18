@@ -81,6 +81,14 @@ function State(name, initialData) {
     };
   };
 
+  stateInstance.find = function (store) {
+    return function (query) {
+      store.find((0, _path.join)(name), query, {
+        strict: false
+      });
+    };
+  };
+
   stateInstance.putByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
 
@@ -170,6 +178,7 @@ function State(name, initialData) {
   stateInstance.set.init = init;
   stateInstance.push.init = init;
   stateInstance.pull.init = init;
+  stateInstance.find.init = init;
   return stateInstance;
 }
 
