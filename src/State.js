@@ -6,7 +6,7 @@ const log = initLog("State");
 function State (name, initialData) {
 	const _initialData = initialData;
 	
-	const init = function (store) {
+	const init = (store) => {
 		if (store.__initCache[name]) return;
 		
 		log.debug(`[${name}] Setting initial data...`);
@@ -17,59 +17,103 @@ function State (name, initialData) {
 		}
 	};
 	
-	const stateInstance = function (store) {
+	const stateInstance = (store) => {
 		return store.get(name);
 	};
 	
-	stateInstance.patch = function (store) {
-		return (newVal) => {
-			store.patch(name, newVal);
-		};
+	stateInstance.read = (store) => {
+		return store.get(name);
 	};
 	
-	stateInstance.put = function (store) {
+	stateInstance.put = (store) => {
 		return (newVal) => {
 			store.put(name, newVal);
 		};
 	};
 	
-	stateInstance.read = function (store) {
-		return store.get(name);
+	stateInstance.patch = (store) => {
+		return (newVal) => {
+			store.patch(name, newVal);
+		};
 	};
 	
-	stateInstance.get = function (store) {
+	stateInstance.get = (store) => {
 		return (path = "", defaultVal) => {
 			store.get(pathJoin(name, path), defaultVal);
 		};
 	};
 	
-	stateInstance.set = function (store) {
+	stateInstance.set = (store) => {
 		return (path = "", newVal) => {
 			store.set(pathJoin(name, path), newVal);
 		};
 	};
 	
-	stateInstance.push = function (store) {
+	stateInstance.push = (store) => {
 		return (path = "", newVal) => {
 			store.push(pathJoin(name, path), newVal);
 		};
 	};
 	
-	stateInstance.pull = function (store) {
+	stateInstance.pull = (store) => {
 		return (path = "", val) => {
+			store.pull(pathJoin(name, path), val, {strict: false});
+		};
+	};
+	
+	stateInstance.putByPath = (path = "") => (store) => {
+		return (newVal) => {
+			store.put(pathJoin(name, path), newVal);
+		};
+	};
+	
+	stateInstance.patchByPath = (path = "") => (store) => {
+		return (newVal) => {
+			store.patch(pathJoin(name, path), newVal);
+		};
+	};
+	
+	stateInstance.pushByPath = (path = "") => (store) => {
+		return (newVal) => {
+			store.push(pathJoin(name, path), newVal);
+		};
+	};
+	
+	stateInstance.pullByPath = (path = "") => (store) => {
+		return (val) => {
+			store.pull(pathJoin(name, path), val, {strict: false});
+		};
+	};
+	
+	stateInstance.setByPath = (path = "") => (store) => {
+		return (val) => {
 			log.debug("PULL----", val, {strict: false});
 			store.pull(pathJoin(name, path), val, {strict: false});
 		};
 	};
 	
+	stateInstance.getByPath = (path = "") => (store) => {
+		return (defaultVal) => {
+			store.get(pathJoin(name, path), defaultVal);
+		};
+	};
+	
 	stateInstance.init = init;
-	stateInstance.patch.init = init;
+	stateInstance.read.init = init;
+	
 	stateInstance.put.init = init;
+	stateInstance.patch.init = init;
 	stateInstance.get.init = init;
 	stateInstance.set.init = init;
-	stateInstance.read.init = init;
 	stateInstance.push.init = init;
 	stateInstance.pull.init = init;
+	
+	stateInstance.putByPath.init = init;
+	stateInstance.patchByPath.init = init;
+	stateInstance.getByPath.init = init;
+	stateInstance.setByPath.init = init;
+	stateInstance.pushByPath.init = init;
+	stateInstance.pullByPath.init = init;
 	
 	return stateInstance;
 }
