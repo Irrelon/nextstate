@@ -120,8 +120,8 @@ function State (name, initialData) {
 	
 	stateInstance.setByPath = function (path = "") {
 		const setByPath = function (store) {
-			return (val) => {
-				store.pull(pathJoin(name, path), val, {strict: false});
+			return (newVal) => {
+				store.set(pathJoin(name, path), newVal);
 			};
 		};
 		

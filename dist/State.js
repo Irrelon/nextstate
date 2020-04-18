@@ -147,10 +147,8 @@ function State(name, initialData) {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
 
     var setByPath = function setByPath(store) {
-      return function (val) {
-        store.pull((0, _path.join)(name, path), val, {
-          strict: false
-        });
+      return function (newVal) {
+        store.set((0, _path.join)(name, path), newVal);
       };
     };
 
