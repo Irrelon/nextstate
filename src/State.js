@@ -72,6 +72,8 @@ function State (name, initialData) {
 		};
 		
 		putByPath.init = init;
+		
+		return putByPath;
 	}
 	
 	stateInstance.patchByPath = function (path = "") {
@@ -82,6 +84,8 @@ function State (name, initialData) {
 		};
 		
 		patchByPath.init = init;
+		
+		return patchByPath;
 	};
 	
 	stateInstance.pushByPath = function (path = "") {
@@ -92,6 +96,8 @@ function State (name, initialData) {
 		};
 		
 		pushByPath.init = init;
+		
+		return pushByPath;
 	};
 	
 	stateInstance.pullByPath = function (path = "") {
@@ -102,6 +108,8 @@ function State (name, initialData) {
 		};
 		
 		pullByPath.init = init;
+		
+		return pullByPath;
 	};
 	
 	stateInstance.setByPath = function (path = "") {
@@ -113,6 +121,8 @@ function State (name, initialData) {
 		};
 		
 		setByPath.init = init;
+		
+		return setByPath;
 	};
 	
 	stateInstance.getByPath = function (path = "") {
@@ -123,6 +133,8 @@ function State (name, initialData) {
 		};
 		
 		getByPath.init = init;
+		
+		return getByPath;
 	};
 	
 	stateInstance.init = init;
