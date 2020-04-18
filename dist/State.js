@@ -15,10 +15,7 @@ function State(name, initialData) {
   var _initialData = initialData;
 
   var init = function init(store) {
-    if (store.__initCache[name]) {
-      return;
-    }
-
+    if (store.__initCache[name]) return;
     log.debug("[".concat(name, "] Setting initial data..."));
     store.__initCache[name] = true;
 
@@ -82,66 +79,85 @@ function State(name, initialData) {
         strict: false
       });
     };
-  }; // These can be arrow functions but must immediately return
-  // actual functions
-
+  };
 
   stateInstance.putByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-    return function (store) {
+
+    var putByPath = function putByPath(store) {
       return function (newVal) {
         store.put((0, _path.join)(name, path), newVal);
       };
     };
+
+    putByPath.init = init;
   };
 
   stateInstance.patchByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-    return function (store) {
+
+    var patchByPath = function patchByPath(store) {
       return function (newVal) {
         store.patch((0, _path.join)(name, path), newVal);
       };
     };
+
+    patchByPath.init = init;
   };
 
   stateInstance.pushByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-    return function (store) {
+
+    var pushByPath = function pushByPath(store) {
       return function (newVal) {
         store.push((0, _path.join)(name, path), newVal);
       };
     };
+
+    pushByPath.init = init;
   };
 
   stateInstance.pullByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-    return function (store) {
+
+    var pullByPath = function pullByPath(store) {
       return function (val) {
         store.pull((0, _path.join)(name, path), val, {
           strict: false
         });
       };
     };
+
+    pullByPath.init = init;
   };
 
   stateInstance.setByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-    return function (store) {
+
+    var setByPath = function setByPath(store) {
       return function (val) {
+        log.debug("PULL----", val, {
+          strict: false
+        });
         store.pull((0, _path.join)(name, path), val, {
           strict: false
         });
       };
     };
+
+    setByPath.init = init;
   };
 
   stateInstance.getByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-    return function (store) {
+
+    var getByPath = function getByPath(store) {
       return function (defaultVal) {
         store.get((0, _path.join)(name, path), defaultVal);
       };
     };
+
+    getByPath.init = init;
   };
 
   stateInstance.init = init;
@@ -152,12 +168,6 @@ function State(name, initialData) {
   stateInstance.set.init = init;
   stateInstance.push.init = init;
   stateInstance.pull.init = init;
-  stateInstance.putByPath.init = init;
-  stateInstance.patchByPath.init = init;
-  stateInstance.getByPath.init = init;
-  stateInstance.setByPath.init = init;
-  stateInstance.pushByPath.init = init;
-  stateInstance.pullByPath.init = init;
   return stateInstance;
 }
 

@@ -7,9 +7,7 @@ function State (name, initialData) {
 	const _initialData = initialData;
 	
 	const init = (store) => {
-		if (store.__initCache[name]) {
-			return;
-		}
+		if (store.__initCache[name]) return;
 		
 		log.debug(`[${name}] Setting initial data...`);
 		
@@ -66,42 +64,65 @@ function State (name, initialData) {
 		};
 	};
 	
-	// These can be arrow functions but must immediately return
-	// actual functions
-	stateInstance.putByPath = (path = "") => function (store) {
-		return (newVal) => {
-			store.put(pathJoin(name, path), newVal);
+	stateInstance.putByPath = function (path = "") {
+		const putByPath = function (store) {
+			return (newVal) => {
+				store.put(pathJoin(name, path), newVal);
+			};
 		};
+		
+		putByPath.init = init;
+	}
+	
+	stateInstance.patchByPath = function (path = "") {
+		const patchByPath = function (store) {
+			return (newVal) => {
+				store.patch(pathJoin(name, path), newVal);
+			};
+		};
+		
+		patchByPath.init = init;
 	};
 	
-	stateInstance.patchByPath = (path = "") => function (store) {
-		return (newVal) => {
-			store.patch(pathJoin(name, path), newVal);
+	stateInstance.pushByPath = function (path = "") {
+		const pushByPath = function (store) {
+			return (newVal) => {
+				store.push(pathJoin(name, path), newVal);
+			};
 		};
+		
+		pushByPath.init = init;
 	};
 	
-	stateInstance.pushByPath = (path = "") => function (store) {
-		return (newVal) => {
-			store.push(pathJoin(name, path), newVal);
+	stateInstance.pullByPath = function (path = "") {
+		const pullByPath = function (store) {
+			return (val) => {
+				store.pull(pathJoin(name, path), val, {strict: false});
+			};
 		};
+		
+		pullByPath.init = init;
 	};
 	
-	stateInstance.pullByPath = (path = "") => function (store) {
-		return (val) => {
-			store.pull(pathJoin(name, path), val, {strict: false});
+	stateInstance.setByPath = function (path = "") {
+		const setByPath = function (store) {
+			return (val) => {
+				log.debug("PULL----", val, {strict: false});
+				store.pull(pathJoin(name, path), val, {strict: false});
+			};
 		};
+		
+		setByPath.init = init;
 	};
 	
-	stateInstance.setByPath = (path = "") => function (store) {
-		return (val) => {
-			store.pull(pathJoin(name, path), val, {strict: false});
+	stateInstance.getByPath = function (path = "") {
+		const getByPath = function (store) {
+			return (defaultVal) => {
+				store.get(pathJoin(name, path), defaultVal);
+			};
 		};
-	};
-	
-	stateInstance.getByPath = (path = "") => function (store) {
-		return (defaultVal) => {
-			store.get(pathJoin(name, path), defaultVal);
-		};
+		
+		getByPath.init = init;
 	};
 	
 	stateInstance.init = init;
@@ -113,13 +134,6 @@ function State (name, initialData) {
 	stateInstance.set.init = init;
 	stateInstance.push.init = init;
 	stateInstance.pull.init = init;
-	
-	stateInstance.putByPath.init = init;
-	stateInstance.patchByPath.init = init;
-	stateInstance.getByPath.init = init;
-	stateInstance.setByPath.init = init;
-	stateInstance.pushByPath.init = init;
-	stateInstance.pullByPath.init = init;
 	
 	return stateInstance;
 }
