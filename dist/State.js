@@ -37,13 +37,13 @@ function State(name, initialData) {
 
   stateInstance.put = function (store) {
     return function (newVal) {
-      store.put(name, newVal);
+      return store.put(name, newVal);
     };
   };
 
   stateInstance.patch = function (store) {
     return function (newVal) {
-      store.patch(name, newVal);
+      return store.patch(name, newVal);
     };
   };
 
@@ -51,7 +51,7 @@ function State(name, initialData) {
     return function () {
       var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
       var defaultVal = arguments.length > 1 ? arguments[1] : undefined;
-      store.get((0, _path.join)(name, path), defaultVal);
+      return store.get((0, _path.join)(name, path), defaultVal);
     };
   };
 
@@ -59,7 +59,7 @@ function State(name, initialData) {
     return function () {
       var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
       var newVal = arguments.length > 1 ? arguments[1] : undefined;
-      store.set((0, _path.join)(name, path), newVal);
+      return store.set((0, _path.join)(name, path), newVal);
     };
   };
 
@@ -67,7 +67,7 @@ function State(name, initialData) {
     return function () {
       var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
       var newVal = arguments.length > 1 ? arguments[1] : undefined;
-      store.push((0, _path.join)(name, path), newVal);
+      return store.push((0, _path.join)(name, path), newVal);
     };
   };
 
@@ -75,7 +75,7 @@ function State(name, initialData) {
     return function () {
       var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
       var val = arguments.length > 1 ? arguments[1] : undefined;
-      store.pull((0, _path.join)(name, path), val, {
+      return store.pull((0, _path.join)(name, path), val, {
         strict: false
       });
     };
@@ -83,7 +83,7 @@ function State(name, initialData) {
 
   stateInstance.find = function (store) {
     return function (query) {
-      store.find((0, _path.join)(name), query, {
+      return store.find((0, _path.join)(name), query, {
         strict: false
       });
     };
@@ -94,7 +94,7 @@ function State(name, initialData) {
 
     var putByPath = function putByPath(store) {
       return function (newVal) {
-        store.put((0, _path.join)(name, path), newVal);
+        return store.put((0, _path.join)(name, path), newVal);
       };
     };
 
@@ -107,7 +107,7 @@ function State(name, initialData) {
 
     var patchByPath = function patchByPath(store) {
       return function (newVal) {
-        store.patch((0, _path.join)(name, path), newVal);
+        return store.patch((0, _path.join)(name, path), newVal);
       };
     };
 
@@ -120,7 +120,7 @@ function State(name, initialData) {
 
     var pushByPath = function pushByPath(store) {
       return function (newVal) {
-        store.push((0, _path.join)(name, path), newVal);
+        return store.push((0, _path.join)(name, path), newVal);
       };
     };
 
@@ -133,7 +133,7 @@ function State(name, initialData) {
 
     var pullByPath = function pullByPath(store) {
       return function (val) {
-        store.pull((0, _path.join)(name, path), val, {
+        return store.pull((0, _path.join)(name, path), val, {
           strict: false
         });
       };
@@ -148,7 +148,7 @@ function State(name, initialData) {
 
     var setByPath = function setByPath(store) {
       return function (newVal) {
-        store.set((0, _path.join)(name, path), newVal);
+        return store.set((0, _path.join)(name, path), newVal);
       };
     };
 
