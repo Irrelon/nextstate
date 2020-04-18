@@ -15,7 +15,10 @@ function State(name, initialData) {
   var _initialData = initialData;
 
   var init = function init(store) {
-    if (store.__initCache[name]) return;
+    if (store.__initCache[name]) {
+      return;
+    }
+
     log.debug("[".concat(name, "] Setting initial data..."));
     store.__initCache[name] = true;
 
@@ -79,7 +82,9 @@ function State(name, initialData) {
         strict: false
       });
     };
-  };
+  }; // These can be arrow functions but must immediately return
+  // actual functions
+
 
   stateInstance.putByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
@@ -123,9 +128,6 @@ function State(name, initialData) {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
     return function (store) {
       return function (val) {
-        log.debug("PULL----", val, {
-          strict: false
-        });
         store.pull((0, _path.join)(name, path), val, {
           strict: false
         });

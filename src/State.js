@@ -7,7 +7,9 @@ function State (name, initialData) {
 	const _initialData = initialData;
 	
 	const init = (store) => {
-		if (store.__initCache[name]) return;
+		if (store.__initCache[name]) {
+			return;
+		}
 		
 		log.debug(`[${name}] Setting initial data...`);
 		
@@ -64,52 +66,41 @@ function State (name, initialData) {
 		};
 	};
 	
-	stateInstance.putByPath = function (path = "") {
-		return (store) => {
-			return (newVal) => {
-				store.put(pathJoin(name, path), newVal);
-			};
-		};
-	}
-	
-	stateInstance.patchByPath = function (path = "") {
-		return (store) => {
-			return (newVal) => {
-				store.patch(pathJoin(name, path), newVal);
-			};
+	// These can be arrow functions but must immediately return
+	// actual functions
+	stateInstance.putByPath = (path = "") => function (store) {
+		return (newVal) => {
+			store.put(pathJoin(name, path), newVal);
 		};
 	};
 	
-	stateInstance.pushByPath = function (path = "") {
-		return (store) => {
-			return (newVal) => {
-				store.push(pathJoin(name, path), newVal);
-			};
+	stateInstance.patchByPath = (path = "") => function (store) {
+		return (newVal) => {
+			store.patch(pathJoin(name, path), newVal);
 		};
 	};
 	
-	stateInstance.pullByPath = function (path = "") {
-		return (store) => {
-			return (val) => {
-				store.pull(pathJoin(name, path), val, {strict: false});
-			};
+	stateInstance.pushByPath = (path = "") => function (store) {
+		return (newVal) => {
+			store.push(pathJoin(name, path), newVal);
 		};
 	};
 	
-	stateInstance.setByPath = function (path = "") {
-		return (store) => {
-			return (val) => {
-				log.debug("PULL----", val, {strict: false});
-				store.pull(pathJoin(name, path), val, {strict: false});
-			};
+	stateInstance.pullByPath = (path = "") => function (store) {
+		return (val) => {
+			store.pull(pathJoin(name, path), val, {strict: false});
 		};
 	};
 	
-	stateInstance.getByPath = function (path = "") {
-		return (store) => {
-			return (defaultVal) => {
-				store.get(pathJoin(name, path), defaultVal);
-			};
+	stateInstance.setByPath = (path = "") => function (store) {
+		return (val) => {
+			store.pull(pathJoin(name, path), val, {strict: false});
+		};
+	};
+	
+	stateInstance.getByPath = (path = "") => function (store) {
+		return (defaultVal) => {
+			store.get(pathJoin(name, path), defaultVal);
 		};
 	};
 	
