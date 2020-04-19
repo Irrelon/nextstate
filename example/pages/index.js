@@ -1,23 +1,39 @@
-import React from 'react'
-import projectState from "../state/projectState"
+import React from 'react';
+import projectState from "../state/projectState";
 import {irrelonNextState} from "../nextstate";
 import Test from "../components/Test";
+
 const {setLogLevel} = require("../nextstate");
 setLogLevel("ProvideState=*,State=*,Store=*,useState=*,irrelonNextState=*");
 
 const Home = (props) => {
-    const {project, patchProject} = props;
-    
-    return (
-        <div className="body">
-            Home Page has state {JSON.stringify(project)}
-            <Test />
-            <button onClick={() => {
-                patchProject({
-                    name:"Next Thing"
-                });
-            }}>Update</button>
-            <style jsx>{`
+	const {projectState, projectState2, projectStatePatch, projectSubItem} = props;
+	
+	return (
+		<div className="body">
+			<table>
+				<tbody>
+				<tr>
+					<td>projectState</td>
+					<td>{JSON.stringify(projectState)}</td>
+				</tr>
+				<tr>
+					<td>projectState2</td>
+					<td>{JSON.stringify(projectState2)}</td>
+				</tr>
+				<tr>
+					<td>projectSubItem</td>
+					<td>{JSON.stringify(projectSubItem)}</td>
+				</tr>
+				</tbody>
+			</table>
+			<Test/>
+			<button onClick={() => {
+				projectStatePatch({
+					name: "Next Thing"
+				});
+			}}>Update</button>
+			<style jsx>{`
                 .body {
                     flex-direction: column;
                     display: flex;
@@ -28,24 +44,32 @@ const Home = (props) => {
                     color: #fff;
                 }
             `}</style>
-        </div>
-    );
+		</div>
+	);
 };
 
-Home.getInitialProps = ({patchProject}) => {
-    const cookieVal = "My Cookie Project";
-    
-    patchProject({
-        name: cookieVal
-    });
-    
-    return {
-        someNextJsProp: "foo",
-        cookieVal
-    };
+Home.getInitialProps = ({projectStatePatch}) => {
+	const cookieVal = "My Cookie Project";
+	
+	projectStatePatch({
+		name: cookieVal
+	});
+	
+	return {
+		someNextJsProp: "foo",
+		cookieVal
+	};
 };
 
 export default irrelonNextState({
-    "project": projectState.read,
-    "patchProject": projectState.patch
+	"projectState": projectState.read,
+	"projectStatePatch": projectState.patch,
+	"projectStateFind": projectState.find
+}, {
+	"projectSubItem": ({projectState, projectStatePatch, projectStateFind}) => {
+		return projectStateFind({
+			_id: "1"
+		});
+	},
+	"projectState2": projectState.read
 }, Home);

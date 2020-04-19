@@ -6,28 +6,33 @@ import ProvideState from "./ProvideState";
 const log = initLog("irrelonNextState");
 const Context = getContext();
 
-const resolveMapping = (stateMap, store, init = false) => {
-	const stateMapKeys = Object.keys(stateMap);
-	const stateData = {};
+const resolveMapping = (stateMapArr, store, init = false) => {
+	log.debug(`(init: ${init}) Mapping states...`);
 	
-	//log.debug(`(init: ${init}) Mapping state keys:`, JSON.stringify(stateMapKeys));
-	
-	stateMapKeys.forEach((propName) => {
-		const stateInstanceFunction = stateMap[propName];
+	const stateData = stateMapArr.reduce((mapData, stateMap) => {
+		const stateMapKeys = Object.keys(stateMap);
 		
-		log.debug(`Mapping ${propName}...`);
+		log.debug(`(init: ${init}) Mapping state keys:`, JSON.stringify(stateMapKeys));
 		
-		if (typeof stateInstanceFunction !== "function") {
-			throw new Error("Cannot map a prop to a state that is not a function!");
-		}
+		stateMapKeys.forEach((propName) => {
+			const stateInstanceFunction = stateMap[propName];
+			
+			log.debug(`Mapping ${propName}...`);
+			
+			if (typeof stateInstanceFunction !== "function") {
+				throw new Error("Cannot map a prop to a state that is not a function!");
+			}
+			
+			if (init) {
+				// Ask state to init
+				stateInstanceFunction.init(store);
+			}
+			
+			mapData[propName] = stateInstanceFunction(store);
+		});
 		
-		if (init) {
-			// Ask state to init
-			stateInstanceFunction.init(store);
-		}
-		
-		stateData[propName] = stateInstanceFunction(store);
-	});
+		return mapData;
+	}, {});
 	
 	log.debug(`Mapping complete`);
 	
@@ -54,7 +59,7 @@ const irrelonNextState = (stateMap, ComponentToWrap) => {
 			}
 			
 			log.debug(`DecisionWrapper(${ComponentToWrap.name}).getInitialProps resolving stateData mapping...`);
-			const stateData = resolveMapping(stateMap, store, true);
+			const stateData = resolveMapping([stateMap], store, true);
 			
 			args[0] = {...args[0], ...stateData};
 			
@@ -72,7 +77,7 @@ const irrelonNextState = (stateMap, ComponentToWrap) => {
 			if (this.context && this.context.stateStore) {
 				// We already have a provider
 				log.debug(`DecisionWrapper(${ComponentToWrap.name}) render, we have a context, rendering component...`);
-				const stateData = resolveMapping(stateMap, this.context.stateStore, true);
+				const stateData = resolveMapping([stateMap], this.context.stateStore, true);
 				
 				return (
 					<ComponentToWrap {...this.props} {...stateData}>
@@ -95,7 +100,7 @@ const irrelonNextState = (stateMap, ComponentToWrap) => {
 					<Context.Consumer>
 						{(stateContainer) => {
 							log.debug(`${ComponentToWrap.name} Provider consumer re-render`);
-							const stateData = resolveMapping(stateMap, stateContainer.stateStore, false);
+							const stateData = resolveMapping([stateMap], stateContainer.stateStore, false);
 							
 							return (
 								<ComponentToWrap {...this.props} {...stateData}>

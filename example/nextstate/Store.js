@@ -5,6 +5,8 @@ import {
 	setImmutable as pathSet,
 	pushValImmutable as pathPush,
 	pullValImmutable as pathPull,
+	findPath as pathFindPath,
+	findOnePath as pathFindOnePath,
 	diff as pathDiff,
 	decouple as pathDecouple
 } from "@irrelon/path";
@@ -46,11 +48,11 @@ const getStore = (initialData) => {
 
 const get = (store, path, defaultVal, options) => {
 	if (!store || !store.__isNextStateStore) {
-		throw new Error("Cannot get() without passing a store retrieved with getStore()!");
+		throw new Error("Cannot call get() without passing a store retrieved with getStore()!");
 	}
 	
 	if (path === undefined) {
-		throw new Error("Cannot get() without state name or state path in path argument!");
+		throw new Error("Cannot call get() without state name or state path in path argument!");
 	}
 	
 	return pathGet(store._data, path, defaultVal);
@@ -62,14 +64,13 @@ const set = (store, path, newState, options = {}) => {
 	}
 	
 	if (path === undefined) {
-		throw new Error("Cannot set() without state name or state path in path argument!");
+		throw new Error("Cannot call set() without state name or state path in path argument!");
 	}
 	
 	// Check if new state is same as old
 	const currentState = pathGet(store._data, path);
 	const diff = pathDiff(currentState, newState);
 	
-	log.debug(`[${path}] Setting state:`, JSON.stringify(newState));
 	store._data = pathSet(store._data, path, newState);
 	
 	if (!diff) {
@@ -82,21 +83,20 @@ const set = (store, path, newState, options = {}) => {
 	return store;
 };
 
-const patch = (store, path, newState, options = {}) => {
+const update = (store, path, newState, options = {}) => {
 	if (!store || !store.__isNextStateStore) {
-		throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
+		throw new Error("Cannot call update() without passing a store retrieved with getStore()!");
 	}
 	
 	const currentState = get(store, path);
 	
 	if (typeof newState === "function") {
-		// Call the function to get the patch data
-		return patch(newState(store, path, currentState, options));
+		// Call the function to get the update data
+		return update(newState(store, path, currentState, options));
 	}
 	
 	if (typeof currentState === "object" && typeof newState === "object") {
 		// Spread the current state and the new data
-		// TODO: Can we use setImmutable from @irrelon/path here instead?
 		if (Array.isArray(currentState)) {
 			if (Array.isArray(newState)) {
 				return set(store, path, [
@@ -127,26 +127,9 @@ const patch = (store, path, newState, options = {}) => {
 	return set(store, path, newState, options);
 };
 
-const put = (store, path, newState, options = {}) => {
-	if (!store || !store.__isNextStateStore) {
-		throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
-	}
-	
-	const currentState = get(store, path);
-	
-	if (typeof newState === "function") {
-		// Call the function to get the patch data
-		return put(newState(store, path, currentState, options));
-	}
-	
-	// We're not setting an object, we are setting a primitive so
-	// simply overwrite the existing data
-	return set(store, path, newState, options);
-};
-
 const push = (store, path, newVal, options = {}) => {
 	if (!store || !store.__isNextStateStore) {
-		throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
+		throw new Error("Cannot call push() without passing a store retrieved with getStore()!");
 	}
 	
 	const currentState = get(store, path);
@@ -157,15 +140,83 @@ const push = (store, path, newVal, options = {}) => {
 
 const pull = (store, path, val, options = {strict: false}) => {
 	if (!store || !store.__isNextStateStore) {
-		throw new Error("Cannot patch() without passing a store retrieved with getStore()!");
+		throw new Error("Cannot call pull() without passing a store retrieved with getStore()!");
 	}
 	
-	log.debug("PULL----", val, options);
 	const currentState = get(store, path);
 	const newState = pathPull(currentState, "", val, options);
-	log.debug("PULL----newstate", newState);
 	
 	return set(store, path, newState, options);
+};
+
+const find = (store, path, query, options = {strict: false}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot call find() without passing a store retrieved with getStore()!");
+	}
+	
+	const currentState = get(store, path);
+	const matchResult = pathFindPath(currentState, query);
+	
+	if (matchResult.match) {
+		return matchResult.path.map((path) => pathGet(currentState, path));
+	} else {
+		return [];
+	}
+};
+
+const findOne = (store, path, query, options = {strict: false}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
+	}
+	
+	const currentState = get(store, path);
+	const matchResult = pathFindOnePath(currentState, query);
+	
+	if (matchResult.match) {
+		return pathGet(currentState, matchResult.path);
+	} else {
+		return undefined;
+	}
+};
+
+const findAndUpdate = (store, path, query, updateData, options = {strict: false}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot call findAndUpdate() without passing a store retrieved with getStore()!");
+	}
+	
+	const currentState = get(store, path);
+	const matchResult = pathFindPath(currentState, query);
+	
+	if (matchResult.match) {
+		return matchResult.path.map((matchResultPath) => {
+			// Update the record
+			update(store, matchResultPath, updateData);
+			
+			// Return the updateed record
+			return pathGet(currentState, matchResultPath)
+		});
+	} else {
+		return [];
+	}
+};
+
+const findOneAndUpdate = (store, path, query, updateData, options = {strict: false}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
+	}
+	
+	const currentState = get(store, path);
+	const matchResult = pathFindOnePath(currentState, query);
+	
+	if (matchResult.match) {
+		// Update the record
+		update(store, matchResult.path, updateData);
+		
+		// Return the updateed record
+		return pathGet(currentState, matchResult.path);
+	} else {
+		return undefined;
+	}
 };
 
 const value = (store, key) => {
@@ -182,14 +233,14 @@ const value = (store, key) => {
 
 const exportData = (store) => {
 	if (!store || !store.__isNextStateStore) {
-		throw new Error("Cannot exportData() without passing a store retrieved with getStore()!");
+		throw new Error("Cannot call exportData() without passing a store retrieved with getStore()!");
 	}
 	
 	return decouple(store._data);
 };
 
 const create = (initialData) => {
-	log.debug("Creating new store with initialData:", JSON.stringify(initialData));
+	//log.debug("Creating new store with initialData:", JSON.stringify(initialData));
 	
 	const newStoreData = {...initialData};
 	const storeObj = {_data: newStoreData,
@@ -208,12 +259,8 @@ const create = (initialData) => {
 		return set(storeObj, path, newState, options);
 	};
 	
-	storeObj.patch = (path, newState, options) => {
-		return patch(storeObj, path, newState, options);
-	};
-	
-	storeObj.put = (path, newState, options) => {
-		return put(storeObj, path, newState, options);
+	storeObj.update = (path, newState, options) => {
+		return update(storeObj, path, newState, options);
 	};
 	
 	storeObj.push = (path, newVal, options) => {
@@ -222,6 +269,14 @@ const create = (initialData) => {
 	
 	storeObj.pull = (path, val, options) => {
 		return pull(storeObj, path, val, options);
+	};
+	
+	storeObj.find = (path, query, options) => {
+		return find(storeObj, path, query, options);
+	};
+	
+	storeObj.findOne = (path, query, options) => {
+		return findOne(storeObj, path, query, options);
 	};
 	
 	storeObj.value = (path) => {
@@ -243,7 +298,7 @@ export default {
 	getStore,
 	get,
 	set,
-	patch,
+	update,
 	value,
 	exportData,
 	getContext,
@@ -254,7 +309,7 @@ export {
 	getStore,
 	get,
 	set,
-	patch,
+	update,
 	value,
 	exportData,
 	getContext,
