@@ -275,8 +275,16 @@ const create = (initialData) => {
 		return find(storeObj, path, query, options);
 	};
 	
+	storeObj.findAndUpdate = (path, query, options) => {
+		return findAndUpdate(storeObj, path, query, options);
+	};
+	
 	storeObj.findOne = (path, query, options) => {
 		return findOne(storeObj, path, query, options);
+	};
+	
+	storeObj.findOneAndUpdate = (path, query, options) => {
+		return findOneAndUpdate(storeObj, path, query, options);
 	};
 	
 	storeObj.value = (path) => {

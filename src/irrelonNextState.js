@@ -7,7 +7,7 @@ const log = initLog("irrelonNextState");
 const Context = getContext();
 
 const resolveMapping = (stateMapArr, store, init = false) => {
-	log.debug(`(init: ${init}) Mapping states...`);
+	log.debug(`(init: ${init}) Mapping states (${stateMapArr.length})...`);
 	
 	const stateData = stateMapArr.reduce((mapData, stateMap) => {
 		const stateMapKeys = Object.keys(stateMap);
@@ -15,20 +15,27 @@ const resolveMapping = (stateMapArr, store, init = false) => {
 		log.debug(`(init: ${init}) Mapping state keys:`, JSON.stringify(stateMapKeys));
 		
 		stateMapKeys.forEach((propName) => {
-			const stateInstanceFunction = stateMap[propName];
+			const mapFunction = stateMap[propName];
+			const isStateFunction = mapFunction.__isNextStateStoreFunction;
 			
 			log.debug(`Mapping ${propName}...`);
 			
-			if (typeof stateInstanceFunction !== "function") {
-				throw new Error("Cannot map a prop to a state that is not a function!");
+			if (typeof mapFunction !== "function") {
+				throw new Error(`Mapping prop ${propName} failed, not provided a function!`);
 			}
 			
-			if (init) {
+			if (init && isStateFunction) {
 				// Ask state to init
-				stateInstanceFunction.init(store);
+				mapFunction.init(store);
 			}
 			
-			mapData[propName] = stateInstanceFunction(store);
+			if (isStateFunction) {
+				mapData[propName] = mapFunction(store);
+			} else {
+				// Pass the existing aggregated mapping to the function
+				// and map the return value to the prop
+				mapData[propName] = mapFunction(mapData);
+			}
 		});
 		
 		return mapData;
@@ -39,8 +46,11 @@ const resolveMapping = (stateMapArr, store, init = false) => {
 	return stateData;
 }
 
-const irrelonNextState = (stateMap, ComponentToWrap) => {
-	const argSignature = `${JSON.stringify(Object.keys(stateMap))}, ${ComponentToWrap.name}`;
+const irrelonNextState = (...args) => {
+	const stateMapArr = args.slice(0, args.length - 1);
+	const ComponentToWrap = args[args.length - 1];
+	const argSignature = `${ComponentToWrap.name}`;
+	
 	log.debug(`irrelonNextState(${argSignature})`);
 	
 	class DecisionWrapper extends React.PureComponent {
@@ -59,7 +69,7 @@ const irrelonNextState = (stateMap, ComponentToWrap) => {
 			}
 			
 			log.debug(`DecisionWrapper(${ComponentToWrap.name}).getInitialProps resolving stateData mapping...`);
-			const stateData = resolveMapping([stateMap], store, true);
+			const stateData = resolveMapping(stateMapArr, store, true);
 			
 			args[0] = {...args[0], ...stateData};
 			
@@ -77,7 +87,7 @@ const irrelonNextState = (stateMap, ComponentToWrap) => {
 			if (this.context && this.context.stateStore) {
 				// We already have a provider
 				log.debug(`DecisionWrapper(${ComponentToWrap.name}) render, we have a context, rendering component...`);
-				const stateData = resolveMapping([stateMap], this.context.stateStore, true);
+				const stateData = resolveMapping(stateMapArr, this.context.stateStore, true);
 				
 				return (
 					<ComponentToWrap {...this.props} {...stateData}>
@@ -100,7 +110,7 @@ const irrelonNextState = (stateMap, ComponentToWrap) => {
 					<Context.Consumer>
 						{(stateContainer) => {
 							log.debug(`${ComponentToWrap.name} Provider consumer re-render`);
-							const stateData = resolveMapping([stateMap], stateContainer.stateStore, false);
+							const stateData = resolveMapping(stateMapArr, stateContainer.stateStore, false);
 							
 							return (
 								<ComponentToWrap {...this.props} {...stateData}>

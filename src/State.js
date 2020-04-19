@@ -3,10 +3,20 @@ import {init as initLog} from "irrelon-log";
 
 const log = initLog("State");
 
+/**
+ * @typedef {object} PullOptions The pull operation options.
+ * @property {boolean} [strict=true] Determines if the matching
+ * system should expect every field in the source (state) object
+ * to match every field in the query object exactly (strict) or
+ * if the source only needs to match the fields defined in the
+ * query object (non-strict).
+ */
+
 function State (name, initialData) {
 	const _initialData = initialData;
 	
-	const init = (store) => {
+	// Has to be a non-arrow function
+	const init = function (store) {
 		if (store.__initCache[name]) return;
 		
 		log.debug(`[${name}] Setting initial data...`);
@@ -17,117 +27,187 @@ function State (name, initialData) {
 		}
 	};
 	
+	init.__isNextStateStoreFunction = true;
+	
 	// These functions all have to be non-arrow functions as
 	// we utilise them as objects and apply a .init() function
 	// to each one
 	const stateInstance = function (store) {
-		return store.get(name);
+		return store.read(name);
 	};
 	
-	stateInstance.read = function (store) {
-		return store.get(name);
-	};
+	stateInstance.init = init;
 	
-	stateInstance.put = function (store) {
+	stateInstance.update = function (store) {
+		/**
+		 * Updates (patches) the state, spreading the new value over
+		 * the existing value if they are both objects or replacing
+		 * outright if either is a primitive.
+		 * value with.
+		 * @param {*} newVal The new value to update the existing
+		 */
 		return (newVal) => {
-			return store.put(name, newVal);
-		};
-	};
-	
-	stateInstance.patch = function (store) {
-		return (newVal) => {
-			return store.patch(name, newVal);
+			return store.update(name, newVal);
 		};
 	};
 	
 	stateInstance.get = function (store) {
-		return (path = "", defaultVal) => {
-			return store.get(pathJoin(name, path), defaultVal);
+		/**
+		 * Gets the state value or the default value if the state value
+		 * is currently undefined.
+		 * @param {*} defaultVal The value to return if the current state
+		 * is undefined.
+		 * */
+		return (defaultVal) => {
+			return store.get(pathJoin(name), defaultVal);
 		};
 	};
 	
 	stateInstance.set = function (store) {
-		return (path = "", newVal) => {
-			return store.set(pathJoin(name, path), newVal);
+		/**
+		 * Replaces the existing state value with the one passed.
+		 * @param {*} newVal The new value to replace the existing
+		 * value with.
+		 */
+		return (newVal) => {
+			return store.set(pathJoin(name), newVal);
 		};
 	};
 	
 	stateInstance.push = function (store) {
-		return (path = "", newVal) => {
-			return store.push(pathJoin(name, path), newVal);
+		/**
+		 * Pushes the passed value to the state array. If the state
+		 * is not an array an error will occur.
+		 * @param {*} newVal The new value to push to the state array.
+		 */
+		return (newVal) => {
+			return store.push(pathJoin(name), newVal);
 		};
 	};
 	
 	stateInstance.pull = function (store) {
-		return (path = "", val) => {
-			return store.pull(pathJoin(name, path), val, {strict: false});
+		/**
+		 * Pulls the passed value to the state array. If the state
+		 * is not an array an error will occur.
+		 * @param {*} newVal The query value to pull from the state array.
+		 * @param {PullOptions} [options] Options object.
+		 */
+		return (val, options = {strict: false}) => {
+			return store.pull(pathJoin(name), val, options);
 		};
 	};
 	
 	stateInstance.find = function (store) {
-		return (query) => {
-			return store.find(pathJoin(name), query, {strict: false});
+		return (query = {}, options = {maxDepth: Infinity}) => {
+			if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
+				options.maxDepth = 0;
+			}
+			return store.find(pathJoin(name), query, options);
 		};
 	};
 	
-	stateInstance.putByPath = function (path = "") {
-		const putByPath = function (store) {
-			return (newVal) => {
-				return store.put(pathJoin(name, path), newVal);
-			};
+	stateInstance.findOne = function (store) {
+		return (query = {}, options = {maxDepth: Infinity}) => {
+			if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
+				options.maxDepth = 0;
+			}
+			return store.findOne(pathJoin(name), query, options);
 		};
-		
-		putByPath.init = init;
-		
-		return putByPath;
-	}
+	};
 	
-	stateInstance.patchByPath = function (path = "") {
-		const patchByPath = function (store) {
-			return (newVal) => {
-				return store.patch(pathJoin(name, path), newVal);
+	stateInstance.findAndUpdate = function (store) {
+		return (query = {}, update = {}, options = {maxDepth: Infinity}) => {
+			if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
+				options.maxDepth = 0;
+			}
+			return store.findAndUpdate(pathJoin(name), query, update, options);
+		};
+	};
+	
+	stateInstance.findOneAndUpdate = function (store) {
+		return (query = {}, update = {}, options = {maxDepth: Infinity}) => {
+			if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
+				options.maxDepth = 0;
+			}
+			return store.findOneAndUpdate(pathJoin(name), query, update, options);
+		};
+	};
+	
+	stateInstance.findByPath = function (path = "") {
+		return function (store) {
+			return (query = {}, options = {maxDepth: Infinity}) => {
+				if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
+					options.maxDepth = 0;
+				}
+				return store.find(pathJoin(name, path), query, options);
 			};
+		}
+	};
+	
+	stateInstance.findOneByPath = function (path = "") {
+		return function (store) {
+			return (query = {}, options = {maxDepth: Infinity}) => {
+				if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
+					options.maxDepth = 0;
+				}
+				return store.findOne(pathJoin(name, path), query, options);
+			};
+		}
+	};
+	
+	stateInstance.findAndUpdateByPath = function (path = "") {
+		return function (store) {
+			return (query = {}, update = {}, options = {maxDepth: Infinity}) => {
+				if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
+					options.maxDepth = 0;
+				}
+				return store.findAndUpdate(pathJoin(name, path), query, update, options);
+			};
+		}
+	};
+	
+	stateInstance.findOneAndUpdateByPath = function (path = "") {
+		return function (store) {
+			return (query = {}, update = {}, options = {maxDepth: Infinity}) => {
+				if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
+					options.maxDepth = 0;
+				}
+				return store.findOneAndUpdate(pathJoin(name, path), query, update, options);
+			};
+		}
+	};
+	
+	stateInstance.updateByPath = function (path = "") {
+		const updateByPath = function (store) {
+			return (newVal) => store.update(pathJoin(name, path), newVal);
 		};
 		
-		patchByPath.init = init;
+		updateByPath.init = init;
+		updateByPath.__isNextStateStoreFunction = true;
 		
-		return patchByPath;
+		return updateByPath;
 	};
 	
 	stateInstance.pushByPath = function (path = "") {
 		const pushByPath = function (store) {
-			return (newVal) => {
-				return store.push(pathJoin(name, path), newVal);
-			};
+			return (newVal) => store.push(pathJoin(name, path), newVal);
 		};
 		
 		pushByPath.init = init;
+		pushByPath.__isNextStateStoreFunction = true;
 		
 		return pushByPath;
 	};
 	
 	stateInstance.pullByPath = function (path = "") {
 		const pullByPath = function (store) {
-			return (val) => {
-				return store.pull(pathJoin(name, path), val, {strict: false});
-			};
+			return (val) => store.pull(pathJoin(name, path), val, {strict: false});
 		};
 		
 		pullByPath.init = init;
+		pullByPath.__isNextStateStoreFunction = true;
 		
 		return pullByPath;
-	};
-	
-	stateInstance.setByPath = function (path = "") {
-		const setByPath = function (store) {
-			return (newVal) => {
-				return store.set(pathJoin(name, path), newVal);
-			};
-		};
-		
-		setByPath.init = init;
-		
-		return setByPath;
 	};
 	
 	stateInstance.getByPath = function (path = "", defaultVal) {
@@ -136,20 +216,38 @@ function State (name, initialData) {
 		};
 		
 		getByPath.init = init;
+		getByPath.__isNextStateStoreFunction = true;
 		
 		return getByPath;
 	};
 	
-	stateInstance.init = init;
-	stateInstance.read.init = init;
+	stateInstance.setByPath = function (path = "") {
+		const setByPath = function (store) {
+			return (newVal) => store.set(pathJoin(name, path), newVal);
+		};
+		
+		setByPath.init = init;
+		setByPath.__isNextStateStoreFunction = true;
+		
+		return setByPath;
+	};
 	
-	stateInstance.put.init = init;
-	stateInstance.patch.init = init;
-	stateInstance.get.init = init;
-	stateInstance.set.init = init;
-	stateInstance.push.init = init;
-	stateInstance.pull.init = init;
-	stateInstance.find.init = init;
+	const functionArr = [
+		"update",
+		"get",
+		"set",
+		"push",
+		"pull",
+		"find",
+		"findOne",
+		"findAndUpdate",
+		"findOneAndUpdate"
+	];
+	
+	functionArr.forEach((funcName) => {
+		stateInstance[funcName].init = init;
+		stateInstance[funcName].__isNextStateStoreFunction = true;
+	});
 	
 	return stateInstance;
 }
