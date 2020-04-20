@@ -44,18 +44,16 @@ function State(name, initialData) {
   };
 
   stateInstance.init = init;
+  /**
+   * Gets the state value or the default value if the state value
+   * is currently undefined.
+   * @param {*} defaultVal The value to return if the current state
+   * is undefined.
+   * */
 
-  stateInstance.get = function () {
+  stateInstance.get = function (defaultVal) {
     var get = function get(store) {
-      /**
-       * Gets the state value or the default value if the state value
-       * is currently undefined.
-       * @param {*} defaultVal The value to return if the current state
-       * is undefined.
-       * */
-      return function (defaultVal) {
-        return store.get((0, _path.join)(name), defaultVal);
-      };
+      return store.get((0, _path.join)(name), defaultVal);
     };
 
     get.init = init;

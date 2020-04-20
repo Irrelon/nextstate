@@ -11,7 +11,7 @@ describe("State", () => {
 			const store = getStore();
 			stateInstance.init(store);
 			
-			const result = stateInstance.get()(store)();
+			const result = stateInstance.get()(store);
 			
 			assert.strictEqual(typeof result, "object", "Value is correct");
 			assert.strictEqual(result.foo, true, "Value is correct");
@@ -27,7 +27,7 @@ describe("State", () => {
 			const store = getStore();
 			stateInstance.init(store);
 			
-			const result1 = stateInstance.get()(store)();
+			const result1 = stateInstance.get()(store);
 			
 			assert.strictEqual(typeof result1, "object", "Value is correct");
 			assert.strictEqual(result1.foo, true, "Value is correct");
@@ -36,7 +36,7 @@ describe("State", () => {
 				"foo": false
 			});
 			
-			const result2 = stateInstance.get()(store)();
+			const result2 = stateInstance.get()(store);
 			
 			assert.strictEqual(typeof result2, "object", "Value is correct");
 			assert.strictEqual(result2.foo, false, "Value is correct");
@@ -52,7 +52,7 @@ describe("State", () => {
 			stateInstance.push()(store)("foo");
 			stateInstance.push()(store)("bar");
 			
-			const result1 = stateInstance.get()(store)();
+			const result1 = stateInstance.get()(store);
 			
 			assert.strictEqual(typeof result1, "object", "Value is correct");
 			assert.strictEqual(result1.length, 2, "Value is correct");
@@ -80,14 +80,14 @@ describe("State", () => {
 			const store = getStore();
 			stateInstance.init(store);
 			
-			const result1 = stateInstance.get()(store)();
+			const result1 = stateInstance.get()(store);
 			
 			assert.strictEqual(typeof result1, "object", "Value is correct");
 			assert.strictEqual(result1.length, 2, "Value is correct");
 			assert.strictEqual(result1[0], "foo", "Value is correct");
 			
 			stateInstance.pull()(store)("foo");
-			const result2 = stateInstance.get()(store)();
+			const result2 = stateInstance.get()(store);
 			
 			assert.strictEqual(typeof result2, "object", "Value is correct");
 			assert.strictEqual(result2.length, 1, "Value is correct");
@@ -120,13 +120,13 @@ describe("State", () => {
 			const store = getStore();
 			stateInstance.init(store);
 			
-			const result1 = stateInstance.get()(store)();
+			const result1 = stateInstance.get()(store);
 			
 			assert.strictEqual(typeof result1, "object", "Value is correct");
 			assert.strictEqual(result1.foo.bar, "ram", "Value is correct");
 			
 			stateInstance.update()(store)({"foo": {"bar": "boo"}});
-			const result2 = stateInstance.get()(store)();
+			const result2 = stateInstance.get()(store);
 			
 			assert.strictEqual(typeof result2, "object", "Value is correct");
 			assert.strictEqual(result2.foo.bar, "boo", "Value is correct");
@@ -591,13 +591,13 @@ describe("State", () => {
 			const store = getStore();
 			stateInstance.init(store);
 			
-			const result1 = stateInstance.get()(store)();
+			const result1 = stateInstance.get()(store);
 			
 			assert.strictEqual(typeof result1, "object", "Value is correct");
 			assert.strictEqual(result1.foo.bar, "ram", "Value is correct");
 			
 			stateInstance.updateByPath("foo.bar")(store)("boo");
-			const result2 = stateInstance.get()(store)();
+			const result2 = stateInstance.get()(store);
 			
 			assert.strictEqual(typeof result2, "object", "Value is correct");
 			assert.strictEqual(result2.foo.bar, "boo", "Value is correct");
@@ -666,14 +666,14 @@ describe("State", () => {
 			const store = getStore();
 			stateInstance.init(store);
 			
-			const result1 = stateInstance.get()(store)();
+			const result1 = stateInstance.get()(store);
 			
 			assert.strictEqual(typeof result1, "object", "Value is correct");
 			assert.strictEqual(result1.myData.yourData.foo, true, "Value is correct");
 			
 			stateInstance.setByPath("myData.yourData.foo")(store)(false);
 			
-			const result2 = stateInstance.get()(store)();
+			const result2 = stateInstance.get()(store);
 			
 			assert.strictEqual(typeof result2, "object", "Value is correct");
 			assert.strictEqual(result2.myData.yourData.foo, false, "Value is correct");
