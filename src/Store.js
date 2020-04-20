@@ -149,13 +149,21 @@ const pull = (store, path, val, options = {strict: false}) => {
 	return set(store, path, newState, options);
 };
 
-const find = (store, path, query, options = {strict: false}) => {
+const find = (store, path, query, options = {}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call find() without passing a store retrieved with getStore()!");
 	}
 	
+	let maxDepth = Infinity;
+	
+	if (query === undefined || (typeof query === "object" && !Object.keys(query).length)) {
+		maxDepth = 1;
+	}
+	
+	options = {strict: false, maxDepth, includeRoot: false, ...options};
+	
 	const currentState = get(store, path);
-	const matchResult = pathFindPath(currentState, query);
+	const matchResult = pathFindPath(currentState, query, options);
 	
 	if (matchResult.match) {
 		return matchResult.path.map((path) => pathGet(currentState, path));

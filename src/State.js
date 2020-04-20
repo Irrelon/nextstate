@@ -98,47 +98,32 @@ function State (name, initialData) {
 	};
 	
 	stateInstance.find = function (store) {
-		return (query = {}, options = {maxDepth: Infinity}) => {
-			if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
-				options.maxDepth = 0;
-			}
+		return (query = {}, options = {}) => {
 			return store.find(pathJoin(name), query, options);
 		};
 	};
 	
 	stateInstance.findOne = function (store) {
-		return (query = {}, options = {maxDepth: Infinity}) => {
-			if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
-				options.maxDepth = 0;
-			}
+		return (query = {}, options = {}) => {
 			return store.findOne(pathJoin(name), query, options);
 		};
 	};
 	
 	stateInstance.findAndUpdate = function (store) {
-		return (query = {}, update = {}, options = {maxDepth: Infinity}) => {
-			if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
-				options.maxDepth = 0;
-			}
+		return (query = {}, update = {}, options = {}) => {
 			return store.findAndUpdate(pathJoin(name), query, update, options);
 		};
 	};
 	
 	stateInstance.findOneAndUpdate = function (store) {
-		return (query = {}, update = {}, options = {maxDepth: Infinity}) => {
-			if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
-				options.maxDepth = 0;
-			}
+		return (query = {}, update = {}, options = {}) => {
 			return store.findOneAndUpdate(pathJoin(name), query, update, options);
 		};
 	};
 	
 	stateInstance.findByPath = function (path = "") {
 		return function (store) {
-			return (query = {}, options = {maxDepth: Infinity}) => {
-				if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
-					options.maxDepth = 0;
-				}
+			return (query = {}, options = {}) => {
 				return store.find(pathJoin(name, path), query, options);
 			};
 		}
@@ -146,10 +131,7 @@ function State (name, initialData) {
 	
 	stateInstance.findOneByPath = function (path = "") {
 		return function (store) {
-			return (query = {}, options = {maxDepth: Infinity}) => {
-				if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
-					options.maxDepth = 0;
-				}
+			return (query = {}, options = {}) => {
 				return store.findOne(pathJoin(name, path), query, options);
 			};
 		}
@@ -157,10 +139,7 @@ function State (name, initialData) {
 	
 	stateInstance.findAndUpdateByPath = function (path = "") {
 		return function (store) {
-			return (query = {}, update = {}, options = {maxDepth: Infinity}) => {
-				if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
-					options.maxDepth = 0;
-				}
+			return (query = {}, update = {}, options = {}) => {
 				return store.findAndUpdate(pathJoin(name, path), query, update, options);
 			};
 		}
@@ -168,10 +147,7 @@ function State (name, initialData) {
 	
 	stateInstance.findOneAndUpdateByPath = function (path = "") {
 		return function (store) {
-			return (query = {}, update = {}, options = {maxDepth: Infinity}) => {
-				if (query === undefined || (typeof query === "object" && Object.keys(query).length)) {
-					options.maxDepth = 0;
-				}
+			return (query = {}, update = {}, options = {}) => {
 				return store.findOneAndUpdate(pathJoin(name, path), query, update, options);
 			};
 		}

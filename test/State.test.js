@@ -69,37 +69,90 @@ describe("State", () => {
 				"_id": "3",
 				"category": "b"
 			}]);
+			
 			const store = getStore();
 			stateInstance.init(store);
-			// If the query is blank we probably need to set the maxDepth to zero so
-			// we return the first layer of any object tree rather than all of them -
-			// just done this, test it!
+			
 			const result = stateInstance.find(store)();
 			
-			assert.strictEqual(typeof result, "object", "Value is correct");
-			assert.strictEqual(result.foo, true, "Value is correct");
+			assert.strictEqual(Array.isArray(result), true, "Value is correct");
+			assert.strictEqual(result.length, 3, "Value is correct");
+			assert.strictEqual(result[0]._id, "1", "Value is correct");
+			assert.strictEqual(result[1]._id, "2", "Value is correct");
+			assert.strictEqual(result[2]._id, "3", "Value is correct");
 		});
 		
-		it("Will find data in state by path", () => {
+		it("Will find data in state by path with empty query", () => {
 			const stateInstance = new State("data", {items:[{
-				"_id": "1",
-				"category": "a"
-			}, {
-				"_id": "2",
-				"category": "a"
-			}, {
-				"_id": "3",
-				"category": "b"
-			}]});
+					"_id": "1",
+					"category": "a"
+				}, {
+					"_id": "2",
+					"category": "a"
+				}, {
+					"_id": "3",
+					"category": "b"
+				}]});
+			
 			const store = getStore();
 			stateInstance.init(store);
-			// If the query is blank we probably need to set the maxDepth to zero so
-			// we return the first layer of any object tree rather than all of them -
-			// just done this, test it!
+			
 			const result = stateInstance.findByPath("items")(store)();
 			
-			assert.strictEqual(typeof result, "object", "Value is correct");
-			assert.strictEqual(result.foo, true, "Value is correct");
+			assert.strictEqual(Array.isArray(result), true, "Value is correct");
+			assert.strictEqual(result.length, 3, "Value is correct");
+			assert.strictEqual(result[0]._id, "1", "Value is correct");
+			assert.strictEqual(result[1]._id, "2", "Value is correct");
+			assert.strictEqual(result[2]._id, "3", "Value is correct");
+		});
+		
+		it("Will find data in state by path with non-empty query", () => {
+			const stateInstance = new State("data", {items:[{
+					"_id": "1",
+					"category": "a"
+				}, {
+					"_id": "2",
+					"category": "a"
+				}, {
+					"_id": "3",
+					"category": "b"
+				}]});
+			
+			const store = getStore();
+			stateInstance.init(store);
+			
+			const result = stateInstance.findByPath("items")(store)({
+				category: "a"
+			});
+			
+			assert.strictEqual(Array.isArray(result), true, "Value is correct");
+			assert.strictEqual(result.length, 2, "Value is correct");
+			assert.strictEqual(result[0]._id, "1", "Value is correct");
+			assert.strictEqual(result[1]._id, "2", "Value is correct");
+		});
+		
+		it("Will find data in state by path with non-empty query and custom options", () => {
+			const stateInstance = new State("data", {items:[{
+					"_id": "1",
+					"category": "a"
+				}, {
+					"_id": "2",
+					"category": "a"
+				}, {
+					"_id": "3",
+					"category": "b"
+				}]});
+			
+			const store = getStore();
+			stateInstance.init(store);
+			
+			const result = stateInstance.findByPath("items.0")(store)({
+				category: "a"
+			}, {includeRoot: true});
+			
+			assert.strictEqual(Array.isArray(result), true, "Value is correct");
+			assert.strictEqual(result.length, 1, "Value is correct");
+			assert.strictEqual(result[0]._id, "1", "Value is correct");
 		});
 	});
 });
