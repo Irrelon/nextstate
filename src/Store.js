@@ -84,6 +84,28 @@ const set = (store, path, newState, options = {}) => {
 	return store;
 };
 
+const push = (store, path, newVal, options = {}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot call push() without passing a store retrieved with getStore()!");
+	}
+	
+	const currentState = get(store, path);
+	const newState = pathPush(currentState, "", newVal);
+	
+	return set(store, path, newState, options);
+};
+
+const pull = (store, path, val, options = {strict: false}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot call pull() without passing a store retrieved with getStore()!");
+	}
+	
+	const currentState = get(store, path);
+	const newState = pathPull(currentState, "", val, options);
+	
+	return set(store, path, newState, options);
+};
+
 const update = (store, path, newState, options = {}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call update() without passing a store retrieved with getStore()!");
@@ -125,28 +147,6 @@ const update = (store, path, newState, options = {}) => {
 	
 	// We're not setting an object, we are setting a primitive so
 	// simply overwrite the existing data
-	return set(store, path, newState, options);
-};
-
-const push = (store, path, newVal, options = {}) => {
-	if (!store || !store.__isNextStateStore) {
-		throw new Error("Cannot call push() without passing a store retrieved with getStore()!");
-	}
-	
-	const currentState = get(store, path);
-	const newState = pathPush(currentState, "", newVal);
-	
-	return set(store, path, newState, options);
-};
-
-const pull = (store, path, val, options = {strict: false}) => {
-	if (!store || !store.__isNextStateStore) {
-		throw new Error("Cannot call pull() without passing a store retrieved with getStore()!");
-	}
-	
-	const currentState = get(store, path);
-	const newState = pathPull(currentState, "", val, options);
-	
 	return set(store, path, newState, options);
 };
 
@@ -296,10 +296,6 @@ const create = (initialData) => {
 		return set(storeObj, path, newState, options);
 	};
 	
-	storeObj.update = (path, newState, options) => {
-		return update(storeObj, path, newState, options);
-	};
-	
 	storeObj.push = (path, newVal, options) => {
 		return push(storeObj, path, newVal, options);
 	};
@@ -308,16 +304,20 @@ const create = (initialData) => {
 		return pull(storeObj, path, val, options);
 	};
 	
+	storeObj.update = (path, newState, options) => {
+		return update(storeObj, path, newState, options);
+	};
+	
 	storeObj.find = (path, query, options) => {
 		return find(storeObj, path, query, options);
 	};
 	
-	storeObj.findAndUpdate = (path, query, options) => {
-		return findAndUpdate(storeObj, path, query, options);
-	};
-	
 	storeObj.findOne = (path, query, options) => {
 		return findOne(storeObj, path, query, options);
+	};
+	
+	storeObj.findAndUpdate = (path, query, options) => {
+		return findAndUpdate(storeObj, path, query, options);
 	};
 	
 	storeObj.findOneAndUpdate = (path, query, options) => {

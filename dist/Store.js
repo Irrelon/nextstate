@@ -107,6 +107,32 @@ var set = function set(store, path, newState) {
 
 exports.set = set;
 
+var push = function push(store, path, newVal) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  if (!store || !store.__isNextStateStore) {
+    throw new Error("Cannot call push() without passing a store retrieved with getStore()!");
+  }
+
+  var currentState = get(store, path);
+  var newState = (0, _path.pushValImmutable)(currentState, "", newVal);
+  return set(store, path, newState, options);
+};
+
+var pull = function pull(store, path, val) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
+    strict: false
+  };
+
+  if (!store || !store.__isNextStateStore) {
+    throw new Error("Cannot call pull() without passing a store retrieved with getStore()!");
+  }
+
+  var currentState = get(store, path);
+  var newState = (0, _path.pullValImmutable)(currentState, "", val, options);
+  return set(store, path, newState, options);
+};
+
 var update = function update(store, path, newState) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
@@ -152,32 +178,6 @@ var update = function update(store, path, newState) {
 };
 
 exports.update = update;
-
-var push = function push(store, path, newVal) {
-  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-
-  if (!store || !store.__isNextStateStore) {
-    throw new Error("Cannot call push() without passing a store retrieved with getStore()!");
-  }
-
-  var currentState = get(store, path);
-  var newState = (0, _path.pushValImmutable)(currentState, "", newVal);
-  return set(store, path, newState, options);
-};
-
-var pull = function pull(store, path, val) {
-  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
-    strict: false
-  };
-
-  if (!store || !store.__isNextStateStore) {
-    throw new Error("Cannot call pull() without passing a store retrieved with getStore()!");
-  }
-
-  var currentState = get(store, path);
-  var newState = (0, _path.pullValImmutable)(currentState, "", val, options);
-  return set(store, path, newState, options);
-};
 
 var find = function find(store, path, query) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -346,10 +346,6 @@ var create = function create(initialData) {
     return set(storeObj, path, newState, options);
   };
 
-  storeObj.update = function (path, newState, options) {
-    return update(storeObj, path, newState, options);
-  };
-
   storeObj.push = function (path, newVal, options) {
     return push(storeObj, path, newVal, options);
   };
@@ -358,16 +354,20 @@ var create = function create(initialData) {
     return pull(storeObj, path, val, options);
   };
 
+  storeObj.update = function (path, newState, options) {
+    return update(storeObj, path, newState, options);
+  };
+
   storeObj.find = function (path, query, options) {
     return find(storeObj, path, query, options);
   };
 
-  storeObj.findAndUpdate = function (path, query, options) {
-    return findAndUpdate(storeObj, path, query, options);
-  };
-
   storeObj.findOne = function (path, query, options) {
     return findOne(storeObj, path, query, options);
+  };
+
+  storeObj.findAndUpdate = function (path, query, options) {
+    return findAndUpdate(storeObj, path, query, options);
   };
 
   storeObj.findOneAndUpdate = function (path, query, options) {
