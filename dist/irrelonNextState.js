@@ -36,32 +36,48 @@ var _ProvideState = _interopRequireDefault(require("./ProvideState"));
 var log = (0, _irrelonLog.init)("irrelonNextState");
 var Context = (0, _Store.getContext)();
 
-var resolveMapping = function resolveMapping(stateMap, store) {
+var resolveMapping = function resolveMapping(stateMapArr, store) {
   var init = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-  var stateMapKeys = Object.keys(stateMap);
-  var stateData = {}; //log.debug(`(init: ${init}) Mapping state keys:`, JSON.stringify(stateMapKeys));
+  log.debug("(init: ".concat(init, ") Mapping states (").concat(stateMapArr.length, ")..."));
+  var stateData = stateMapArr.reduce(function (mapData, stateMap) {
+    var stateMapKeys = Object.keys(stateMap);
+    log.debug("(init: ".concat(init, ") Mapping state keys:"), JSON.stringify(stateMapKeys));
+    stateMapKeys.forEach(function (propName) {
+      var mapFunction = stateMap[propName];
+      var isStateFunction = mapFunction.__isNextStateStoreFunction;
+      log.debug("Mapping ".concat(propName, "..."));
 
-  stateMapKeys.forEach(function (propName) {
-    var stateInstanceFunction = stateMap[propName];
-    log.debug("Mapping ".concat(propName, "..."));
+      if (typeof mapFunction !== "function") {
+        throw new Error("Mapping prop ".concat(propName, " failed, not provided a function!"));
+      }
 
-    if (typeof stateInstanceFunction !== "function") {
-      throw new Error("Cannot map a prop to a state that is not a function!");
-    }
+      if (init && isStateFunction) {
+        // Ask state to init
+        mapFunction.init(store);
+      }
 
-    if (init) {
-      // Ask state to init
-      stateInstanceFunction.init(store);
-    }
-
-    stateData[propName] = stateInstanceFunction(store);
-  });
+      if (isStateFunction) {
+        mapData[propName] = mapFunction(store);
+      } else {
+        // Pass the existing aggregated mapping to the function
+        // and map the return value to the prop
+        mapData[propName] = mapFunction(mapData);
+      }
+    });
+    return mapData;
+  }, {});
   log.debug("Mapping complete");
   return stateData;
 };
 
-var irrelonNextState = function irrelonNextState(stateMap, ComponentToWrap) {
-  var argSignature = "".concat(JSON.stringify(Object.keys(stateMap)), ", ").concat(ComponentToWrap.name);
+var irrelonNextState = function irrelonNextState() {
+  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  var stateMapArr = args.slice(0, args.length - 1);
+  var ComponentToWrap = args[args.length - 1];
+  var argSignature = "".concat(ComponentToWrap.name);
   log.debug("irrelonNextState(".concat(argSignature, ")"));
 
   var DecisionWrapper =
@@ -82,7 +98,7 @@ var irrelonNextState = function irrelonNextState(stateMap, ComponentToWrap) {
         if (this.context && this.context.stateStore) {
           // We already have a provider
           log.debug("DecisionWrapper(".concat(ComponentToWrap.name, ") render, we have a context, rendering component..."));
-          var stateData = resolveMapping(stateMap, this.context.stateStore, true);
+          var stateData = resolveMapping(stateMapArr, this.context.stateStore, true);
           return _react["default"].createElement(ComponentToWrap, (0, _extends2["default"])({}, this.props, stateData), this.props.children);
         } // We don't have a provider, render one
 
@@ -99,7 +115,7 @@ var irrelonNextState = function irrelonNextState(stateMap, ComponentToWrap) {
           stateStore: this.stateStore
         }, _react["default"].createElement(Context.Consumer, null, function (stateContainer) {
           log.debug("".concat(ComponentToWrap.name, " Provider consumer re-render"));
-          var stateData = resolveMapping(stateMap, stateContainer.stateStore, false);
+          var stateData = resolveMapping(stateMapArr, stateContainer.stateStore, false);
           return _react["default"].createElement(ComponentToWrap, (0, _extends2["default"])({}, _this.props, stateData), _this.props.children);
         }));
       }
@@ -112,9 +128,9 @@ var irrelonNextState = function irrelonNextState(stateMap, ComponentToWrap) {
           var finalProps,
               store,
               stateData,
-              _len,
+              _len2,
               args,
-              _key,
+              _key2,
               _args = arguments;
 
           return _regenerator["default"].wrap(function _callee$(_context) {
@@ -133,10 +149,10 @@ var irrelonNextState = function irrelonNextState(stateMap, ComponentToWrap) {
                   }
 
                   log.debug("DecisionWrapper(".concat(ComponentToWrap.name, ").getInitialProps resolving stateData mapping..."));
-                  stateData = resolveMapping(stateMap, store, true);
+                  stateData = resolveMapping(stateMapArr, store, true);
 
-                  for (_len = _args.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-                    args[_key] = _args[_key];
+                  for (_len2 = _args.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                    args[_key2] = _args[_key2];
                   }
 
                   args[0] = (0, _objectSpread2["default"])({}, args[0], stateData);

@@ -8,7 +8,8 @@ import {
 	findPath as pathFindPath,
 	findOnePath as pathFindOnePath,
 	diff as pathDiff,
-	decouple as pathDecouple
+	decouple as pathDecouple,
+	join as pathJoin
 } from "@irrelon/path";
 import {init as initLog, setLevel as setLogLevel} from "irrelon-log";
 
@@ -205,11 +206,21 @@ const findAndUpdate = (store, path, query, updateData, options = {strict: false}
 	
 	if (matchResult.match) {
 		return matchResult.path.map((matchResultPath) => {
-			// Update the record
-			update(store, matchResultPath, updateData);
+			const updatePath = pathJoin(path, matchResultPath);
+			let finalUpdateData = updateData;
 			
-			// Return the updateed record
-			return pathGet(currentState, matchResultPath)
+			// Check if the updateData is a function
+			if (typeof updateData === "function") {
+				// Get the new update data for this item
+				// from the function
+				finalUpdateData = updateData(pathGet(currentState, matchResultPath));
+			}
+			
+			// Update the record
+			update(store, updatePath, finalUpdateData);
+			
+			// Return the updated record
+			return get(store, updatePath);
 		});
 	} else {
 		return [];
@@ -225,11 +236,21 @@ const findOneAndUpdate = (store, path, query, updateData, options = {strict: fal
 	const matchResult = pathFindOnePath(currentState, query);
 	
 	if (matchResult.match) {
-		// Update the record
-		update(store, matchResult.path, updateData);
+		const updatePath = pathJoin(path, matchResult.path);
+		let finalUpdateData = updateData;
 		
-		// Return the updateed record
-		return pathGet(currentState, matchResult.path);
+		// Check if the updateData is a function
+		if (typeof updateData === "function") {
+			// Get the new update data for this item
+			// from the function
+			finalUpdateData = updateData(pathGet(currentState, matchResult.path));
+		}
+		
+		// Update the record
+		update(store, updatePath, finalUpdateData);
+		
+		// Return the updated record
+		return get(store, updatePath);
 	} else {
 		return undefined;
 	}
