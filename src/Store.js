@@ -177,8 +177,16 @@ const findOne = (store, path, query, options = {strict: false}) => {
 		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
 	}
 	
+	let maxDepth = Infinity;
+	
+	if (query === undefined || (typeof query === "object" && !Object.keys(query).length)) {
+		maxDepth = 1;
+	}
+	
+	options = {strict: false, maxDepth, includeRoot: false, ...options};
+	
 	const currentState = get(store, path);
-	const matchResult = pathFindOnePath(currentState, query);
+	const matchResult = pathFindOnePath(currentState, query, options);
 	
 	if (matchResult.match) {
 		return pathGet(currentState, matchResult.path);

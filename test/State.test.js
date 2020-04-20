@@ -73,8 +73,8 @@ describe("State", () => {
 			const store = getStore();
 			stateInstance.init(store);
 			
+			debugger;
 			const result = stateInstance.find(store)();
-			
 			assert.strictEqual(Array.isArray(result), true, "Value is correct");
 			assert.strictEqual(result.length, 3, "Value is correct");
 			assert.strictEqual(result[0]._id, "1", "Value is correct");
