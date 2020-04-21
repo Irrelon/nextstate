@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 		});
 		
 		// Update a state, the store should then have the updated state
-		store1.patch("testState", {
+		store1.update("testState", {
 			"testVal2": "foo"
 		});
 		
@@ -48,7 +48,7 @@ app.get("/", (req, res) => {
 		
 		setTimeout(() => {
 			// Update a state, the store should then have the updated state
-			store2.patch("testState", {
+			store2.update("testState", {
 				"testVal2": "bar"
 			});
 			
@@ -68,7 +68,7 @@ app.get("/", (req, res) => {
 
 const server = app.listen();
 const port = server.address().port;
-const numTests = 1000;
+const numTests = 300;
 let completeCount = 0;
 
 events.on("completed", () => {

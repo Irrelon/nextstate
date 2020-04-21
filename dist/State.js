@@ -40,7 +40,7 @@ function State(name, initialData) {
   // to each one
 
   var stateInstance = function stateInstance(store) {
-    return store.read(name);
+    throw new Error("Please use one of the state methods!");
   };
 
   stateInstance.init = init;

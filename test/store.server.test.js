@@ -15,7 +15,7 @@ describe("Store", () => {
 			});
 			
 			// Update a state, the store should then have the updated state
-			store1.patch("testState", {
+			store1.update("testState", {
 				"testVal2": "foo"
 			});
 			

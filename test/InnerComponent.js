@@ -20,7 +20,7 @@ class InnerComponent extends React.Component {
 }
 
 export default irrelonNextState({
-	"stateProp1": state1,
-	"stateProp2": state2,
-	"updateState1": state1.patch
+	"stateProp1": state1.get(),
+	"stateProp2": state2.get(),
+	"updateState1": state1.update()
 }, InnerComponent);

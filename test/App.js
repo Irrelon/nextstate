@@ -1,12 +1,9 @@
 import React from "react";
 import {irrelonNextState} from "../src/index";
 import InnerComponent from "./InnerComponent";
+import state1 from "./state1";
 
 class App extends React.PureComponent {
-	constructor (props) {
-		super(props);
-	}
-	
 	render () {
 		return (
 			<InnerComponent someProp={"true dat"}>
@@ -16,6 +13,14 @@ class App extends React.PureComponent {
 	}
 }
 
-export default irrelonNextState({
+App.getInitialProps = async ({updateState1}) => {
+	updateState1("foo");
+	return {
+		pageProp: "isHere"
+	};
+};
 
+export default irrelonNextState({
+	"state1": state1.get(),
+	"updateState1": state1.update()
 }, App);

@@ -7,12 +7,16 @@ const {setLogLevel} = require("../nextstate");
 setLogLevel("ProvideState=*,State=*,Store=*,useState=*,irrelonNextState=*");
 
 const Home = (props) => {
-	const {projectState, projectState2, projectStatePatch, projectSubItem} = props;
+	const {projectState, projectState2, projectStatePatch, projectSubItem, someNextJsProp} = props;
 	
 	return (
 		<div className="body">
 			<table>
 				<tbody>
+				<tr>
+					<td>someNextJsProp</td>
+					<td>{someNextJsProp}</td>
+				</tr>
 				<tr>
 					<td>projectState</td>
 					<td>{JSON.stringify(projectState)}</td>
@@ -48,7 +52,7 @@ const Home = (props) => {
 	);
 };
 
-Home.getInitialProps = ({projectStatePatch}) => {
+Home.getInitialProps = async ({projectStatePatch}) => {
 	const cookieVal = "My Cookie Project";
 	
 	projectStatePatch({
@@ -62,14 +66,14 @@ Home.getInitialProps = ({projectStatePatch}) => {
 };
 
 export default irrelonNextState({
-	"projectState": projectState.read,
-	"projectStatePatch": projectState.patch,
-	"projectStateFind": projectState.find
+	"projectState": projectState.get(),
+	"projectStatePatch": projectState.update(),
+	"projectStateFind": projectState.find()
 }, {
 	"projectSubItem": ({projectState, projectStatePatch, projectStateFind}) => {
 		return projectStateFind({
 			_id: "1"
 		});
 	},
-	"projectState2": projectState.read
+	"projectState2": projectState.get()
 }, Home);

@@ -17,7 +17,9 @@ function State (name, initialData) {
 	
 	// Has to be a non-arrow function
 	const init = function (store) {
-		if (store.__initCache[name]) return;
+		if (store.__initCache[name]) {
+			return;
+		}
 		
 		log.debug(`[${name}] Setting initial data...`);
 		
@@ -33,106 +35,183 @@ function State (name, initialData) {
 	// we utilise them as objects and apply a .init() function
 	// to each one
 	const stateInstance = function (store) {
-		return store.read(name);
+		throw new Error("Please use one of the state methods!");
 	};
 	
 	stateInstance.init = init;
-	
-	stateInstance.update = function (store) {
-		/**
-		 * Updates (patches) the state, spreading the new value over
-		 * the existing value if they are both objects or replacing
-		 * outright if either is a primitive.
-		 * value with.
-		 * @param {*} newVal The new value to update the existing
-		 */
-		return (newVal) => {
-			return store.update(name, newVal);
-		};
-	};
-	
-	stateInstance.get = function (store) {
-		/**
-		 * Gets the state value or the default value if the state value
-		 * is currently undefined.
-		 * @param {*} defaultVal The value to return if the current state
-		 * is undefined.
-		 * */
-		return (defaultVal) => {
+	/**
+	 * Gets the state value or the default value if the state value
+	 * is currently undefined.
+	 * @param {*} defaultVal The value to return if the current state
+	 * is undefined.
+	 * */
+	stateInstance.get = function (defaultVal) {
+		const get = function (store) {
 			return store.get(pathJoin(name), defaultVal);
 		};
+		
+		get.init = init;
+		get.__isNextStateStoreFunction = true;
+		
+		return get;
 	};
 	
-	stateInstance.set = function (store) {
-		/**
-		 * Replaces the existing state value with the one passed.
-		 * @param {*} newVal The new value to replace the existing
-		 * value with.
-		 */
-		return (newVal) => {
-			return store.set(pathJoin(name), newVal);
+	stateInstance.set = function () {
+		const set = function (store) {
+			/**
+			 * Replaces the existing state value with the one passed.
+			 * @param {*} newVal The new value to replace the existing
+			 * value with.
+			 */
+			return (newVal) => {
+				return store.set(pathJoin(name), newVal);
+			};
+		};
+		
+		set.init = init;
+		set.__isNextStateStoreFunction = true;
+		
+		return set;
+	};
+	
+	stateInstance.push = function () {
+		const push = function (store) {
+			/**
+			 * Pushes the passed value to the state array. If the state
+			 * is not an array an error will occur.
+			 * @param {*} newVal The new value to push to the state array.
+			 */
+			return (newVal) => {
+				return store.push(pathJoin(name), newVal);
+			};
+		};
+		
+		push.init = init;
+		push.__isNextStateStoreFunction = true;
+		
+		return push;
+	};
+	
+	stateInstance.pull = function () {
+		const pull = function (store) {
+			/**
+			 * Pulls the passed value to the state array. If the state
+			 * is not an array an error will occur.
+			 * @param {*} newVal The query value to pull from the state array.
+			 * @param {PullOptions} [options] Options object.
+			 */
+			return (val, options = {strict: false}) => {
+				return store.pull(pathJoin(name), val, options);
+			};
+		};
+		
+		pull.init = init;
+		pull.__isNextStateStoreFunction = true;
+		
+		return pull;
+	};
+	
+	stateInstance.update = function () {
+		const update = function (store) {
+			/**
+			 * Updates (patches) the state, spreading the new value over
+			 * the existing value if they are both objects or replacing
+			 * outright if either is a primitive.
+			 * value with.
+			 * @param {*} newVal The new value to update the existing
+			 */
+			return (newVal) => {
+				return store.update(name, newVal);
+			};
+		}
+		
+		update.init = init;
+		update.__isNextStateStoreFunction = true;
+		
+		return update;
+	};
+	
+	stateInstance.find = function () {
+		const find = function (store) {
+			return (query = {}, options = {}) => {
+				return store.find(pathJoin(name), query, options);
+			};
+		};
+		
+		find.init = init;
+		find.__isNextStateStoreFunction = true;
+		
+		return find;
+	};
+	
+	stateInstance.findOne = function () {
+		const findOne = function (store) {
+			return (query = {}, options = {}) => {
+				return store.findOne(pathJoin(name), query, options);
+			};
+		};
+		
+		findOne.init = init;
+		findOne.__isNextStateStoreFunction = true;
+		
+		return findOne;
+	};
+	
+	stateInstance.findAndUpdate = function () {
+		const findAndUpdate = function (store) {
+			return (query = {}, update = {}, options = {}) => {
+				return store.findAndUpdate(pathJoin(name), query, update, options);
+			};
+		};
+		
+		findAndUpdate.init = init;
+		findAndUpdate.__isNextStateStoreFunction = true;
+		
+		return findAndUpdate;
+	};
+	
+	stateInstance.findOneAndUpdate = function () {
+		const findOneAndUpdate = function (store) {
+			return (query = {}, update = {}, options = {}) => {
+				return store.findOneAndUpdate(pathJoin(name), query, update, options);
+			};
+		};
+		
+		findOneAndUpdate.init = init;
+		findOneAndUpdate.__isNextStateStoreFunction = true;
+		
+		return findOneAndUpdate;
+	};
+	
+	stateInstance.findByPath = function (path = "") {
+		return function (store) {
+			return (query = {}, options = {}) => {
+				return store.find(pathJoin(name, path), query, options);
+			};
 		};
 	};
 	
-	stateInstance.push = function (store) {
-		/**
-		 * Pushes the passed value to the state array. If the state
-		 * is not an array an error will occur.
-		 * @param {*} newVal The new value to push to the state array.
-		 */
-		return (newVal) => {
-			return store.push(pathJoin(name), newVal);
+	stateInstance.findOneByPath = function (path = "") {
+		return function (store) {
+			return (query = {}, options = {}) => {
+				return store.findOne(pathJoin(name, path), query, options);
+			};
 		};
 	};
 	
-	stateInstance.pull = function (store) {
-		/**
-		 * Pulls the passed value to the state array. If the state
-		 * is not an array an error will occur.
-		 * @param {*} newVal The query value to pull from the state array.
-		 * @param {PullOptions} [options] Options object.
-		 */
-		return (val, options = {strict: false}) => {
-			return store.pull(pathJoin(name), val, options);
+	stateInstance.findAndUpdateByPath = function (path = "") {
+		return function (store) {
+			return (query = {}, update = {}, options = {}) => {
+				return store.findAndUpdate(pathJoin(name, path), query, update, options);
+			};
 		};
 	};
 	
-	stateInstance.find = function (store) {
-		return (query = {}, options = {maxDepth: Infinity}) => {
-			return store.find(pathJoin(name), query, options);
-		};
-	};
-	
-	stateInstance.findOne = function (store) {
-		return (query = {}, path = "", options = {maxDepth: Infinity}) => {
-			if (typeof path === "object") {
-				options = path;
-				path = "";
-			}
-			
-			return store.findOne(pathJoin(name, path), query, options);
-		};
-	};
-	
-	stateInstance.findAndUpdate = function (store) {
-		return (query = {}, update = {}, path = "", options = {maxDepth: Infinity}) => {
-			if (typeof path === "object") {
-				options = path;
-				path = "";
-			}
-			
-			return store.findAndUpdate(pathJoin(name, path), query, update, options);
-		};
-	};
-	
-	stateInstance.findOneAndUpdate = function (store) {
-		return (query = {}, update = {}, path = "", options = {maxDepth: Infinity}) => {
-			if (typeof path === "object") {
-				options = path;
-				path = "";
-			}
-			
-			return store.findOneAndUpdate(pathJoin(name, path), query, update, options);
+	stateInstance.findOneAndUpdateByPath = function (path = "") {
+		return function (store) {
+			return (query = {}, update = {}, options = {}) => {
+				return store.findOneAndUpdate(pathJoin(name, path), query, update, options);
+			};
 		};
 	};
 	

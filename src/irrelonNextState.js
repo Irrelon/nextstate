@@ -6,7 +6,7 @@ import ProvideState from "./ProvideState";
 const log = initLog("irrelonNextState");
 const Context = getContext();
 
-const resolveMapping = (stateMapArr, store, init = false) => {
+const resolveMapping = (stateMapArr, store, init = false, componentName) => {
 	log.debug(`(init: ${init}) Mapping states (${stateMapArr.length})...`);
 	
 	const stateData = stateMapArr.reduce((mapData, stateMap) => {
@@ -16,6 +16,9 @@ const resolveMapping = (stateMapArr, store, init = false) => {
 		
 		stateMapKeys.forEach((propName) => {
 			const mapFunction = stateMap[propName];
+			if (!mapFunction) {
+				throw new Error(`"irrelonNextState: The prop named "${propName}" in the component "${componentName}" has been passed an undefined value when we expected a state method such as myState.get()`)
+			}
 			const isStateFunction = mapFunction.__isNextStateStoreFunction;
 			
 			log.debug(`Mapping ${propName}...`);
@@ -69,13 +72,14 @@ const irrelonNextState = (...args) => {
 			}
 			
 			log.debug(`DecisionWrapper(${ComponentToWrap.name}).getInitialProps resolving stateData mapping...`);
-			const stateData = resolveMapping(stateMapArr, store, true);
+			const stateData = resolveMapping(stateMapArr, store, true, ComponentToWrap.name);
 			
 			args[0] = {...args[0], ...stateData};
 			
 			if (ComponentToWrap.getInitialProps) {
 				log.debug(`DecisionWrapper(${ComponentToWrap.name}) calling wrapped component ${ComponentToWrap.name}.getInitialProps()...`);
-				finalProps = {...ComponentToWrap.getInitialProps(...args)}
+				const pageProps = await ComponentToWrap.getInitialProps(...args);
+				finalProps = {...pageProps};
 			}
 			
 			finalProps._serverSideState = store.exportData();
@@ -87,7 +91,7 @@ const irrelonNextState = (...args) => {
 			if (this.context && this.context.stateStore) {
 				// We already have a provider
 				log.debug(`DecisionWrapper(${ComponentToWrap.name}) render, we have a context, rendering component...`);
-				const stateData = resolveMapping(stateMapArr, this.context.stateStore, true);
+				const stateData = resolveMapping(stateMapArr, this.context.stateStore, true, ComponentToWrap.name);
 				
 				return (
 					<ComponentToWrap {...this.props} {...stateData}>
@@ -110,7 +114,7 @@ const irrelonNextState = (...args) => {
 					<Context.Consumer>
 						{(stateContainer) => {
 							log.debug(`${ComponentToWrap.name} Provider consumer re-render`);
-							const stateData = resolveMapping(stateMapArr, stateContainer.stateStore, false);
+							const stateData = resolveMapping(stateMapArr, stateContainer.stateStore, false, ComponentToWrap.name);
 							
 							return (
 								<ComponentToWrap {...this.props} {...stateData}>

@@ -38,12 +38,18 @@ var Context = (0, _Store.getContext)();
 
 var resolveMapping = function resolveMapping(stateMapArr, store) {
   var init = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  var componentName = arguments.length > 3 ? arguments[3] : undefined;
   log.debug("(init: ".concat(init, ") Mapping states (").concat(stateMapArr.length, ")..."));
   var stateData = stateMapArr.reduce(function (mapData, stateMap) {
     var stateMapKeys = Object.keys(stateMap);
     log.debug("(init: ".concat(init, ") Mapping state keys:"), JSON.stringify(stateMapKeys));
     stateMapKeys.forEach(function (propName) {
       var mapFunction = stateMap[propName];
+
+      if (!mapFunction) {
+        throw new Error("\"irrelonNextState: The prop named \"".concat(propName, "\" in the component \"").concat(componentName, "\" has been passed an undefined value when we expected a state method such as myState.get()"));
+      }
+
       var isStateFunction = mapFunction.__isNextStateStoreFunction;
       log.debug("Mapping ".concat(propName, "..."));
 
@@ -98,7 +104,7 @@ var irrelonNextState = function irrelonNextState() {
         if (this.context && this.context.stateStore) {
           // We already have a provider
           log.debug("DecisionWrapper(".concat(ComponentToWrap.name, ") render, we have a context, rendering component..."));
-          var stateData = resolveMapping(stateMapArr, this.context.stateStore, true);
+          var stateData = resolveMapping(stateMapArr, this.context.stateStore, true, ComponentToWrap.name);
           return _react["default"].createElement(ComponentToWrap, (0, _extends2["default"])({}, this.props, stateData), this.props.children);
         } // We don't have a provider, render one
 
@@ -115,7 +121,7 @@ var irrelonNextState = function irrelonNextState() {
           stateStore: this.stateStore
         }, _react["default"].createElement(Context.Consumer, null, function (stateContainer) {
           log.debug("".concat(ComponentToWrap.name, " Provider consumer re-render"));
-          var stateData = resolveMapping(stateMapArr, stateContainer.stateStore, false);
+          var stateData = resolveMapping(stateMapArr, stateContainer.stateStore, false, ComponentToWrap.name);
           return _react["default"].createElement(ComponentToWrap, (0, _extends2["default"])({}, _this.props, stateData), _this.props.children);
         }));
       }
@@ -131,6 +137,7 @@ var irrelonNextState = function irrelonNextState() {
               _len2,
               args,
               _key2,
+              pageProps,
               _args = arguments;
 
           return _regenerator["default"].wrap(function _callee$(_context) {
@@ -149,7 +156,7 @@ var irrelonNextState = function irrelonNextState() {
                   }
 
                   log.debug("DecisionWrapper(".concat(ComponentToWrap.name, ").getInitialProps resolving stateData mapping..."));
-                  stateData = resolveMapping(stateMapArr, store, true);
+                  stateData = resolveMapping(stateMapArr, store, true, ComponentToWrap.name);
 
                   for (_len2 = _args.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
                     args[_key2] = _args[_key2];
@@ -157,15 +164,24 @@ var irrelonNextState = function irrelonNextState() {
 
                   args[0] = (0, _objectSpread2["default"])({}, args[0], stateData);
 
-                  if (ComponentToWrap.getInitialProps) {
-                    log.debug("DecisionWrapper(".concat(ComponentToWrap.name, ") calling wrapped component ").concat(ComponentToWrap.name, ".getInitialProps()..."));
-                    finalProps = (0, _objectSpread2["default"])({}, ComponentToWrap.getInitialProps.apply(ComponentToWrap, args));
+                  if (!ComponentToWrap.getInitialProps) {
+                    _context.next = 13;
+                    break;
                   }
 
+                  log.debug("DecisionWrapper(".concat(ComponentToWrap.name, ") calling wrapped component ").concat(ComponentToWrap.name, ".getInitialProps()..."));
+                  _context.next = 11;
+                  return ComponentToWrap.getInitialProps.apply(ComponentToWrap, args);
+
+                case 11:
+                  pageProps = _context.sent;
+                  finalProps = (0, _objectSpread2["default"])({}, pageProps);
+
+                case 13:
                   finalProps._serverSideState = store.exportData();
                   return _context.abrupt("return", finalProps);
 
-                case 10:
+                case 15:
                 case "end":
                   return _context.stop();
               }

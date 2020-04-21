@@ -35,7 +35,7 @@ function State (name, initialData) {
 	// we utilise them as objects and apply a .init() function
 	// to each one
 	const stateInstance = function (store) {
-		return store.read(name);
+		throw new Error("Please use one of the state methods!");
 	};
 	
 	stateInstance.init = init;

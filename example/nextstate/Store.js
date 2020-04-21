@@ -8,7 +8,8 @@ import {
 	findPath as pathFindPath,
 	findOnePath as pathFindOnePath,
 	diff as pathDiff,
-	decouple as pathDecouple
+	decouple as pathDecouple,
+	join as pathJoin
 } from "@irrelon/path";
 import {init as initLog, setLevel as setLogLevel} from "irrelon-log";
 
@@ -83,6 +84,28 @@ const set = (store, path, newState, options = {}) => {
 	return store;
 };
 
+const push = (store, path, newVal, options = {}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot call push() without passing a store retrieved with getStore()!");
+	}
+	
+	const currentState = get(store, path);
+	const newState = pathPush(currentState, "", newVal);
+	
+	return set(store, path, newState, options);
+};
+
+const pull = (store, path, val, options = {strict: false}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot call pull() without passing a store retrieved with getStore()!");
+	}
+	
+	const currentState = get(store, path);
+	const newState = pathPull(currentState, "", val, options);
+	
+	return set(store, path, newState, options);
+};
+
 const update = (store, path, newState, options = {}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call update() without passing a store retrieved with getStore()!");
@@ -127,35 +150,21 @@ const update = (store, path, newState, options = {}) => {
 	return set(store, path, newState, options);
 };
 
-const push = (store, path, newVal, options = {}) => {
-	if (!store || !store.__isNextStateStore) {
-		throw new Error("Cannot call push() without passing a store retrieved with getStore()!");
-	}
-	
-	const currentState = get(store, path);
-	const newState = pathPush(currentState, "", newVal);
-	
-	return set(store, path, newState, options);
-};
-
-const pull = (store, path, val, options = {strict: false}) => {
-	if (!store || !store.__isNextStateStore) {
-		throw new Error("Cannot call pull() without passing a store retrieved with getStore()!");
-	}
-	
-	const currentState = get(store, path);
-	const newState = pathPull(currentState, "", val, options);
-	
-	return set(store, path, newState, options);
-};
-
-const find = (store, path, query, options = {strict: false}) => {
+const find = (store, path, query, options = {}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call find() without passing a store retrieved with getStore()!");
 	}
 	
+	let maxDepth = Infinity;
+	
+	if (query === undefined || (typeof query === "object" && !Object.keys(query).length)) {
+		maxDepth = 1;
+	}
+	
+	options = {strict: false, maxDepth, includeRoot: false, ...options};
+	
 	const currentState = get(store, path);
-	const matchResult = pathFindPath(currentState, query);
+	const matchResult = pathFindPath(currentState, query, options);
 	
 	if (matchResult.match) {
 		return matchResult.path.map((path) => pathGet(currentState, path));
@@ -169,8 +178,16 @@ const findOne = (store, path, query, options = {strict: false}) => {
 		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
 	}
 	
+	let maxDepth = Infinity;
+	
+	if (query === undefined || (typeof query === "object" && !Object.keys(query).length)) {
+		maxDepth = 1;
+	}
+	
+	options = {strict: false, maxDepth, includeRoot: false, ...options};
+	
 	const currentState = get(store, path);
-	const matchResult = pathFindOnePath(currentState, query);
+	const matchResult = pathFindOnePath(currentState, query, options);
 	
 	if (matchResult.match) {
 		return pathGet(currentState, matchResult.path);
@@ -189,11 +206,21 @@ const findAndUpdate = (store, path, query, updateData, options = {strict: false}
 	
 	if (matchResult.match) {
 		return matchResult.path.map((matchResultPath) => {
-			// Update the record
-			update(store, matchResultPath, updateData);
+			const updatePath = pathJoin(path, matchResultPath);
+			let finalUpdateData = updateData;
 			
-			// Return the updateed record
-			return pathGet(currentState, matchResultPath)
+			// Check if the updateData is a function
+			if (typeof updateData === "function") {
+				// Get the new update data for this item
+				// from the function
+				finalUpdateData = updateData(pathGet(currentState, matchResultPath));
+			}
+			
+			// Update the record
+			update(store, updatePath, finalUpdateData);
+			
+			// Return the updated record
+			return get(store, updatePath);
 		});
 	} else {
 		return [];
@@ -209,11 +236,21 @@ const findOneAndUpdate = (store, path, query, updateData, options = {strict: fal
 	const matchResult = pathFindOnePath(currentState, query);
 	
 	if (matchResult.match) {
-		// Update the record
-		update(store, matchResult.path, updateData);
+		const updatePath = pathJoin(path, matchResult.path);
+		let finalUpdateData = updateData;
 		
-		// Return the updateed record
-		return pathGet(currentState, matchResult.path);
+		// Check if the updateData is a function
+		if (typeof updateData === "function") {
+			// Get the new update data for this item
+			// from the function
+			finalUpdateData = updateData(pathGet(currentState, matchResult.path));
+		}
+		
+		// Update the record
+		update(store, updatePath, finalUpdateData);
+		
+		// Return the updated record
+		return get(store, updatePath);
 	} else {
 		return undefined;
 	}
@@ -259,10 +296,6 @@ const create = (initialData) => {
 		return set(storeObj, path, newState, options);
 	};
 	
-	storeObj.update = (path, newState, options) => {
-		return update(storeObj, path, newState, options);
-	};
-	
 	storeObj.push = (path, newVal, options) => {
 		return push(storeObj, path, newVal, options);
 	};
@@ -271,16 +304,20 @@ const create = (initialData) => {
 		return pull(storeObj, path, val, options);
 	};
 	
+	storeObj.update = (path, newState, options) => {
+		return update(storeObj, path, newState, options);
+	};
+	
 	storeObj.find = (path, query, options) => {
 		return find(storeObj, path, query, options);
 	};
 	
-	storeObj.findAndUpdate = (path, query, options) => {
-		return findAndUpdate(storeObj, path, query, options);
-	};
-	
 	storeObj.findOne = (path, query, options) => {
 		return findOne(storeObj, path, query, options);
+	};
+	
+	storeObj.findAndUpdate = (path, query, options) => {
+		return findAndUpdate(storeObj, path, query, options);
 	};
 	
 	storeObj.findOneAndUpdate = (path, query, options) => {

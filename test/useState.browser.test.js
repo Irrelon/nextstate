@@ -40,14 +40,34 @@ beforeEach(() => {
 
 describe("Browser", () => {
 	describe("irrelonNextState", function () {
-		describe("patch()", () => {
+		/*describe("getInitialProps()", () => {
+			it("App should be passed the data from getInitialProps()", () => {
+				let testRenderer;
+				
+				assert.strictEqual(changeEventCount, 0);
+				
+				stateStore.update("state1", true);
+				assert.strictEqual(changeEventCount, 1);
+				
+				assert.strictEqual(stateStore.get("state1"), true, "The store data for state1 has the correct value");
+				
+				testRenderer = mount(
+					<App stateStore={stateStore} />
+				);
+				testRenderer.update();
+				console.log("Found", testRenderer.find("App").props());
+				assert.strictEqual(testRenderer.find("App").props().pageProp, "isHere");
+			});
+		});*/
+		
+		describe("update()", () => {
 			it("InnerComponent should be passed the correct boolean state data before and after state updates", function () {
 				let testRenderer;
 				
 				assert.strictEqual(changeEventCount, 0);
 				
 				log.debug("CALLING PATCH");
-				stateStore.patch("state1", true);
+				stateStore.update("state1", true);
 				
 				log.debug("SHOULD HAVE EMITTED BY NOW");
 				assert.strictEqual(changeEventCount, 1);
@@ -62,7 +82,7 @@ describe("Browser", () => {
 				assert.strictEqual(testRenderer.find("InnerComponent").props().someProp, "true dat");
 				
 				// Update the state and see if the new state is reflected in the component
-				stateStore.patch("state1", false);
+				stateStore.update("state1", false);
 				
 				assert.strictEqual(changeEventCount, 2);
 				testRenderer.update();
@@ -75,7 +95,7 @@ describe("Browser", () => {
 				
 				assert.strictEqual(changeEventCount, 0);
 				
-				stateStore.patch("state1", 0);
+				stateStore.update("state1", 0);
 				
 				assert.strictEqual(changeEventCount, 1);
 				
@@ -86,7 +106,7 @@ describe("Browser", () => {
 				assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1, 0);
 				
 				// Update the state and see if the new state is reflected in the component
-				stateStore.patch("state1", 2);
+				stateStore.update("state1", 2);
 				
 				assert.strictEqual(changeEventCount, 2);
 				testRenderer.update();
@@ -100,10 +120,10 @@ describe("Browser", () => {
 				
 				assert.strictEqual(changeEventCount, 0);
 				
-				stateStore.patch("state1", {
+				stateStore.update("state1", {
 					"testVal": true
 				});
-				stateStore.patch("state2", {
+				stateStore.update("state2", {
 					"testVal": true
 				});
 				
@@ -117,7 +137,7 @@ describe("Browser", () => {
 				assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
 				
 				// Update the state and see if the new state is reflected in the component
-				stateStore.patch("state1", {
+				stateStore.update("state1", {
 					"testVal": false
 				});
 				testRenderer.update();
@@ -127,12 +147,12 @@ describe("Browser", () => {
 				assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp2.testVal, true);
 			});
 			
-			it("Doesn't wipe out the other keys when you update a single key calling patch()", () => {
+			it("Doesn't wipe out the other keys when you update a single key calling update()", () => {
 				let testRenderer;
 				
 				assert.strictEqual(changeEventCount, 0);
 				
-				stateStore.patch("state1", {
+				stateStore.update("state1", {
 					"testVal": true,
 					"otherVal": 12345
 				});
@@ -147,7 +167,7 @@ describe("Browser", () => {
 				assert.strictEqual(testRenderer.find("InnerComponent").props().stateProp1.otherVal, 12345);
 				
 				// Update the state and see if the new state is reflected in the component
-				stateStore.patch("state1", {
+				stateStore.update("state1", {
 					"testVal": false
 				});
 				testRenderer.update();
@@ -169,7 +189,7 @@ describe("Browser", () => {
 				
 				assert.strictEqual(changeEventCount, 0);
 				
-				stateStore.patch("state1", stateObj);
+				stateStore.update("state1", stateObj);
 				
 				assert.strictEqual(changeEventCount, 1);
 				
@@ -182,7 +202,7 @@ describe("Browser", () => {
 				
 				// Update the state and see if the new state is reflected in the component
 				stateObj.testVal.foo = false;
-				stateStore.patch("state1", stateObj);
+				stateStore.update("state1", stateObj);
 				testRenderer.update();
 				assert.strictEqual(changeEventCount, 2);
 				
@@ -202,8 +222,8 @@ describe("Browser", () => {
 				
 				assert.strictEqual(changeEventCount, 0);
 				
-				stateStore.patch("state1", stateObj);
-				stateStore.patch("state2", {"testVal": false});
+				stateStore.update("state1", stateObj);
+				stateStore.update("state2", {"testVal": false});
 				
 				assert.strictEqual(changeEventCount, 2);
 				
@@ -216,8 +236,8 @@ describe("Browser", () => {
 				
 				// Update the state and see if the new state is reflected in the component
 				stateObj.testVal.foo = false;
-				stateStore.patch("state1", stateObj);
-				stateStore.patch("state2", {"testVal": true});
+				stateStore.update("state1", stateObj);
+				stateStore.update("state2", {"testVal": true});
 				testRenderer.update();
 				assert.strictEqual(changeEventCount, 4);
 				
@@ -232,7 +252,7 @@ describe("Browser", () => {
 				
 				assert.strictEqual(changeEventCount, 0);
 				
-				stateStore.patch("state1", []);
+				stateStore.update("state1", []);
 				
 				assert.strictEqual(changeEventCount, 1);
 				assert.strictEqual(Array.isArray(stateStore.get("state1")), true, "The store data for state1 has the correct value");
@@ -259,7 +279,7 @@ describe("Browser", () => {
 				
 				assert.strictEqual(changeEventCount, 0);
 				
-				stateStore.put("state1", [{
+				stateStore.set("state1", [{
 					"_id": "1",
 					"name": "jim"
 				}, {
