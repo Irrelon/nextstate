@@ -1,9 +1,13 @@
 "use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+
+var _objectSpread2 = _interopRequireDefault(require("@babel/runtime/helpers/objectSpread"));
 
 var _path = require("@irrelon/path");
 
@@ -21,6 +25,12 @@ var log = (0, _irrelonLog.init)("State");
 
 function State(name, initialData) {
   var _initialData = initialData; // Has to be a non-arrow function
+  // This function checks if this is the first time a function has been
+  // called on this State instance. If so, we first initialise the state
+  // with any initial data we were given. We wait for the first call to
+  // a function to do this because until a call is made, we are not aware
+  // of what the `store` object will be, so setting initial data before
+  // that point is impossible.
 
   var init = function init(store) {
     if (store.__initCache[name]) {
@@ -33,7 +43,15 @@ function State(name, initialData) {
     if (store.get(name) === undefined) {
       store.set(name, _initialData);
     }
-  };
+  }; // This flag is used and applied to every function that needs to have
+  // the init() function called on it when state is being updated.
+  // By setting this flag we indicate the function is a state-based
+  // function that might rely on some initial data to be populated in
+  // the store via the init() function before we operate. It is primarily
+  // used in the resolveMapping() function in irrelonNextState.js
+  // IS VERY IMPORTANT AS WITHOUT THIS FLAG, THE FUNCTION WILL *NOT* BE
+  // PASSED THE `store` INSTANCE!!!
+
 
   init.__isNextStateStoreFunction = true; // These functions all have to be non-arrow functions as
   // we utilise them as objects and apply a .init() function
@@ -53,7 +71,7 @@ function State(name, initialData) {
 
   stateInstance.get = function (defaultVal) {
     var get = function get(store) {
-      return store.get((0, _path.join)(name), defaultVal);
+      return store.get(name, defaultVal);
     };
 
     get.init = init;
@@ -68,8 +86,9 @@ function State(name, initialData) {
        * @param {*} newVal The new value to replace the existing
        * value with.
        */
-      return function (newVal) {
-        return store.set((0, _path.join)(name), newVal);
+      return function (newVal, options) {
+        log.debug("[".concat(name, "] set() called..."));
+        return store.set(name, newVal, options);
       };
     };
 
@@ -85,8 +104,12 @@ function State(name, initialData) {
        * is not an array an error will occur.
        * @param {*} newVal The new value to push to the state array.
        */
-      return function (newVal) {
-        return store.push((0, _path.join)(name), newVal);
+      return function (newVal, options) {
+        log.debug("[".concat(name, "] push() called..."), {
+          newVal: newVal,
+          options: options
+        });
+        return store.push(name, newVal, options);
       };
     };
 
@@ -98,16 +121,19 @@ function State(name, initialData) {
   stateInstance.pull = function () {
     var pull = function pull(store) {
       /**
-       * Pulls the passed value to the state array. If the state
-       * is not an array an error will occur.
-       * @param {*} newVal The query value to pull from the state array.
+       * Pulls a single item matching the passed query from the state array.
+       * If the state is not an array an error will occur.
+       * @param {*} val The query to match.
        * @param {PullOptions} [options] Options object.
        */
-      return function (val) {
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+      return function (val, options) {
+        log.debug("[".concat(name, "] pull() called..."), {
+          val: val,
+          options: options
+        });
+        return store.pull(name, val, (0, _objectSpread2["default"])({
           strict: false
-        };
-        return store.pull((0, _path.join)(name), val, options);
+        }, options));
       };
     };
 
@@ -125,8 +151,12 @@ function State(name, initialData) {
        * value with.
        * @param {*} newVal The new value to update the existing
        */
-      return function (newVal) {
-        return store.update(name, newVal);
+      return function (newVal, options) {
+        log.debug("[".concat(name, "] update() called..."), {
+          newVal: newVal,
+          options: options
+        });
+        return store.update(name, newVal, options);
       };
     };
 
@@ -139,8 +169,12 @@ function State(name, initialData) {
     var find = function find(store) {
       return function () {
         var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        return store.find((0, _path.join)(name), query, options);
+        var options = arguments.length > 1 ? arguments[1] : undefined;
+        log.debug("[".concat(name, "] find() called..."), {
+          query: query,
+          options: options
+        });
+        return store.find(name, query, options);
       };
     };
 
@@ -153,8 +187,12 @@ function State(name, initialData) {
     var findOne = function findOne(store) {
       return function () {
         var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        return store.findOne((0, _path.join)(name), query, options);
+        var options = arguments.length > 1 ? arguments[1] : undefined;
+        log.debug("[".concat(name, "] findOne() called..."), {
+          query: query,
+          options: options
+        });
+        return store.findOne(name, query, options);
       };
     };
 
@@ -168,8 +206,13 @@ function State(name, initialData) {
       return function () {
         var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         var update = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-        return store.findAndUpdate((0, _path.join)(name), query, update, options);
+        var options = arguments.length > 2 ? arguments[2] : undefined;
+        log.debug("[".concat(name, "] findAndUpdate() called..."), {
+          query: query,
+          update: update,
+          options: options
+        });
+        return store.findAndUpdate(name, query, update, options);
       };
     };
 
@@ -183,8 +226,13 @@ function State(name, initialData) {
       return function () {
         var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         var update = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-        return store.findOneAndUpdate((0, _path.join)(name), query, update, options);
+        var options = arguments.length > 2 ? arguments[2] : undefined;
+        log.debug("[".concat(name, "] findOneAndUpdate() called..."), {
+          query: query,
+          update: update,
+          options: options
+        });
+        return store.findOneAndUpdate(name, query, update, options);
       };
     };
 
@@ -195,56 +243,103 @@ function State(name, initialData) {
 
   stateInstance.findByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-    return function (store) {
+
+    var findByPath = function findByPath(store) {
       return function () {
         var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var options = arguments.length > 1 ? arguments[1] : undefined;
+        log.debug("[".concat(name, "] findByPath() called..."), {
+          path: path,
+          query: query,
+          options: options
+        });
         return store.find((0, _path.join)(name, path), query, options);
       };
     };
+
+    findByPath.init = init;
+    findByPath.__isNextStateStoreFunction = true;
+    return findByPath;
   };
 
   stateInstance.findOneByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-    return function (store) {
+
+    var findOneByPath = function findOneByPath(store) {
       return function () {
         var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var options = arguments.length > 1 ? arguments[1] : undefined;
+        log.debug("[".concat(name, "] findOneByPath() called..."), {
+          path: path,
+          query: query,
+          options: options
+        });
         return store.findOne((0, _path.join)(name, path), query, options);
       };
     };
+
+    findOneByPath.init = init;
+    findOneByPath.__isNextStateStoreFunction = true;
+    return findOneByPath;
   };
 
   stateInstance.findAndUpdateByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-    return function (store) {
+
+    var findAndUpdateByPath = function findAndUpdateByPath(store) {
       return function () {
         var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         var update = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        var options = arguments.length > 2 ? arguments[2] : undefined;
+        log.debug("[".concat(name, "] findAndUpdateByPath() called..."), {
+          path: path,
+          query: query,
+          update: update,
+          options: options
+        });
         return store.findAndUpdate((0, _path.join)(name, path), query, update, options);
       };
     };
+
+    findAndUpdateByPath.init = init;
+    findAndUpdateByPath.__isNextStateStoreFunction = true;
+    return findAndUpdateByPath;
   };
 
   stateInstance.findOneAndUpdateByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-    return function (store) {
+
+    var findOneAndUpdateByPath = function findOneAndUpdateByPath(store) {
       return function () {
         var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         var update = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        var options = arguments.length > 2 ? arguments[2] : undefined;
+        log.debug("[".concat(name, "] findOneAndUpdateByPath() called..."), {
+          path: path,
+          query: query,
+          update: update,
+          options: options
+        });
         return store.findOneAndUpdate((0, _path.join)(name, path), query, update, options);
       };
     };
+
+    findOneAndUpdateByPath.init = init;
+    findOneAndUpdateByPath.__isNextStateStoreFunction = true;
+    return findOneAndUpdateByPath;
   };
 
   stateInstance.updateByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
 
     var updateByPath = function updateByPath(store) {
-      return function (newVal) {
-        return store.update((0, _path.join)(name, path), newVal);
+      return function (newVal, options) {
+        log.debug("[".concat(name, "] updateByPath() called..."), {
+          path: path,
+          newVal: newVal,
+          options: options
+        });
+        return store.update((0, _path.join)(name, path), newVal, options);
       };
     };
 
@@ -257,8 +352,13 @@ function State(name, initialData) {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
 
     var pushByPath = function pushByPath(store) {
-      return function (newVal) {
-        return store.push((0, _path.join)(name, path), newVal);
+      return function (newVal, options) {
+        log.debug("[".concat(name, "] pushByPath() called..."), {
+          path: path,
+          newVal: newVal,
+          options: options
+        });
+        return store.push((0, _path.join)(name, path), newVal, options);
       };
     };
 
@@ -271,10 +371,15 @@ function State(name, initialData) {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
 
     var pullByPath = function pullByPath(store) {
-      return function (val) {
-        return store.pull((0, _path.join)(name, path), val, {
-          strict: false
+      return function (val, options) {
+        log.debug("[".concat(name, "] pullByPath() called..."), {
+          path: path,
+          val: val,
+          options: options
         });
+        return store.pull((0, _path.join)(name, path), val, (0, _objectSpread2["default"])({
+          strict: false
+        }, options));
       };
     };
 
@@ -286,9 +391,13 @@ function State(name, initialData) {
   stateInstance.getByPath = function () {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
     var defaultVal = arguments.length > 1 ? arguments[1] : undefined;
+    var options = arguments.length > 2 ? arguments[2] : undefined;
 
     var getByPath = function getByPath(store) {
-      return store.get((0, _path.join)(name, path), defaultVal);
+      log.debug("[".concat(name, "] getByPath() called..."), {
+        path: path
+      });
+      return store.get((0, _path.join)(name, path), defaultVal, options);
     };
 
     getByPath.init = init;
@@ -300,8 +409,13 @@ function State(name, initialData) {
     var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
 
     var setByPath = function setByPath(store) {
-      return function (newVal) {
-        return store.set((0, _path.join)(name, path), newVal);
+      return function (newVal, options) {
+        log.debug("[".concat(name, "] setByPath() called..."), {
+          path: path,
+          newVal: newVal,
+          options: options
+        });
+        return store.set((0, _path.join)(name, path), newVal, options);
       };
     };
 
@@ -310,7 +424,7 @@ function State(name, initialData) {
     return setByPath;
   };
 
-  var functionArr = ["update", "get", "set", "push", "pull", "find", "findOne", "findAndUpdate", "findOneAndUpdate"];
+  var functionArr = ["update", "get", "set", "push", "pull", "find", "findOne", "findAndUpdate", "findOneAndUpdate", "findByPath", "findOneByPath", "findAndUpdateByPath", "findOneAndUpdateByPath", "updateByPath", "pushByPath", "pullByPath", "getByPath", "setByPath"];
   functionArr.forEach(function (funcName) {
     stateInstance[funcName].init = init;
     stateInstance[funcName].__isNextStateStoreFunction = true;
