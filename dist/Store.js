@@ -34,7 +34,7 @@ var _context = _react["default"].createContext(null);
  * @typedef {object} UpdateOptions An update operation options object.
  * @property {boolean} [strict=false] If set to true, only updates exact
  * object matches.
- * @property {boolean} [dataFunction=false] If set to true, treats any
+ * @property {boolean} [dataFunction=true] If set to true, treats any
  * function passed in the update argument of an update() call to be a
  * function that returns the update data, rather than itself being the
  * actual data to set.
@@ -162,7 +162,7 @@ var pull = function pull(store, path, val) {
 var update = function update(store, path, newState) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
     strict: false,
-    dataFunction: false
+    dataFunction: true
   };
 
   if (!store || !store.__isNextStateStore) {
@@ -271,7 +271,7 @@ var findOne = function findOne(store, path, query) {
 var findAndUpdate = function findAndUpdate(store, path, query, updateData) {
   var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {
     strict: false,
-    dataFunction: false
+    dataFunction: true
   };
 
   if (!store || !store.__isNextStateStore) {
@@ -305,7 +305,7 @@ var findAndUpdate = function findAndUpdate(store, path, query, updateData) {
 var findOneAndUpdate = function findOneAndUpdate(store, path, query, updateData) {
   var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {
     strict: false,
-    dataFunction: false
+    dataFunction: true
   };
 
   if (!store || !store.__isNextStateStore) {

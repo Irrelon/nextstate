@@ -20,7 +20,7 @@ const _context = React.createContext(null);
  * @typedef {object} UpdateOptions An update operation options object.
  * @property {boolean} [strict=false] If set to true, only updates exact
  * object matches.
- * @property {boolean} [dataFunction=false] If set to true, treats any
+ * @property {boolean} [dataFunction=true] If set to true, treats any
  * function passed in the update argument of an update() call to be a
  * function that returns the update data, rather than itself being the
  * actual data to set.
@@ -131,7 +131,7 @@ const pull = (store, path, val, options = {strict: false}) => {
  * @param {UpdateOptions} [options={}] The update options object.
  * @returns {*}
  */
-const update = (store, path, newState, options = {strict: false, dataFunction: false}) => {
+const update = (store, path, newState, options = {strict: false, dataFunction: true}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call update() without passing a store retrieved with getStore()!");
 	}
@@ -221,7 +221,7 @@ const findOne = (store, path, query, options = {strict: false}) => {
 	}
 };
 
-const findAndUpdate = (store, path, query, updateData, options = {strict: false, dataFunction: false}) => {
+const findAndUpdate = (store, path, query, updateData, options = {strict: false, dataFunction: true}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call findAndUpdate() without passing a store retrieved with getStore()!");
 	}
@@ -252,7 +252,7 @@ const findAndUpdate = (store, path, query, updateData, options = {strict: false,
 	}
 };
 
-const findOneAndUpdate = (store, path, query, updateData, options = {strict: false, dataFunction: false}) => {
+const findOneAndUpdate = (store, path, query, updateData, options = {strict: false, dataFunction: true}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
 	}
