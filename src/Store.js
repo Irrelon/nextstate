@@ -16,6 +16,14 @@ import {init as initLog, setLevel as setLogLevel} from "irrelon-log";
 const log = initLog("Store");
 const _context = React.createContext(null);
 
+/**
+ * @typedef {object} UpdateOptions An update operation options object.
+ * @property {boolean} [dataFunction=false] If set to true, treats any
+ * function passed in the update argument of an update() call to be a
+ * function that returns the update data, rather than itself being the
+ * actual data to set.
+ */
+
 const decouple = (obj) => {
 	if (typeof obj !== "object") {
 		return obj;
@@ -107,14 +115,28 @@ const pull = (store, path, val, options = {strict: false}) => {
 	return set(store, path, newState, options);
 };
 
-const update = (store, path, newState, options = {}) => {
+/**
+ * Update the store at a given path with new data.
+ * @param {Store} store The store to operate on.
+ * @param {String} path The path to the data to operate on.
+ * @param {*|Function} newState The new data to update to,
+ * or a function that returns the new data to update to. If
+ * you wish to pass a function so that you can return data
+ * dynamically based on other factors, ensure you have set
+ * the options.dataFunction to true, otherwise the update
+ * will set the passed function as the new data rather than
+ * calling it to get new data.
+ * @param {UpdateOptions} [options={}] The update options object.
+ * @returns {*}
+ */
+const update = (store, path, newState, options = {dataFunction: false}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call update() without passing a store retrieved with getStore()!");
 	}
 	
 	const currentState = get(store, path);
 	
-	if (typeof newState === "function") {
+	if (typeof newState === "function" && options.dataFunction === true) {
 		// Call the function to get the update data
 		return update(newState(store, path, currentState, options));
 	}
@@ -218,7 +240,7 @@ const findAndUpdate = (store, path, query, updateData, options = {strict: false}
 			}
 			
 			// Update the record
-			update(store, updatePath, finalUpdateData);
+			update(store, updatePath, finalUpdateData, options);
 			
 			// Return the updated record
 			return get(store, updatePath);
@@ -248,7 +270,7 @@ const findOneAndUpdate = (store, path, query, updateData, options = {strict: fal
 		}
 		
 		// Update the record
-		update(store, updatePath, finalUpdateData);
+		update(store, updatePath, finalUpdateData, options);
 		
 		// Return the updated record
 		return get(store, updatePath);

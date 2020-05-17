@@ -30,6 +30,14 @@ var _irrelonLog = require("irrelon-log");
 var log = (0, _irrelonLog.init)("Store");
 
 var _context = _react["default"].createContext(null);
+/**
+ * @typedef {object} UpdateOptions An update operation options object.
+ * @property {boolean} [dataFunction=false] If set to true, treats any
+ * function passed in the update argument of an update() call to be a
+ * function that returns the update data, rather than itself being the
+ * actual data to set.
+ */
+
 
 var decouple = function decouple(obj) {
   if ((0, _typeof2["default"])(obj) !== "object") {
@@ -133,9 +141,26 @@ var pull = function pull(store, path, val) {
   var newState = (0, _path.pullValImmutable)(currentState, "", val, options);
   return set(store, path, newState, options);
 };
+/**
+ * Update the store at a given path with new data.
+ * @param {Store} store The store to operate on.
+ * @param {String} path The path to the data to operate on.
+ * @param {*|Function} newState The new data to update to,
+ * or a function that returns the new data to update to. If
+ * you wish to pass a function so that you can return data
+ * dynamically based on other factors, ensure you have set
+ * the options.dataFunction to true, otherwise the update
+ * will set the passed function as the new data rather than
+ * calling it to get new data.
+ * @param {UpdateOptions} [options={}] The update options object.
+ * @returns {*}
+ */
+
 
 var update = function update(store, path, newState) {
-  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
+    dataFunction: false
+  };
 
   if (!store || !store.__isNextStateStore) {
     throw new Error("Cannot call update() without passing a store retrieved with getStore()!");
@@ -143,7 +168,7 @@ var update = function update(store, path, newState) {
 
   var currentState = get(store, path);
 
-  if (typeof newState === "function") {
+  if (typeof newState === "function" && options.dataFunction === true) {
     // Call the function to get the update data
     return update(newState(store, path, currentState, options));
   }
@@ -264,7 +289,7 @@ var findAndUpdate = function findAndUpdate(store, path, query, updateData) {
       } // Update the record
 
 
-      update(store, updatePath, finalUpdateData); // Return the updated record
+      update(store, updatePath, finalUpdateData, options); // Return the updated record
 
       return get(store, updatePath);
     });
@@ -296,7 +321,7 @@ var findOneAndUpdate = function findOneAndUpdate(store, path, query, updateData)
     } // Update the record
 
 
-    update(store, updatePath, finalUpdateData); // Return the updated record
+    update(store, updatePath, finalUpdateData, options); // Return the updated record
 
     return get(store, updatePath);
   } else {
