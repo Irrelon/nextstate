@@ -241,17 +241,19 @@ function State(name, initialData) {
     return findOneAndUpdate;
   };
 
-  stateInstance.findByPath = function (path) {
+  stateInstance.findByPath = function (initialPath) {
     var findByPath = function findByPath(store) {
       return function () {
+        var path;
         var query;
         var options;
 
         if (arguments.length === 3) {
-          path = (0, _path.join)(path, arguments[0]);
+          path = (0, _path.join)(initialPath, arguments[0]);
           query = arguments[1] || {};
           options = arguments[2];
         } else {
+          path = initialPath;
           query = arguments[0] || {};
           options = arguments[1];
         }
@@ -270,17 +272,19 @@ function State(name, initialData) {
     return findByPath;
   };
 
-  stateInstance.findOneByPath = function (path) {
+  stateInstance.findOneByPath = function (initialPath) {
     var findOneByPath = function findOneByPath(store) {
       return function () {
+        var path;
         var query;
         var options;
 
         if (arguments.length === 3) {
-          path = (0, _path.join)(path, arguments[0]);
+          path = (0, _path.join)(initialPath, arguments[0]);
           query = arguments[1] || {};
           options = arguments[2];
         } else {
+          path = initialPath;
           query = arguments[0] || {};
           options = arguments[1];
         }
@@ -299,19 +303,21 @@ function State(name, initialData) {
     return findOneByPath;
   };
 
-  stateInstance.findAndUpdateByPath = function (path) {
+  stateInstance.findAndUpdateByPath = function (initialPath) {
     var findAndUpdateByPath = function findAndUpdateByPath(store) {
       return function () {
+        var path;
         var query;
         var update;
         var options;
 
         if (arguments.length === 4) {
-          path = (0, _path.join)(path, arguments[0]);
+          path = (0, _path.join)(initialPath, arguments[0]);
           query = arguments[1] || {};
           update = arguments[2] || {};
           options = arguments[3];
         } else {
+          path = initialPath;
           query = arguments[0] || {};
           update = arguments[1] || {};
           options = arguments[2];
@@ -332,19 +338,21 @@ function State(name, initialData) {
     return findAndUpdateByPath;
   };
 
-  stateInstance.findOneAndUpdateByPath = function (path) {
+  stateInstance.findOneAndUpdateByPath = function (initialPath) {
     var findOneAndUpdateByPath = function findOneAndUpdateByPath(store) {
       return function () {
+        var path;
         var query;
         var update;
         var options;
 
         if (arguments.length === 4) {
-          path = (0, _path.join)(path, arguments[0]);
+          path = (0, _path.join)(initialPath, arguments[0]);
           query = arguments[1] || {};
           update = arguments[2] || {};
           options = arguments[3];
         } else {
+          path = initialPath;
           query = arguments[0] || {};
           update = arguments[1] || {};
           options = arguments[2];
@@ -365,17 +373,19 @@ function State(name, initialData) {
     return findOneAndUpdateByPath;
   };
 
-  stateInstance.updateByPath = function (path) {
+  stateInstance.updateByPath = function (initialPath) {
     var updateByPath = function updateByPath(store) {
       return function () {
+        var path;
         var newVal;
         var options;
 
         if (arguments.length === 3) {
-          path = (0, _path.join)(path, arguments[0]);
+          path = (0, _path.join)(initialPath, arguments[0]);
           newVal = arguments[1];
           options = arguments[2];
         } else {
+          path = initialPath;
           newVal = arguments[0];
           options = arguments[1];
         }
@@ -394,17 +404,19 @@ function State(name, initialData) {
     return updateByPath;
   };
 
-  stateInstance.pushByPath = function (path) {
+  stateInstance.pushByPath = function (initialPath) {
     var pushByPath = function pushByPath(store) {
       return function () {
+        var path;
         var newVal;
         var options;
 
         if (arguments.length === 3) {
-          path = (0, _path.join)(path, arguments[0]);
+          path = (0, _path.join)(initialPath, arguments[0]);
           newVal = arguments[1];
           options = arguments[2];
         } else {
+          path = initialPath;
           newVal = arguments[0];
           options = arguments[1];
         }
@@ -423,17 +435,19 @@ function State(name, initialData) {
     return pushByPath;
   };
 
-  stateInstance.pullByPath = function (path) {
+  stateInstance.pullByPath = function (initialPath) {
     var pullByPath = function pullByPath(store) {
       return function () {
+        var path;
         var val;
         var options;
 
         if (arguments.length === 3) {
-          path = (0, _path.join)(path, arguments[0]);
+          path = (0, _path.join)(initialPath, arguments[0]);
           val = arguments[1];
           options = arguments[2];
         } else {
+          path = initialPath;
           val = arguments[0];
           options = arguments[1];
         }
@@ -454,9 +468,9 @@ function State(name, initialData) {
     return pullByPath;
   };
 
-  stateInstance.getByPath = function (path, defaultVal, options) {
+  stateInstance.getByPath = function (initialPath, defaultVal, options) {
     var getByPath = function getByPath(store) {
-      if (path === undefined) {
+      if (initialPath === undefined) {
         return function (path, defaultVal, options) {
           log.debug("[".concat(name, "] getByPath() called..."), {
             path: path
@@ -465,6 +479,7 @@ function State(name, initialData) {
         };
       }
 
+      var path = initialPath;
       log.debug("[".concat(name, "] getByPath() called..."), {
         path: path
       });
@@ -476,17 +491,19 @@ function State(name, initialData) {
     return getByPath;
   };
 
-  stateInstance.setByPath = function (path) {
+  stateInstance.setByPath = function (initialPath) {
     var setByPath = function setByPath(store) {
       return function () {
+        var path;
         var newVal;
         var options;
 
         if (arguments.length === 3) {
-          path = (0, _path.join)(path, arguments[0]);
+          path = (0, _path.join)(initialPath, arguments[0]);
           newVal = arguments[1];
           options = arguments[2];
         } else {
+          path = initialPath;
           newVal = arguments[0];
           options = arguments[1];
         }
