@@ -39,7 +39,7 @@ var Context = (0, _Store.getContext)();
 var resolveMapping = function resolveMapping(stateMapArr, store) {
   var init = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
   var componentName = arguments.length > 3 ? arguments[3] : undefined;
-  log.debug("(init: ".concat(init, ") Mapping states (").concat(stateMapArr.length, ")..."));
+  log.debug("(init: ".concat(init, ") Mapping states..."), stateMapArr);
   var stateData = stateMapArr.reduce(function (mapData, stateMap) {
     var stateMapKeys = Object.keys(stateMap);
     log.debug("(init: ".concat(init, ") Mapping state keys:"), JSON.stringify(stateMapKeys));

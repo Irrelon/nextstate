@@ -7,7 +7,7 @@ const log = initLog("irrelonNextState");
 const Context = getContext();
 
 const resolveMapping = (stateMapArr, store, init = false, componentName) => {
-	log.debug(`(init: ${init}) Mapping states (${stateMapArr.length})...`);
+	log.debug(`(init: ${init}) Mapping states...`, stateMapArr);
 	
 	const stateData = stateMapArr.reduce((mapData, stateMap) => {
 		const stateMapKeys = Object.keys(stateMap);

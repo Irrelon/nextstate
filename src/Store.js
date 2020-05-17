@@ -79,6 +79,7 @@ const set = (store, path, newState, options = {}) => {
 		return store;
 	}
 	
+	log.debug(`[${path}] Diff was different so emitting change event`, diff);
 	store.events.emitId("change", path, newState);
 	
 	return store;

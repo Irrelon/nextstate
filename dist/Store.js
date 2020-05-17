@@ -101,6 +101,7 @@ var set = function set(store, path, newState) {
     return store;
   }
 
+  log.debug("[".concat(path, "] Diff was different so emitting change event"), diff);
   store.events.emitId("change", path, newState);
   return store;
 };
