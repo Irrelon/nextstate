@@ -32,6 +32,8 @@ var log = (0, _irrelonLog.init)("Store");
 var _context = _react["default"].createContext(null);
 /**
  * @typedef {object} UpdateOptions An update operation options object.
+ * @property {boolean} [strict=false] If set to true, only updates exact
+ * object matches.
  * @property {boolean} [dataFunction=false] If set to true, treats any
  * function passed in the update argument of an update() call to be a
  * function that returns the update data, rather than itself being the

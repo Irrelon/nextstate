@@ -16,6 +16,12 @@ function State (name, initialData) {
 	const _initialData = initialData;
 	
 	// Has to be a non-arrow function
+	// This function checks if this is the first time a function has been
+	// called on this State instance. If so, we first initialise the state
+	// with any initial data we were given. We wait for the first call to
+	// a function to do this because until a call is made, we are not aware
+	// of what the `store` object will be, so setting initial data before
+	// that point is impossible.
 	const init = function (store) {
 		if (store.__initCache[name]) {
 			return;
@@ -29,6 +35,14 @@ function State (name, initialData) {
 		}
 	};
 	
+	// This flag is used and applied to every function that needs to have
+	// the init() function called on it when state is being updated.
+	// By setting this flag we indicate the function is a state-based
+	// function that might rely on some initial data to be populated in
+	// the store via the init() function before we operate. It is primarily
+	// used in the resolveMapping() function in irrelonNextState.js
+	// IS VERY IMPORTANT AS WITHOUT THIS FLAG, THE FUNCTION WILL *NOT* BE
+	// PASSED THE `store` INSTANCE!!!
 	init.__isNextStateStoreFunction = true;
 	
 	// These functions all have to be non-arrow functions as
@@ -194,39 +208,59 @@ function State (name, initialData) {
 	};
 	
 	stateInstance.findByPath = function (path = "") {
-		return function (store) {
+		const findByPath = function (store) {
 			return (query = {}, options) => {
 				log.debug(`[${name}] findByPath() called...`, {path, query, options});
 				return store.find(pathJoin(name, path), query, options);
 			};
 		};
+		
+		findByPath.init = init;
+		findByPath.__isNextStateStoreFunction = true;
+		
+		return findByPath;
 	};
 	
 	stateInstance.findOneByPath = function (path = "") {
-		return function (store) {
+		const findOneByPath = function (store) {
 			return (query = {}, options) => {
 				log.debug(`[${name}] findOneByPath() called...`, {path, query, options});
 				return store.findOne(pathJoin(name, path), query, options);
 			};
 		};
+		
+		findOneByPath.init = init;
+		findOneByPath.__isNextStateStoreFunction = true;
+		
+		return findOneByPath;
 	};
 	
 	stateInstance.findAndUpdateByPath = function (path = "") {
-		return function (store) {
+		const findAndUpdateByPath = function (store) {
 			return (query = {}, update = {}, options) => {
 				log.debug(`[${name}] findAndUpdateByPath() called...`, {path, query, update, options});
 				return store.findAndUpdate(pathJoin(name, path), query, update, options);
 			};
 		};
+		
+		findAndUpdateByPath.init = init;
+		findAndUpdateByPath.__isNextStateStoreFunction = true;
+		
+		return findAndUpdateByPath;
 	};
 	
 	stateInstance.findOneAndUpdateByPath = function (path = "") {
-		return function (store) {
+		const findOneAndUpdateByPath = function (store) {
 			return (query = {}, update = {}, options) => {
 				log.debug(`[${name}] findOneAndUpdateByPath() called...`, {path, query, update, options});
 				return store.findOneAndUpdate(pathJoin(name, path), query, update, options);
 			};
 		};
+		
+		findOneAndUpdateByPath.init = init;
+		findOneAndUpdateByPath.__isNextStateStoreFunction = true;
+		
+		return findOneAndUpdateByPath;
 	};
 	
 	stateInstance.updateByPath = function (path = "") {
@@ -306,7 +340,16 @@ function State (name, initialData) {
 		"find",
 		"findOne",
 		"findAndUpdate",
-		"findOneAndUpdate"
+		"findOneAndUpdate",
+		"findByPath",
+		"findOneByPath",
+		"findAndUpdateByPath",
+		"findOneAndUpdateByPath",
+		"updateByPath",
+		"pushByPath",
+		"pullByPath",
+		"getByPath",
+		"setByPath"
 	];
 	
 	functionArr.forEach((funcName) => {

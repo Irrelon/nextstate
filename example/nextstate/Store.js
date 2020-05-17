@@ -217,7 +217,7 @@ const findAndUpdate = (store, path, query, updateData, options = {strict: false}
 			}
 			
 			// Update the record
-			update(store, updatePath, finalUpdateData);
+			update(store, updatePath, finalUpdateData, options);
 			
 			// Return the updated record
 			return get(store, updatePath);
@@ -247,7 +247,7 @@ const findOneAndUpdate = (store, path, query, updateData, options = {strict: fal
 		}
 		
 		// Update the record
-		update(store, updatePath, finalUpdateData);
+		update(store, updatePath, finalUpdateData, options);
 		
 		// Return the updated record
 		return get(store, updatePath);
