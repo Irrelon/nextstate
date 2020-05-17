@@ -131,7 +131,7 @@ const pull = (store, path, val, options = {strict: false}) => {
  * @param {UpdateOptions} [options={}] The update options object.
  * @returns {*}
  */
-const update = (store, path, newState, options = {dataFunction: false}) => {
+const update = (store, path, newState, options = {strict: false, dataFunction: false}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call update() without passing a store retrieved with getStore()!");
 	}
@@ -140,7 +140,7 @@ const update = (store, path, newState, options = {dataFunction: false}) => {
 	
 	if (typeof newState === "function" && options.dataFunction === true) {
 		// Call the function to get the update data
-		return update(newState(store, path, currentState, options));
+		return update(newState(currentState, path));
 	}
 	
 	if (typeof currentState === "object" && typeof newState === "object") {
@@ -221,7 +221,7 @@ const findOne = (store, path, query, options = {strict: false}) => {
 	}
 };
 
-const findAndUpdate = (store, path, query, updateData, options = {strict: false}) => {
+const findAndUpdate = (store, path, query, updateData, options = {strict: false, dataFunction: false}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call findAndUpdate() without passing a store retrieved with getStore()!");
 	}
@@ -238,7 +238,7 @@ const findAndUpdate = (store, path, query, updateData, options = {strict: false}
 			if (typeof updateData === "function") {
 				// Get the new update data for this item
 				// from the function
-				finalUpdateData = updateData(pathGet(currentState, matchResultPath));
+				finalUpdateData = updateData(pathGet(currentState, matchResultPath), matchResultPath);
 			}
 			
 			// Update the record
@@ -252,7 +252,7 @@ const findAndUpdate = (store, path, query, updateData, options = {strict: false}
 	}
 };
 
-const findOneAndUpdate = (store, path, query, updateData, options = {strict: false}) => {
+const findOneAndUpdate = (store, path, query, updateData, options = {strict: false, dataFunction: false}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
 	}
@@ -265,10 +265,10 @@ const findOneAndUpdate = (store, path, query, updateData, options = {strict: fal
 		let finalUpdateData = updateData;
 		
 		// Check if the updateData is a function
-		if (typeof updateData === "function") {
+		if (typeof updateData === "function" && options.dataFunction === true) {
 			// Get the new update data for this item
 			// from the function
-			finalUpdateData = updateData(pathGet(currentState, matchResult.path));
+			finalUpdateData = updateData(pathGet(currentState, matchResult.path), matchResult.path);
 		}
 		
 		// Update the record
@@ -341,12 +341,12 @@ const create = (initialData) => {
 		return findOne(storeObj, path, query, options);
 	};
 	
-	storeObj.findAndUpdate = (path, query, options) => {
-		return findAndUpdate(storeObj, path, query, options);
+	storeObj.findAndUpdate = (path, query, update, options) => {
+		return findAndUpdate(storeObj, path, query, update, options);
 	};
 	
-	storeObj.findOneAndUpdate = (path, query, options) => {
-		return findOneAndUpdate(storeObj, path, query, options);
+	storeObj.findOneAndUpdate = (path, query, update, options) => {
+		return findOneAndUpdate(storeObj, path, query, update, options);
 	};
 	
 	storeObj.value = (path) => {

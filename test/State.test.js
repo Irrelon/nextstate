@@ -290,6 +290,8 @@ describe("State", () => {
 			}, (item) => {
 				item.category = "c";
 				return item;
+			}, {
+				dataFunction: true
 			});
 			
 			assert.strictEqual(Array.isArray(result2), false, "Value is correct");
@@ -541,6 +543,8 @@ describe("State", () => {
 			}, (item) => {
 				item.category = "c";
 				return item;
+			}, {
+				dataFunction: true
 			});
 			
 			assert.strictEqual(Array.isArray(result2), false, "Value is correct");

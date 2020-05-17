@@ -161,6 +161,7 @@ var pull = function pull(store, path, val) {
 
 var update = function update(store, path, newState) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
+    strict: false,
     dataFunction: false
   };
 
@@ -172,7 +173,7 @@ var update = function update(store, path, newState) {
 
   if (typeof newState === "function" && options.dataFunction === true) {
     // Call the function to get the update data
-    return update(newState(store, path, currentState, options));
+    return update(newState(currentState, path));
   }
 
   if ((0, _typeof2["default"])(currentState) === "object" && (0, _typeof2["default"])(newState) === "object") {
@@ -269,7 +270,8 @@ var findOne = function findOne(store, path, query) {
 
 var findAndUpdate = function findAndUpdate(store, path, query, updateData) {
   var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {
-    strict: false
+    strict: false,
+    dataFunction: false
   };
 
   if (!store || !store.__isNextStateStore) {
@@ -287,7 +289,7 @@ var findAndUpdate = function findAndUpdate(store, path, query, updateData) {
       if (typeof updateData === "function") {
         // Get the new update data for this item
         // from the function
-        finalUpdateData = updateData((0, _path.get)(currentState, matchResultPath));
+        finalUpdateData = updateData((0, _path.get)(currentState, matchResultPath), matchResultPath);
       } // Update the record
 
 
@@ -302,7 +304,8 @@ var findAndUpdate = function findAndUpdate(store, path, query, updateData) {
 
 var findOneAndUpdate = function findOneAndUpdate(store, path, query, updateData) {
   var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {
-    strict: false
+    strict: false,
+    dataFunction: false
   };
 
   if (!store || !store.__isNextStateStore) {
@@ -316,10 +319,10 @@ var findOneAndUpdate = function findOneAndUpdate(store, path, query, updateData)
     var updatePath = (0, _path.join)(path, matchResult.path);
     var finalUpdateData = updateData; // Check if the updateData is a function
 
-    if (typeof updateData === "function") {
+    if (typeof updateData === "function" && options.dataFunction === true) {
       // Get the new update data for this item
       // from the function
-      finalUpdateData = updateData((0, _path.get)(currentState, matchResult.path));
+      finalUpdateData = updateData((0, _path.get)(currentState, matchResult.path), matchResult.path);
     } // Update the record
 
 
@@ -394,12 +397,12 @@ var create = function create(initialData) {
     return findOne(storeObj, path, query, options);
   };
 
-  storeObj.findAndUpdate = function (path, query, options) {
-    return findAndUpdate(storeObj, path, query, options);
+  storeObj.findAndUpdate = function (path, query, update, options) {
+    return findAndUpdate(storeObj, path, query, update, options);
   };
 
-  storeObj.findOneAndUpdate = function (path, query, options) {
-    return findOneAndUpdate(storeObj, path, query, options);
+  storeObj.findOneAndUpdate = function (path, query, update, options) {
+    return findOneAndUpdate(storeObj, path, query, update, options);
   };
 
   storeObj.value = function (path) {
