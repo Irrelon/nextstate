@@ -207,8 +207,15 @@ function State (name, initialData) {
 		return findOneAndUpdate;
 	};
 	
-	stateInstance.findByPath = function (path = "") {
+	stateInstance.findByPath = function (path) {
 		const findByPath = function (store) {
+			if (path === undefined) {
+				return (path, query = {}, options) => {
+					log.debug(`[${name}] findByPath() called...`, {path, query, options});
+					return store.find(pathJoin(name, path), query, options);
+				};
+			}
+			
 			return (query = {}, options) => {
 				log.debug(`[${name}] findByPath() called...`, {path, query, options});
 				return store.find(pathJoin(name, path), query, options);
@@ -221,8 +228,15 @@ function State (name, initialData) {
 		return findByPath;
 	};
 	
-	stateInstance.findOneByPath = function (path = "") {
+	stateInstance.findOneByPath = function (path) {
 		const findOneByPath = function (store) {
+			if (path === undefined) {
+				return (path, query = {}, options) => {
+					log.debug(`[${name}] findOneByPath() called...`, {path, query, options});
+					return store.findOne(pathJoin(name, path), query, options);
+				};
+			}
+			
 			return (query = {}, options) => {
 				log.debug(`[${name}] findOneByPath() called...`, {path, query, options});
 				return store.findOne(pathJoin(name, path), query, options);
@@ -235,8 +249,15 @@ function State (name, initialData) {
 		return findOneByPath;
 	};
 	
-	stateInstance.findAndUpdateByPath = function (path = "") {
+	stateInstance.findAndUpdateByPath = function (path) {
 		const findAndUpdateByPath = function (store) {
+			if (path === undefined) {
+				return (path, query = {}, update = {}, options) => {
+					log.debug(`[${name}] findAndUpdateByPath() called...`, {path, query, update, options});
+					return store.findAndUpdate(pathJoin(name, path), query, update, options);
+				};
+			}
+			
 			return (query = {}, update = {}, options) => {
 				log.debug(`[${name}] findAndUpdateByPath() called...`, {path, query, update, options});
 				return store.findAndUpdate(pathJoin(name, path), query, update, options);
@@ -249,8 +270,15 @@ function State (name, initialData) {
 		return findAndUpdateByPath;
 	};
 	
-	stateInstance.findOneAndUpdateByPath = function (path = "") {
+	stateInstance.findOneAndUpdateByPath = function (path) {
 		const findOneAndUpdateByPath = function (store) {
+			if (path === undefined) {
+				return (path, query = {}, update = {}, options) => {
+					log.debug(`[${name}] findOneAndUpdateByPath() called...`, {path, query, update, options});
+					return store.findOneAndUpdate(pathJoin(name, path), query, update, options);
+				};
+			}
+			
 			return (query = {}, update = {}, options) => {
 				log.debug(`[${name}] findOneAndUpdateByPath() called...`, {path, query, update, options});
 				return store.findOneAndUpdate(pathJoin(name, path), query, update, options);
@@ -263,8 +291,15 @@ function State (name, initialData) {
 		return findOneAndUpdateByPath;
 	};
 	
-	stateInstance.updateByPath = function (path = "") {
+	stateInstance.updateByPath = function (path) {
 		const updateByPath = function (store) {
+			if (path === undefined) {
+				return (path, newVal, options) => {
+					log.debug(`[${name}] updateByPath() called...`, {path, newVal, options});
+					return store.update(pathJoin(name, path), newVal, options);
+				}
+			}
+			
 			return (newVal, options) => {
 				log.debug(`[${name}] updateByPath() called...`, {path, newVal, options});
 				return store.update(pathJoin(name, path), newVal, options);
@@ -277,8 +312,15 @@ function State (name, initialData) {
 		return updateByPath;
 	};
 	
-	stateInstance.pushByPath = function (path = "") {
+	stateInstance.pushByPath = function (path) {
 		const pushByPath = function (store) {
+			if (path === undefined) {
+				return (path, newVal, options) => {
+					log.debug(`[${name}] pushByPath() called...`, {path, newVal, options});
+					return store.push(pathJoin(name, path), newVal, options);
+				}
+			}
+			
 			return (newVal, options) => {
 				log.debug(`[${name}] pushByPath() called...`, {path, newVal, options});
 				return store.push(pathJoin(name, path), newVal, options);
@@ -291,8 +333,15 @@ function State (name, initialData) {
 		return pushByPath;
 	};
 	
-	stateInstance.pullByPath = function (path = "") {
+	stateInstance.pullByPath = function (path) {
 		const pullByPath = function (store) {
+			if (path === undefined) {
+				return (path, val, options) => {
+					log.debug(`[${name}] pullByPath() called...`, {path, val, options});
+					return store.pull(pathJoin(name, path), val, {strict: false, ...options});
+				}
+			}
+			
 			return (val, options) => {
 				log.debug(`[${name}] pullByPath() called...`, {path, val, options});
 				return store.pull(pathJoin(name, path), val, {strict: false, ...options});
@@ -305,8 +354,15 @@ function State (name, initialData) {
 		return pullByPath;
 	};
 	
-	stateInstance.getByPath = function (path = "", defaultVal, options) {
+	stateInstance.getByPath = function (path, defaultVal, options) {
 		const getByPath = function (store) {
+			if (path === undefined) {
+				return (path, defaultVal, options) => {
+					log.debug(`[${name}] getByPath() called...`, {path});
+					return store.get(pathJoin(name, path), defaultVal, options);
+				};
+			}
+			
 			log.debug(`[${name}] getByPath() called...`, {path});
 			return store.get(pathJoin(name, path), defaultVal, options);
 		};
@@ -317,8 +373,15 @@ function State (name, initialData) {
 		return getByPath;
 	};
 	
-	stateInstance.setByPath = function (path = "") {
+	stateInstance.setByPath = function (path) {
 		const setByPath = function (store) {
+			if (path === undefined) {
+				return (path, newVal, options) => {
+					log.debug(`[${name}] setByPath() called...`, {path, newVal, options});
+					return store.set(pathJoin(name, path), newVal, options);
+				}
+			}
+			
 			return (newVal, options) => {
 				log.debug(`[${name}] setByPath() called...`, {path, newVal, options});
 				return store.set(pathJoin(name, path), newVal, options);
