@@ -248,7 +248,7 @@ function State(name, initialData) {
         var options;
 
         if (arguments.length === 3) {
-          path = arguments[0];
+          path = (0, _path.join)(path, arguments[0]);
           query = arguments[1] || {};
           options = arguments[2];
         } else {
@@ -277,7 +277,7 @@ function State(name, initialData) {
         var options;
 
         if (arguments.length === 3) {
-          path = arguments[0];
+          path = (0, _path.join)(path, arguments[0]);
           query = arguments[1] || {};
           options = arguments[2];
         } else {
@@ -307,7 +307,7 @@ function State(name, initialData) {
         var options;
 
         if (arguments.length === 4) {
-          path = arguments[0];
+          path = (0, _path.join)(path, arguments[0]);
           query = arguments[1] || {};
           update = arguments[2] || {};
           options = arguments[3];
@@ -340,7 +340,7 @@ function State(name, initialData) {
         var options;
 
         if (arguments.length === 4) {
-          path = arguments[0];
+          path = (0, _path.join)(path, arguments[0]);
           query = arguments[1] || {};
           update = arguments[2] || {};
           options = arguments[3];
@@ -372,7 +372,7 @@ function State(name, initialData) {
         var options;
 
         if (arguments.length === 3) {
-          path = arguments[0];
+          path = (0, _path.join)(path, arguments[0]);
           newVal = arguments[1];
           options = arguments[2];
         } else {
@@ -401,7 +401,7 @@ function State(name, initialData) {
         var options;
 
         if (arguments.length === 3) {
-          path = arguments[0];
+          path = (0, _path.join)(path, arguments[0]);
           newVal = arguments[1];
           options = arguments[2];
         } else {
@@ -430,7 +430,7 @@ function State(name, initialData) {
         var options;
 
         if (arguments.length === 3) {
-          path = arguments[0];
+          path = (0, _path.join)(path, arguments[0]);
           val = arguments[1];
           options = arguments[2];
         } else {
@@ -483,7 +483,7 @@ function State(name, initialData) {
         var options;
 
         if (arguments.length === 3) {
-          path = arguments[0];
+          path = (0, _path.join)(path, arguments[0]);
           newVal = arguments[1];
           options = arguments[2];
         } else {
