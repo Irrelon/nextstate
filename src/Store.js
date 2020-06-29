@@ -282,7 +282,7 @@ const findOneAndUpdate = (store, path, query, updateData, options = {strict: fal
 	}
 };
 
-const findOneAndPull = (store, path, query, options = {strict: false, dataFunction: true}) => {
+const findOneAndPull = (store, path, query, options = {strict: false}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
 	}
@@ -299,6 +299,27 @@ const findOneAndPull = (store, path, query, options = {strict: false, dataFuncti
 
 		// Return the pulled record
 		return recordToPull;
+	} else {
+		return undefined;
+	}
+};
+
+const findOneAndPushToPath = (store, path, query, pushPath, pushVal, options = {strict: false}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
+	}
+
+	const currentState = get(store, path);
+	const matchResult = pathFindOnePath(currentState, query);
+
+	if (matchResult.match) {
+		const finalPushPath = pathJoin(path, matchResult.path, pushPath);
+
+		// Pull the record
+		push(store, finalPushPath, pushVal, options);
+
+		// Return the array the data was pushed to
+		return get(store, finalPushPath);
 	} else {
 		return undefined;
 	}
@@ -374,6 +395,10 @@ const create = (initialData) => {
 
 	storeObj.findOneAndPull = (path, query, update, options) => {
 		return findOneAndPull(storeObj, path, query, update, options);
+	};
+
+	storeObj.findOneAndPushToPath = (path, query, pushPath, pushVal, options) => {
+		return findOneAndPushToPath(storeObj, path, query, pushPath, pushVal, options);
 	};
 	
 	storeObj.value = (path) => {

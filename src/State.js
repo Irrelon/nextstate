@@ -221,6 +221,20 @@ function State (name, initialData) {
 		return findOneAndPull;
 	};
 
+	stateInstance.findOneAndPushToPath = function () {
+		const findOneAndPushToPath = function (store) {
+			return (query = {}, pushPath = "", pushVal, options) => {
+				log.debug(`[${name}] findOneAndPushToPath() called...`, {query, pushPath, pushVal, options});
+				return store.findOneAndPushToPath(name, query, pushPath, pushVal, options);
+			};
+		};
+
+		findOneAndPushToPath.init = init;
+		findOneAndPushToPath.__isNextStateStoreFunction = true;
+
+		return findOneAndPushToPath;
+	};
+
 	stateInstance.findByPath = function (initialPath) {
 		const findByPath = function (store) {
 			return function () {
@@ -483,6 +497,7 @@ function State (name, initialData) {
 		"findAndUpdate",
 		"findOneAndUpdate",
 		"findOneAndPull",
+		"findOneAndPushToPath",
 		"findByPath",
 		"findOneByPath",
 		"findAndUpdateByPath",

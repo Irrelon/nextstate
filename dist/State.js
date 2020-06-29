@@ -261,6 +261,28 @@ function State(name, initialData) {
     return findOneAndPull;
   };
 
+  stateInstance.findOneAndPushToPath = function () {
+    var findOneAndPushToPath = function findOneAndPushToPath(store) {
+      return function () {
+        var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        var pushPath = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+        var pushVal = arguments.length > 2 ? arguments[2] : undefined;
+        var options = arguments.length > 3 ? arguments[3] : undefined;
+        log.debug("[".concat(name, "] findOneAndPushToPath() called..."), {
+          query: query,
+          pushPath: pushPath,
+          pushVal: pushVal,
+          options: options
+        });
+        return store.findOneAndPushToPath(name, query, pushPath, pushVal, options);
+      };
+    };
+
+    findOneAndPushToPath.init = init;
+    findOneAndPushToPath.__isNextStateStoreFunction = true;
+    return findOneAndPushToPath;
+  };
+
   stateInstance.findByPath = function (initialPath) {
     var findByPath = function findByPath(store) {
       return function () {
@@ -542,7 +564,7 @@ function State(name, initialData) {
     return setByPath;
   };
 
-  var functionArr = ["update", "get", "set", "push", "pull", "find", "findOne", "findAndUpdate", "findOneAndUpdate", "findOneAndPull", "findByPath", "findOneByPath", "findAndUpdateByPath", "findOneAndUpdateByPath", "updateByPath", "pushByPath", "pullByPath", "getByPath", "setByPath"];
+  var functionArr = ["update", "get", "set", "push", "pull", "find", "findOne", "findAndUpdate", "findOneAndUpdate", "findOneAndPull", "findOneAndPushToPath", "findByPath", "findOneByPath", "findAndUpdateByPath", "findOneAndUpdateByPath", "updateByPath", "pushByPath", "pullByPath", "getByPath", "setByPath"];
   functionArr.forEach(function (funcName) {
     stateInstance[funcName].init = init;
     stateInstance[funcName].__isNextStateStoreFunction = true;
