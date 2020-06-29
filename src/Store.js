@@ -9,7 +9,8 @@ import {
 	findOnePath as pathFindOnePath,
 	diff as pathDiff,
 	decouple as pathDecouple,
-	join as pathJoin
+	join as pathJoin,
+	up as pathUp
 } from "@irrelon/path";
 import {init as initLog, setLevel as setLogLevel} from "irrelon-log";
 
@@ -281,6 +282,28 @@ const findOneAndUpdate = (store, path, query, updateData, options = {strict: fal
 	}
 };
 
+const findOneAndPull = (store, path, query, options = {strict: false, dataFunction: true}) => {
+	if (!store || !store.__isNextStateStore) {
+		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
+	}
+
+	const currentState = get(store, path);
+	const matchResult = pathFindOnePath(currentState, query);
+
+	if (matchResult.match) {
+		const pullPath = pathJoin(path, matchResult.path);
+		const recordToPull = get(store, pullPath);
+
+		// Pull the record
+		pull(store, pathUp(pullPath), recordToPull, options);
+
+		// Return the pulled record
+		return recordToPull;
+	} else {
+		return undefined;
+	}
+};
+
 const value = (store, key) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call value() without passing a store retrieved with getStore()!");
@@ -347,6 +370,10 @@ const create = (initialData) => {
 	
 	storeObj.findOneAndUpdate = (path, query, update, options) => {
 		return findOneAndUpdate(storeObj, path, query, update, options);
+	};
+
+	storeObj.findOneAndPull = (path, query, update, options) => {
+		return findOneAndPull(storeObj, path, query, update, options);
 	};
 	
 	storeObj.value = (path) => {

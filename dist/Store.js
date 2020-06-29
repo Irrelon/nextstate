@@ -334,6 +334,31 @@ var findOneAndUpdate = function findOneAndUpdate(store, path, query, updateData)
   }
 };
 
+var findOneAndPull = function findOneAndPull(store, path, query) {
+  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
+    strict: false,
+    dataFunction: true
+  };
+
+  if (!store || !store.__isNextStateStore) {
+    throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
+  }
+
+  var currentState = get(store, path);
+  var matchResult = (0, _path.findOnePath)(currentState, query);
+
+  if (matchResult.match) {
+    var pullPath = (0, _path.join)(path, matchResult.path);
+    var recordToPull = get(store, pullPath); // Pull the record
+
+    pull(store, (0, _path.up)(pullPath), recordToPull, options); // Return the pulled record
+
+    return recordToPull;
+  } else {
+    return undefined;
+  }
+};
+
 var value = function value(store, key) {
   if (!store || !store.__isNextStateStore) {
     throw new Error("Cannot call value() without passing a store retrieved with getStore()!");
@@ -403,6 +428,10 @@ var create = function create(initialData) {
 
   storeObj.findOneAndUpdate = function (path, query, update, options) {
     return findOneAndUpdate(storeObj, path, query, update, options);
+  };
+
+  storeObj.findOneAndPull = function (path, query, update, options) {
+    return findOneAndPull(storeObj, path, query, update, options);
   };
 
   storeObj.value = function (path) {
