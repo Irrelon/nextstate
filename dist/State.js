@@ -442,7 +442,7 @@ function State(name, initialData) {
         var val;
         var options;
 
-        if (arguments.length === 3) {
+        if (arguments.length === 3 || arguments.length === 2 && typeof arguments[0] === "string") {
           path = (0, _path.join)(initialPath, arguments[0]);
           val = arguments[1];
           options = arguments[2];
