@@ -227,6 +227,8 @@ const findAndUpdate = (store, path, query, updateData, options = {strict: false,
 		throw new Error("Cannot call findAndUpdate() without passing a store retrieved with getStore()!");
 	}
 	
+	options = {strict: false, maxDepth: Infinity, includeRoot: true, ...options};
+	
 	const currentState = get(store, path);
 	const matchResult = pathFindPath(currentState, query, {
 		maxDepth: options.maxDepth,
@@ -262,6 +264,8 @@ const findOneAndUpdate = (store, path, query, updateData, options = {strict: fal
 		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
 	}
 	
+	options = {strict: false, maxDepth: Infinity, includeRoot: true, ...options};
+	
 	const currentState = get(store, path);
 	const matchResult = pathFindOnePath(currentState, query, {
 		maxDepth: options.maxDepth,
@@ -290,10 +294,12 @@ const findOneAndUpdate = (store, path, query, updateData, options = {strict: fal
 	}
 };
 
-const findOneAndPull = (store, path, query, options = {strict: false}) => {
+const findOneAndPull = (store, path, query, options = {strict: false, maxDepth: Infinity, currentDepth: 0, includeRoot: true}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
 	}
+	
+	options = {strict: false, maxDepth: Infinity, includeRoot: true, ...options};
 
 	const currentState = get(store, path);
 	const matchResult = pathFindOnePath(currentState, query, {
@@ -316,10 +322,12 @@ const findOneAndPull = (store, path, query, options = {strict: false}) => {
 	}
 };
 
-const findOneAndPushToPath = (store, path, query, pushPath, pushVal, options = {strict: false}) => {
+const findOneAndPushToPath = (store, path, query, pushPath, pushVal, options = {strict: false, maxDepth: Infinity, currentDepth: 0, includeRoot: true}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
 	}
+	
+	options = {strict: false, maxDepth: Infinity, includeRoot: true, ...options};
 
 	const currentState = get(store, path);
 	const matchResult = pathFindOnePath(currentState, query, {
