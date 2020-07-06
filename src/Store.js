@@ -417,8 +417,8 @@ const create = (initialData) => {
 		return findOneAndUpdate(storeObj, path, query, update, options);
 	};
 
-	storeObj.findOneAndPull = (path, query, update, options) => {
-		return findOneAndPull(storeObj, path, query, update, options);
+	storeObj.findOneAndPull = (path, query, options) => {
+		return findOneAndPull(storeObj, path, query, options);
 	};
 
 	storeObj.findOneAndPushToPath = (path, query, pushPath, pushVal, options) => {

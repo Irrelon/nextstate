@@ -245,14 +245,12 @@ function State(name, initialData) {
     var findOneAndPull = function findOneAndPull(store) {
       return function () {
         var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        var update = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        var options = arguments.length > 2 ? arguments[2] : undefined;
+        var options = arguments.length > 1 ? arguments[1] : undefined;
         log.debug("[".concat(name, "] findOneAndPull() called..."), {
           query: query,
-          update: update,
           options: options
         });
-        return store.findOneAndPull(name, query, update, options);
+        return store.findOneAndPull(name, query, options);
       };
     };
 

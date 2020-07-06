@@ -500,8 +500,8 @@ var create = function create(initialData) {
     return findOneAndUpdate(storeObj, path, query, update, options);
   };
 
-  storeObj.findOneAndPull = function (path, query, update, options) {
-    return findOneAndPull(storeObj, path, query, update, options);
+  storeObj.findOneAndPull = function (path, query, options) {
+    return findOneAndPull(storeObj, path, query, options);
   };
 
   storeObj.findOneAndPushToPath = function (path, query, pushPath, pushVal, options) {
