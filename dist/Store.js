@@ -271,22 +271,34 @@ var findOne = function findOne(store, path, query) {
 var findAndUpdate = function findAndUpdate(store, path, query, updateData) {
   var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {
     strict: false,
-    dataFunction: true
+    dataFunction: true,
+    maxDepth: Infinity,
+    currentDepth: 0,
+    includeRoot: true
   };
 
   if (!store || !store.__isNextStateStore) {
     throw new Error("Cannot call findAndUpdate() without passing a store retrieved with getStore()!");
   }
 
+  options = (0, _objectSpread2["default"])({
+    strict: false,
+    maxDepth: Infinity,
+    includeRoot: true
+  }, options);
   var currentState = get(store, path);
-  var matchResult = (0, _path.findPath)(currentState, query);
+  var matchResult = (0, _path.findPath)(currentState, query, {
+    maxDepth: options.maxDepth,
+    currentDepth: options.currentDepth,
+    includeRoot: options.includeRoot
+  });
 
   if (matchResult.match) {
     return matchResult.path.map(function (matchResultPath) {
       var updatePath = (0, _path.join)(path, matchResultPath);
       var finalUpdateData = updateData; // Check if the updateData is a function
 
-      if (typeof updateData === "function") {
+      if (typeof updateData === "function" && options.dataFunction === true) {
         // Get the new update data for this item
         // from the function
         finalUpdateData = updateData((0, _path.get)(currentState, matchResultPath), matchResultPath);
@@ -305,15 +317,27 @@ var findAndUpdate = function findAndUpdate(store, path, query, updateData) {
 var findOneAndUpdate = function findOneAndUpdate(store, path, query, updateData) {
   var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {
     strict: false,
-    dataFunction: true
+    dataFunction: true,
+    maxDepth: Infinity,
+    currentDepth: 0,
+    includeRoot: true
   };
 
   if (!store || !store.__isNextStateStore) {
     throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
   }
 
+  options = (0, _objectSpread2["default"])({
+    strict: false,
+    maxDepth: Infinity,
+    includeRoot: true
+  }, options);
   var currentState = get(store, path);
-  var matchResult = (0, _path.findOnePath)(currentState, query);
+  var matchResult = (0, _path.findOnePath)(currentState, query, {
+    maxDepth: options.maxDepth,
+    currentDepth: options.currentDepth,
+    includeRoot: options.includeRoot
+  });
 
   if (matchResult.match) {
     var updatePath = (0, _path.join)(path, matchResult.path);
@@ -336,15 +360,27 @@ var findOneAndUpdate = function findOneAndUpdate(store, path, query, updateData)
 
 var findOneAndPull = function findOneAndPull(store, path, query) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
-    strict: false
+    strict: false,
+    maxDepth: Infinity,
+    currentDepth: 0,
+    includeRoot: true
   };
 
   if (!store || !store.__isNextStateStore) {
     throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
   }
 
+  options = (0, _objectSpread2["default"])({
+    strict: false,
+    maxDepth: Infinity,
+    includeRoot: true
+  }, options);
   var currentState = get(store, path);
-  var matchResult = (0, _path.findOnePath)(currentState, query);
+  var matchResult = (0, _path.findOnePath)(currentState, query, {
+    maxDepth: options.maxDepth,
+    currentDepth: options.currentDepth,
+    includeRoot: options.includeRoot
+  });
 
   if (matchResult.match) {
     var pullPath = (0, _path.join)(path, matchResult.path);
@@ -360,15 +396,27 @@ var findOneAndPull = function findOneAndPull(store, path, query) {
 
 var findOneAndPushToPath = function findOneAndPushToPath(store, path, query, pushPath, pushVal) {
   var options = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {
-    strict: false
+    strict: false,
+    maxDepth: Infinity,
+    currentDepth: 0,
+    includeRoot: true
   };
 
   if (!store || !store.__isNextStateStore) {
     throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
   }
 
+  options = (0, _objectSpread2["default"])({
+    strict: false,
+    maxDepth: Infinity,
+    includeRoot: true
+  }, options);
   var currentState = get(store, path);
-  var matchResult = (0, _path.findOnePath)(currentState, query);
+  var matchResult = (0, _path.findOnePath)(currentState, query, {
+    maxDepth: options.maxDepth,
+    currentDepth: options.currentDepth,
+    includeRoot: options.includeRoot
+  });
 
   if (matchResult.match) {
     var finalPushPath = (0, _path.join)(path, matchResult.path, pushPath); // Pull the record
@@ -452,8 +500,8 @@ var create = function create(initialData) {
     return findOneAndUpdate(storeObj, path, query, update, options);
   };
 
-  storeObj.findOneAndPull = function (path, query, update, options) {
-    return findOneAndPull(storeObj, path, query, update, options);
+  storeObj.findOneAndPull = function (path, query, options) {
+    return findOneAndPull(storeObj, path, query, options);
   };
 
   storeObj.findOneAndPushToPath = function (path, query, pushPath, pushVal, options) {

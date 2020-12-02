@@ -222,13 +222,19 @@ const findOne = (store, path, query, options = {strict: false}) => {
 	}
 };
 
-const findAndUpdate = (store, path, query, updateData, options = {strict: false, dataFunction: true}) => {
+const findAndUpdate = (store, path, query, updateData, options = {strict: false, dataFunction: true, maxDepth: Infinity, currentDepth: 0, includeRoot: true}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call findAndUpdate() without passing a store retrieved with getStore()!");
 	}
 	
+	options = {strict: false, maxDepth: Infinity, includeRoot: true, ...options};
+	
 	const currentState = get(store, path);
-	const matchResult = pathFindPath(currentState, query);
+	const matchResult = pathFindPath(currentState, query, {
+		maxDepth: options.maxDepth,
+		currentDepth: options.currentDepth,
+		includeRoot: options.includeRoot
+	});
 	
 	if (matchResult.match) {
 		return matchResult.path.map((matchResultPath) => {
@@ -236,7 +242,7 @@ const findAndUpdate = (store, path, query, updateData, options = {strict: false,
 			let finalUpdateData = updateData;
 			
 			// Check if the updateData is a function
-			if (typeof updateData === "function") {
+			if (typeof updateData === "function" && options.dataFunction === true) {
 				// Get the new update data for this item
 				// from the function
 				finalUpdateData = updateData(pathGet(currentState, matchResultPath), matchResultPath);
@@ -253,13 +259,19 @@ const findAndUpdate = (store, path, query, updateData, options = {strict: false,
 	}
 };
 
-const findOneAndUpdate = (store, path, query, updateData, options = {strict: false, dataFunction: true}) => {
+const findOneAndUpdate = (store, path, query, updateData, options = {strict: false, dataFunction: true, maxDepth: Infinity, currentDepth: 0, includeRoot: true}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
 	}
 	
+	options = {strict: false, maxDepth: Infinity, includeRoot: true, ...options};
+	
 	const currentState = get(store, path);
-	const matchResult = pathFindOnePath(currentState, query);
+	const matchResult = pathFindOnePath(currentState, query, {
+		maxDepth: options.maxDepth,
+		currentDepth: options.currentDepth,
+		includeRoot: options.includeRoot
+	});
 	
 	if (matchResult.match) {
 		const updatePath = pathJoin(path, matchResult.path);
@@ -282,13 +294,19 @@ const findOneAndUpdate = (store, path, query, updateData, options = {strict: fal
 	}
 };
 
-const findOneAndPull = (store, path, query, options = {strict: false}) => {
+const findOneAndPull = (store, path, query, options = {strict: false, maxDepth: Infinity, currentDepth: 0, includeRoot: true}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
 	}
+	
+	options = {strict: false, maxDepth: Infinity, includeRoot: true, ...options};
 
 	const currentState = get(store, path);
-	const matchResult = pathFindOnePath(currentState, query);
+	const matchResult = pathFindOnePath(currentState, query, {
+		maxDepth: options.maxDepth,
+		currentDepth: options.currentDepth,
+		includeRoot: options.includeRoot
+	});
 
 	if (matchResult.match) {
 		const pullPath = pathJoin(path, matchResult.path);
@@ -304,13 +322,19 @@ const findOneAndPull = (store, path, query, options = {strict: false}) => {
 	}
 };
 
-const findOneAndPushToPath = (store, path, query, pushPath, pushVal, options = {strict: false}) => {
+const findOneAndPushToPath = (store, path, query, pushPath, pushVal, options = {strict: false, maxDepth: Infinity, currentDepth: 0, includeRoot: true}) => {
 	if (!store || !store.__isNextStateStore) {
 		throw new Error("Cannot call findOne() without passing a store retrieved with getStore()!");
 	}
+	
+	options = {strict: false, maxDepth: Infinity, includeRoot: true, ...options};
 
 	const currentState = get(store, path);
-	const matchResult = pathFindOnePath(currentState, query);
+	const matchResult = pathFindOnePath(currentState, query, {
+		maxDepth: options.maxDepth,
+		currentDepth: options.currentDepth,
+		includeRoot: options.includeRoot
+	});
 
 	if (matchResult.match) {
 		const finalPushPath = pathJoin(path, matchResult.path, pushPath);
@@ -393,8 +417,8 @@ const create = (initialData) => {
 		return findOneAndUpdate(storeObj, path, query, update, options);
 	};
 
-	storeObj.findOneAndPull = (path, query, update, options) => {
-		return findOneAndPull(storeObj, path, query, update, options);
+	storeObj.findOneAndPull = (path, query, options) => {
+		return findOneAndPull(storeObj, path, query, options);
 	};
 
 	storeObj.findOneAndPushToPath = (path, query, pushPath, pushVal, options) => {

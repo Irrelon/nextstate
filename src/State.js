@@ -209,9 +209,9 @@ function State (name, initialData) {
 
 	stateInstance.findOneAndPull = function () {
 		const findOneAndPull = function (store) {
-			return (query = {}, update = {}, options) => {
-				log.debug(`[${name}] findOneAndPull() called...`, {query, update, options});
-				return store.findOneAndPull(name, query, update, options);
+			return (query = {}, options) => {
+				log.debug(`[${name}] findOneAndPull() called...`, {query, options});
+				return store.findOneAndPull(name, query, options);
 			};
 		};
 
